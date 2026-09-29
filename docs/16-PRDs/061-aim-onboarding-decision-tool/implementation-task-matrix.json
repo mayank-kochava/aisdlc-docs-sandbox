@@ -1,0 +1,2640 @@
+{
+  "matrix_id": "wi_2107ce6eb1a6349e127c-r1",
+  "prd": {
+    "id": "wi_2107ce6eb1a6349e127c",
+    "folder": "docs/16-PRDs/061-aim-onboarding-decision-tool",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-09-29T16:10:37.068828Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Add `AimOnboardingSessions = \"aim_onboarding_sessions\"` to `Kochava.Aim.Portal.DataAccess/Mongo/CollectionNames.cs`",
+      "description": "Add `AimOnboardingSessions = \"aim_onboarding_sessions\"` to `Kochava.Aim.Portal.DataAccess/Mongo/CollectionNames.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T001 [P] [US-2] Add `AimOnboardingSessions = \"aim_onboarding_sessions\"` to `Kochava.Aim.Portal.DataAccess/Mongo/Co",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava.Aim.Portal.DataAccess/Mongo/CollectionNames.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T010",
+      "title": "Add a mos-iam `GetUserByEmail` helper that resolves the caller's `is_as_admin` (cached, fail closed; `x-user-id` is the…",
+      "description": "Add a mos-iam `GetUserByEmail` helper that resolves the caller's `is_as_admin` (cached, fail closed; `x-user-id` is the email) in `Kochava.Aim.Portal.Common/Identity/AdminResolver.cs`; expose `IsAsAdmin` on `ICurrentUserContext` in `Kochava.Aim.Portal.Common/Identity/ICurrentUserContext.cs` and populate it in `Kochava.Aim.Portal.Api/Filters/AdvertiserContextActionFilter.cs`.\n\nCheckpoint: Collection name registered; admin flag available on the user context",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T010 [P] [US-3] Add a mos-iam `GetUserByEmail` helper that resolves the caller's `is_as_admin` (cached, fail close",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava.Aim.Portal.Common/Identity/AdminResolver.cs",
+          "Kochava.Aim.Portal.Common/Identity/ICurrentUserContext.cs",
+          "Kochava.Aim.Portal.Api/Filters/AdvertiserContextActionFilter.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T002",
+      "title": "Create the `OnboardingSession` aggregate POCO with embedded `Wizard`, `Tier`, `ScopeOfWork`, `TimelineState`, `Mileston…",
+      "description": "Create the `OnboardingSession` aggregate POCO with embedded `Wizard`, `Tier`, `ScopeOfWork`, `TimelineState`, `Milestone`, `ChangeLogEntry` (BSON attributes, PascalCase, shape per design-consolidated section 5) in `Kochava.Aim.Portal.DataAccess/Mongo/Models/OnboardingSession.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T002 [US-2] Create the `OnboardingSession` aggregate POCO with embedded `Wizard`, `Tier`, `ScopeOfWork`, `Timeline",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.DataAccess/Mongo/Models/OnboardingSession.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T003",
+      "title": "Create `IOnboardingSessionDataLayer` (`GetLatestByAdvertiserAsync`, `CreateAsync`, `ReplaceAsync`, `AppendChangeLogAsyn…",
+      "description": "Create `IOnboardingSessionDataLayer` (`GetLatestByAdvertiserAsync`, `CreateAsync`, `ReplaceAsync`, `AppendChangeLogAsync`) in `Kochava.Aim.Portal.DataAccess/Mongo/DataLayers/Interfaces/IOnboardingSessionDataLayer.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T003 [US-2] Create `IOnboardingSessionDataLayer` (`GetLatestByAdvertiserAsync`, `CreateAsync`, `ReplaceAsync`, `Ap",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.DataAccess/Mongo/DataLayers/Interfaces/IOnboardingSessionDataLayer.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [
+        "T002"
+      ],
+      "wave": 1,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T004",
+      "title": "Create `OnboardingSessionDataLayer` extending `MongoDataLayerBase` with an advertiser-scoped filter (SavedViews data-la…",
+      "description": "Create `OnboardingSessionDataLayer` extending `MongoDataLayerBase` with an advertiser-scoped filter (SavedViews data-layer pattern); `ReplaceAsync` returns a conflict result once `ApprovedAt` is set; auto-registers via Autofac, in `Kochava.Aim.Portal.DataAccess/Mongo/DataLayers/OnboardingSessionDataLayer.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T004 [US-2] Create `OnboardingSessionDataLayer` extending `MongoDataLayerBase` with an advertiser-scoped filter (S",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.DataAccess/Mongo/DataLayers/OnboardingSessionDataLayer.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003"
+      ],
+      "inferred_depends_on": [
+        "T003"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T005",
+      "title": "Add NUnit tests (advertiser scoping, latest-wins, replace rejected after approval; Moq `IMongoCollection`) in `Kochava.…",
+      "description": "Add NUnit tests (advertiser scoping, latest-wins, replace rejected after approval; Moq `IMongoCollection`) in `Kochava.Aim.Portal.Tests/OnboardingSessionDataLayerTests.cs`; after T004.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T005 [P] [US-2] Add NUnit tests (advertiser scoping, latest-wins, replace rejected after approval; Moq `IMongoColl",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Kochava.Aim.Portal.Tests/OnboardingSessionDataLayerTests.cs"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T006",
+      "title": "Create `OnboardingSessionDto` and `OnboardingSessionUpsertDto` (mirror the model, no server-owned fields writable) in `…",
+      "description": "Create `OnboardingSessionDto` and `OnboardingSessionUpsertDto` (mirror the model, no server-owned fields writable) in `Kochava.Aim.Portal.Models/OnboardingSessionDto.cs`; after T002.\n\nCheckpoint: Session doc persists and reads back, advertiser-scoped",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T006 [P] [US-2] Create `OnboardingSessionDto` and `OnboardingSessionUpsertDto` (mirror the model, no server-owned ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.Models/OnboardingSessionDto.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T007",
+      "title": "Create `IOnboardingSessionService` and `OnboardingSessionService` (get-latest, create, full-doc replace stamping `Updat…",
+      "description": "Create `IOnboardingSessionService` and `OnboardingSessionService` (get-latest, create, full-doc replace stamping `UpdatedAt` and `UpdatedByUserId`, terminal-approval guard, no change-log on autosave) in `Kochava.Aim.Portal.Services/Onboarding/OnboardingSessionService.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T007 [US-2] Create `IOnboardingSessionService` and `OnboardingSessionService` (get-latest, create, full-doc replac",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingSessionService.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [
+        "T004"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T008",
+      "title": "Create `OnboardingSessionsController` with `GET` (latest), `POST`, `PUT /{id}` under `/mmm/advertisers/{advertiserId}/o…",
+      "description": "Create `OnboardingSessionsController` with `GET` (latest), `POST`, `PUT /{id}` under `/mmm/advertisers/{advertiserId}/onboarding-sessions` (SavedViews controller pattern; 409 mapped via `HandleDataUpdateResult`) in `Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingSessionsController.cs`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T008 [US-2] Create `OnboardingSessionsController` with `GET` (latest), `POST`, `PUT /{id}` under `/mmm/advertisers",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingSessionsController.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [
+        "T007"
+      ],
+      "wave": 4,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T009",
+      "title": "Add NUnit service tests (create, replace stamps `UpdatedAt`, replace after approval conflicts) in `Kochava.Aim.Portal.T…",
+      "description": "Add NUnit service tests (create, replace stamps `UpdatedAt`, replace after approval conflicts) in `Kochava.Aim.Portal.Tests/OnboardingSessionServiceTests.cs`; after T007.\n\nCheckpoint: CRUD round-trip green",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T009 [P] [US-2] Add NUnit service tests (create, replace stamps `UpdatedAt`, replace after approval conflicts) in ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Kochava.Aim.Portal.Tests/OnboardingSessionServiceTests.cs"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T011",
+      "title": "Add a service-layer super-admin guard returning `DataUpdateResult.AccessDenied` (maps to 403 through `ForbidWithReason`…",
+      "description": "Add a service-layer super-admin guard returning `DataUpdateResult.AccessDenied` (maps to 403 through `ForbidWithReason`) in `Kochava.Aim.Portal.Services/Onboarding/OnboardingCsmGuard.cs`; after T010 and T007.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T011 [US-3] Add a service-layer super-admin guard returning `DataUpdateResult.AccessDenied` (maps to 403 through `",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingCsmGuard.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T010",
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T012",
+      "title": "Create `OnboardingCsmService` and `OnboardingCsmController` with `POST /{id}/approve` (sets `CsmApproved`) and `POST /{…",
+      "description": "Create `OnboardingCsmService` and `OnboardingCsmController` with `POST /{id}/approve` (sets `CsmApproved`) and `POST /{id}/tier-override` (asymmetric: X to Pro only when the auto tier is Pro; mandatory change-log append) in `Kochava.Aim.Portal.Services/Onboarding/OnboardingCsmService.cs` and `Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingCsmController.cs`; after T011.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T012 [US-3] Create `OnboardingCsmService` and `OnboardingCsmController` with `POST /{id}/approve` (sets `CsmApprov",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingCsmController.cs"
+        ],
+        "modify": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingCsmService.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T011"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T013",
+      "title": "Create `OnboardingSowApprovalService` and controller `PUT /{id}/sow-approval` (requires `CsmApproved`; sets approver na…",
+      "description": "Create `OnboardingSowApprovalService` and controller `PUT /{id}/sow-approval` (requires `CsmApproved`; sets approver name, job title, `ApprovedAt`, `Status=complete`, anchors the timeline, change-log append, terminal lock) in `Kochava.Aim.Portal.Services/Onboarding/OnboardingSowApprovalService.cs` and `Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingSowApprovalController.cs`; after T007.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T013 [P] [US-3] Create `OnboardingSowApprovalService` and controller `PUT /{id}/sow-approval` (requires `CsmApprov",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingSowApprovalController.cs"
+        ],
+        "modify": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingSowApprovalService.cs"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T015",
+      "title": "Create `OnboardingTimelineService` and controller `PUT /{id}/timeline` (milestone status, new-date delay stored as `Del…",
+      "description": "Create `OnboardingTimelineService` and controller `PUT /{id}/timeline` (milestone status, new-date delay stored as `DelayedToDate`, notes, cascade recompute, one change-log entry per edit with server-stamped session email; client and CSM allowed) in `Kochava.Aim.Portal.Services/Onboarding/OnboardingTimelineService.cs` and `Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingTimelineController.cs`; after T007.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T015 [P] [US-3] Create `OnboardingTimelineService` and controller `PUT /{id}/timeline` (milestone status, new-date",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingTimelineService.cs",
+          "Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingTimelineController.cs"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T017",
+      "title": "Add `OnboardingMeetingRequested.html` and `.txt` SES templates (subject, body and Reply-To per design-consolidated 8c),…",
+      "description": "Add `OnboardingMeetingRequested.html` and `.txt` SES templates (subject, body and Reply-To per design-consolidated 8c), a `CsmTeamEmail` setting, and `POST /{id}/book-meeting` via `IEmailService` returning a clear 200 or error, in `Kochava.Aim.Portal.Services/Onboarding/OnboardingMeetingService.cs`, `Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingMeetingController.cs` and `Kochava.Aim.Portal.Api/appsettings.json`; after T007.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T017 [P] [US-4] Add `OnboardingMeetingRequested.html` and `.txt` SES templates (subject, body and Reply-To per des",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava.Aim.Portal.Services/Onboarding/OnboardingMeetingService.cs",
+          "Kochava.Aim.Portal.Api/Areas/App/Controllers/OnboardingMeetingController.cs",
+          "Kochava.Aim.Portal.Api/appsettings.json"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "US-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T016",
+      "title": "Add NUnit tests: 403 for non-admin on approve and tier-override, change-log appended with session email, sow-approval t…",
+      "description": "Add NUnit tests: 403 for non-admin on approve and tier-override, change-log appended with session email, sow-approval terminal lock, cascade math, in `Kochava.Aim.Portal.Tests/OnboardingPrivilegedOpsTests.cs`; after T012, T013 and T015.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T016 [P] [US-3] Add NUnit tests: 403 for non-admin on approve and tier-override, change-log appended with session ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Kochava.Aim.Portal.Tests/OnboardingPrivilegedOpsTests.cs"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T012",
+        "T013",
+        "T015"
+      ],
+      "inferred_depends_on": [],
+      "wave": 6,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T019",
+      "title": "Add NUnit test for book-meeting success and SES-failure responses in `Kochava.Aim.Portal.Tests/OnboardingMeetingService…",
+      "description": "Add NUnit test for book-meeting success and SES-failure responses in `Kochava.Aim.Portal.Tests/OnboardingMeetingServiceTests.cs`; after T017.\n\nCheckpoint: Privileged ops gated and audited; email fires",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T019 [P] [US-4] Add NUnit test for book-meeting success and SES-failure responses in `Kochava.Aim.Portal.Tests/Onb",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Kochava.Aim.Portal.Tests/OnboardingMeetingServiceTests.cs"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T017"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "US-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T101",
+      "title": "Create session and wizard-state types (use `campaignGrouping` and `campaignGroupingChoice`, PascalCase API contract) in…",
+      "description": "Create session and wizard-state types (use `campaignGrouping` and `campaignGroupingChoice`, PascalCase API contract) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/interfaces/aimOnboarding.ts`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T101 [US-2] Create session and wizard-state types (use `campaignGrouping` and `campaignGroupingChoice`, PascalCase",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/interfaces/aimOnboarding.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T102",
+      "title": "Create `onboardingService` (`getLatest`, `create`, `update`, `bookMeeting`, `approve`, `sowApproval`, `updateTimeline`,…",
+      "description": "Create `onboardingService` (`getLatest`, `create`, `update`, `bookMeeting`, `approve`, `sowApproval`, `updateTimeline`, `tierOverride`) on the shared `mmmPortalApi`, and extend the request interceptor to attach `x-user-id` and `x-user-name` for `onboarding-sessions` URLs, in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/services/onboarding.ts` and `packages/advertiser/src/views/Analytics/services/mmm.ts`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T102 [US-2] Create `onboardingService` (`getLatest`, `create`, `update`, `bookMeeting`, `approve`, `sowApproval`, ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/services/onboarding.ts",
+          "packages/advertiser/src/views/Analytics/services/mmm.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T101"
+      ],
+      "inferred_depends_on": [
+        "T101"
+      ],
+      "wave": 1,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T103",
+      "title": "Register the third tab (`aimOnboarding` v-tab and v-window-item, i18n key `mmm_config.tabs.aim_onboarding`) in `package…",
+      "description": "Register the third tab (`aimOnboarding` v-tab and v-window-item, i18n key `mmm_config.tabs.aim_onboarding`) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/MmmInsightsConfiguration.vue` and create the stub wrapper `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/AimOnboardingTab.vue`.\n\nCheckpoint: Empty tab renders in the existing view",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T103 [P] [US-2] Register the third tab (`aimOnboarding` v-tab and v-window-item, i18n key `mmm_config.tabs.aim_onb",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/AimOnboardingTab.vue"
+        ],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/MmmInsightsConfiguration.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T104",
+      "title": "Create `recommendTier` with the 8 prototype bug-fixes (budgetMonthly/Annual and annual divided by 12, 12-month history…",
+      "description": "Create `recommendTier` with the 8 prototype bug-fixes (budgetMonthly/Annual and annual divided by 12, 12-month history threshold) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/recommendTier.ts`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T104 [US-1] Create `recommendTier` with the 8 prototype bug-fixes (budgetMonthly/Annual and annual divided by 12, ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/recommendTier.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102"
+      ],
+      "inferred_depends_on": [
+        "T102"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T105",
+      "title": "Create `buildProvisionPlan` (Data Schema dimension and metric columns from funnel events and sources, flattened cohort-…",
+      "description": "Create `buildProvisionPlan` (Data Schema dimension and metric columns from funnel events and sources, flattened cohort-day columns for days 0, 1, 7, 30, 90 and 360, no incremental or lift variants) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/buildProvisionPlan.ts`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T105 [P] [US-1] Create `buildProvisionPlan` (Data Schema dimension and metric columns from funnel events and sourc",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/buildProvisionPlan.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T106",
+      "title": "Create per-step and output validation, routing flags (`uaUeRoutingFlag`, `brandRoutingFlag`) and the milestone date and…",
+      "description": "Create per-step and output validation, routing flags (`uaUeRoutingFlag`, `brandRoutingFlag`) and the milestone date and cascade formula (anchor plus week offset, week-commencing Monday) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/validation.ts`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T106 [P] [US-1] Create per-step and output validation, routing flags (`uaUeRoutingFlag`, `brandRoutingFlag`) and t",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/validation.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T107",
+      "title": "Add Vitest unit tests for the three logic modules (annual to monthly, 12 to 24 month qualification, business-model-chan…",
+      "description": "Add Vitest unit tests for the three logic modules (annual to monthly, 12 to 24 month qualification, business-model-change reset, cascade) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/logic.spec.ts`; after T104, T105 and T106.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T107 [P] [US-1] Add Vitest unit tests for the three logic modules (annual to monthly, 12 to 24 month qualification",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/logic/logic.spec.ts"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T104",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T108",
+      "title": "Create `useAimOnboarding` (flat state, computed flags, step navigation, per-step validation derivation) in `packages/ad…",
+      "description": "Create `useAimOnboarding` (flat state, computed flags, step navigation, per-step validation derivation) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.ts`; after T104, T105 and T106.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T108 [P] [US-1] Create `useAimOnboarding` (flat state, computed flags, step navigation, per-step validation deriva",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T104",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T124",
+      "title": "Build shared `ToggleCard` (checkbox affordance for multi-select), `ShareAllocator` (sliders summing to 100) and `Budget…",
+      "description": "Build shared `ToggleCard` (checkbox affordance for multi-select), `ShareAllocator` (sliders summing to 100) and `BudgetSlider` (monthly/annual toggle, qualify banner) on `v-card` and `v-slider` in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/ToggleCard.vue`, `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/ShareAllocator.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/BudgetSlider.vue`.\n\nCheckpoint: Logic green; shared components ready",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T124 [P] [US-1] Build shared `ToggleCard` (checkbox affordance for multi-select), `ShareAllocator` (sliders summin",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/ToggleCard.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/ShareAllocator.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/BudgetSlider.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T109",
+      "title": "Add hybrid autosave to the composable (localStorage buffer, debounced full-doc PUT on step or tab switch and manual sav…",
+      "description": "Add hybrid autosave to the composable (localStorage buffer, debounced full-doc PUT on step or tab switch and manual save, saving/saved/failed/offline status, load latest on mount, guard overlapping PUTs, handle 409 after approval) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.ts`; after T108.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T109 [US-2] Add hybrid autosave to the composable (localStorage buffer, debounced full-doc PUT on step or tab swit",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.ts"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T008",
+        "T201",
+        "T108"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T110",
+      "title": "Add Vitest tests for autosave (debounce, failure retry, load on mount, 409) with a mocked service in `packages/advertis…",
+      "description": "Add Vitest tests for autosave (debounce, failure retry, load on mount, 409) with a mocked service in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.spec.ts`; after T109.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T110 [P] [US-2] Add Vitest tests for autosave (debounce, failure retry, load on mount, 409) with a mocked service ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/composables/useAimOnboarding.spec.ts"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T109"
+      ],
+      "inferred_depends_on": [],
+      "wave": 6,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T112",
+      "title": "Build Steps 1-2 (Your Team, About Your Product) with progressive disclosure in `packages/advertiser/src/views/Analytics…",
+      "description": "Build Steps 1-2 (Your Team, About Your Product) with progressive disclosure in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step1Team.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step2Product.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T112 [P] [US-1] Build Steps 1-2 (Your Team, About Your Product) with progressive disclosure in `packages/advertise",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step1Team.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step2Product.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T113",
+      "title": "Build Step 3 Marketing Setup including the `campaignGrouping` question in `packages/advertiser/src/views/Analytics/MmmI…",
+      "description": "Build Step 3 Marketing Setup including the `campaignGrouping` question in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step3Marketing.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T113 [P] [US-1] Build Step 3 Marketing Setup including the `campaignGrouping` question in `packages/advertiser/src",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step3Marketing.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T114",
+      "title": "Build Step 4 Business Model and Funnel (model change clears LTV and `webFunnel` state) in `packages/advertiser/src/view…",
+      "description": "Build Step 4 Business Model and Funnel (model change clears LTV and `webFunnel` state) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step4Funnel.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T114 [P] [US-1] Build Step 4 Business Model and Funnel (model change clears LTV and `webFunnel` state) in `package",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step4Funnel.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T115",
+      "title": "Build Steps 5-6 (Data Sources, External Factors) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/A…",
+      "description": "Build Steps 5-6 (Data Sources, External Factors) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step5Data.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step6Factors.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T115 [P] [US-1] Build Steps 5-6 (Data Sources, External Factors) in `packages/advertiser/src/views/Analytics/MmmIn",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step5Data.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step6Factors.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T116",
+      "title": "Build Steps 7-8 (Objectives, Review) with Generate (1.6s animation, no backend call) in `packages/advertiser/src/views/…",
+      "description": "Build Steps 7-8 (Objectives, Review) with Generate (1.6s animation, no backend call) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step7Objectives.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step8Review.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T116 [P] [US-1] Build Steps 7-8 (Objectives, Review) with Generate (1.6s animation, no backend call) in `packages/",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step7Objectives.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/Step8Review.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T117",
+      "title": "Build the collapsible Setup Summary panel (steps 2-6, tier chip) and component tests for representative steps in `packa…",
+      "description": "Build the collapsible Setup Summary panel (steps 2-6, tier chip) and component tests for representative steps in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/SetupSummary.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/steps.spec.ts`; after T112 and T113.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T117 [P] [US-1] Build the collapsible Setup Summary panel (steps 2-6, tier chip) and component tests for represent",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/components/SetupSummary.vue"
+        ],
+        "test": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/steps/steps.spec.ts"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T112",
+        "T113"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T111",
+      "title": "Complete the `AimOnboardingTab` wrapper: status routing from the latest session (wizard, Continue, or read-only record)…",
+      "description": "Complete the `AimOnboardingTab` wrapper: status routing from the latest session (wizard, Continue, or read-only record), custom step rail plus `v-stepper` shell (pattern: the ScenarioCreateView stepper), `isASAdmin` CSM mode via `useOrganizationStore` in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/AimOnboardingTab.vue`.\n\nCheckpoint: 8-step wizard completes; state round-trips to Mongo",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T111 [US-1] Complete the `AimOnboardingTab` wrapper: status routing from the latest session (wizard, Continue, or ",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/AimOnboardingTab.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T114",
+        "T115",
+        "T116",
+        "T117"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T119",
+      "title": "Create SoW-only PDF export (print stylesheet plus `window.print()`, excludes empty placeholders) in `packages/advertise…",
+      "description": "Create SoW-only PDF export (print stylesheet plus `window.print()`, excludes empty placeholders) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/usePdfExport.ts` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/sowPrint.scss`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T119 [P] [US-1] Create SoW-only PDF export (print stylesheet plus `window.print()`, excludes empty placeholders) i",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/usePdfExport.ts",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/sowPrint.scss"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T118",
+      "title": "Build the SoW tab (generated sections in mono document style, tier band, inline notes editable after approval, approval…",
+      "description": "Build the SoW tab (generated sections in mono document style, tier band, inline notes editable after approval, approval block with name, job title and timestamp, objectives) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/SowTab.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T118 [P] [US-1] Build the SoW tab (generated sections in mono document style, tier band, inline notes editable aft",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/SowTab.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T119",
+        "T013"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T120",
+      "title": "Build the Timeline tab as a bare `v-data-table` (6 milestones, computed dates anchored on `approvedAt`, status select,…",
+      "description": "Build the Timeline tab as a bare `v-data-table` (6 milestones, computed dates anchored on `approvedAt`, status select, delay via new-date preview then confirm, cascade, audit-log view, CSM tier-override toggle gated on `isASAdmin` and 403-aware) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/TimelineTab.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T120 [P] [US-3] Build the Timeline tab as a bare `v-data-table` (6 milestones, computed dates anchored on `approve",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/TimelineTab.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T015",
+        "T201"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T121",
+      "title": "Build the Data Schema tab (Kochava-collects versus you-provide split from `buildProvisionPlan`, downloadable CSV templa…",
+      "description": "Build the Data Schema tab (Kochava-collects versus you-provide split from `buildProvisionPlan`, downloadable CSV templates via Blob, file and folder arrangement guidance) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/DataSchemaTab.vue`.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T121 [P] [US-4] Build the Data Schema tab (Kochava-collects versus you-provide split from `buildProvisionPlan`, do",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/DataSchemaTab.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T105"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "US-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T122",
+      "title": "Build the output shell with validation summary and deep links, output `v-tabs`, CSM Approve button, and the \"Book my on…",
+      "description": "Build the output shell with validation summary and deep links, output `v-tabs`, CSM Approve button, and the \"Book my onboarding meeting\" button with sent and retry states in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/OutputScreen.vue` and `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/CsmActionsBar.vue`; after T118, T120 and T121.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T122 [US-3] [US-4] Build the output shell with validation summary and deep links, output `v-tabs`, CSM Approve but",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/OutputScreen.vue",
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/CsmActionsBar.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T012",
+        "T017",
+        "T118",
+        "T120",
+        "T121"
+      ],
+      "inferred_depends_on": [],
+      "wave": 6,
+      "requirements": [
+        "US-3",
+        "US-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T123",
+      "title": "Add component tests for output tabs (SoW render, schema rows, CSM gating, book-meeting retry) in `packages/advertiser/s…",
+      "description": "Add component tests for output tabs (SoW render, schema rows, CSM gating, book-meeting retry) in `packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/OutputScreen.spec.ts`; after T122.\n\nCheckpoint: All 3 output tabs functional; CSM actions wired",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T123 [P] [US-4] Add component tests for output tabs (SoW render, schema rows, CSM gating, book-meeting retry) in `",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/AimOnboardingTab/output/OutputScreen.spec.ts"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T122"
+      ],
+      "inferred_depends_on": [],
+      "wave": 7,
+      "requirements": [
+        "US-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "T201",
+      "title": "Add an Oathkeeper access rule for the onboarding-sessions route (GET/POST/PUT, api-key authorizer, `noop` mutators; rol…",
+      "description": "Add an Oathkeeper access rule for the onboarding-sessions route (GET/POST/PUT, api-key authorizer, `noop` mutators; role enforcement stays in portal-api, mirror the saved-views rule) to `oathkeeper/proxy/qa/portal/portal-mmm-kochava-com-api.yaml` and `oathkeeper/proxy/prod/portal/portal-mmm-kochava-com-api.yaml`.\n\nCheckpoint: Onboarding routes reachable through the gateway",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T201 [P] [US-2] Add an Oathkeeper access rule for the onboarding-sessions route (GET/POST/PUT, api-key authorizer,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-k8s-apps",
+      "stack": "yaml-tf",
+      "domain_manifest": "infra",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "oathkeeper/proxy/qa/portal/portal-mmm-kochava-com-api.yaml",
+          "oathkeeper/proxy/prod/portal/portal-mmm-kochava-com-api.yaml"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "sre-agent",
+        "id": "sre-agent",
+        "reason": "infra repo routed to sre-agent",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "description": "",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/frontend-mos before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T103",
+        "T107",
+        "T124",
+        "T110",
+        "T111",
+        "T123"
+      ],
+      "inferred_depends_on": [],
+      "wave": 8,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "TG2",
+      "title": "Run tests & validate build",
+      "description": "",
+      "source": {
+        "file": "generated",
+        "heading": "TG2",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-k8s-apps",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/ko-k8s-apps before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T201"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    },
+    {
+      "id": "TG3",
+      "title": "Run tests & validate build",
+      "description": "",
+      "source": {
+        "file": "generated",
+        "heading": "TG3",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/mmm-portal-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/mmm-portal-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T005",
+        "T006",
+        "T008",
+        "T009",
+        "T016",
+        "T019"
+      ],
+      "inferred_depends_on": [],
+      "wave": 7,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T002",
+      "T010",
+      "T101",
+      "T103",
+      "T105",
+      "T106",
+      "T112",
+      "T113",
+      "T114",
+      "T115",
+      "T116",
+      "T119",
+      "T124",
+      "T201"
+    ],
+    [
+      "T003",
+      "T006",
+      "T102",
+      "T117",
+      "T121",
+      "TG2"
+    ],
+    [
+      "T004",
+      "T104",
+      "T111"
+    ],
+    [
+      "T005",
+      "T007",
+      "T107",
+      "T108"
+    ],
+    [
+      "T008",
+      "T009",
+      "T011",
+      "T013",
+      "T015",
+      "T017"
+    ],
+    [
+      "T012",
+      "T019",
+      "T109",
+      "T118",
+      "T120"
+    ],
+    [
+      "T016",
+      "T110",
+      "T122"
+    ],
+    [
+      "T123",
+      "TG3"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 4,
+    "covered": 4,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": []
+}
