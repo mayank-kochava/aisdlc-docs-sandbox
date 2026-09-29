@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIM Onboarding — K4A</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F5F6F8;color:#1A1B1C;min-height:100vh;overflow:hidden;font-size:13px}
+:root{
+  --navy:#1E4B97;--navy-soft:rgba(30,75,151,.08);--navy-border:rgba(30,75,151,.14);--navy-ring:rgba(30,75,151,.25);
+  --bd:#E1E1E1;--bd-em:#CDCDCD;--surface:#fff;--bg:#F5F6F8;
+  --text:#1A1B1C;--text2:#5C5E60;--text3:#9A9B9D;
+  --ok:#427900;--ok-bg:rgba(66,121,0,.10);
+  --warn:#936404;--warn-bg:rgba(147,100,4,.10);
+  --err:#BE202E;--err-bg:rgba(190,32,46,.10);
+  --info:#095ABD;--info-bg:rgba(9,90,189,.10);
+  --r:8px;--pill:9999px;--rsm:4px;
+  --sh:0 1px 3px rgba(0,0,0,.07);
+}
+input,textarea,select{font-family:inherit;font-size:13px;color:var(--text)}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--bd);outline:none;cursor:pointer;margin:6px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--navy);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--navy);flex-shrink:0}
+/* form inputs */
+.inp{width:100%;padding:8px 11px;border:1px solid var(--bd);border-radius:var(--r);font-size:13px;background:var(--surface);outline:none;transition:border-color .12s,box-shadow .12s}
+.inp:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-soft)}
+.ta{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:var(--r);font-size:13px;background:var(--surface);outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .12s,box-shadow .12s}
+.ta:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-soft)}
+.sel{width:100%;padding:8px 11px;border:1px solid var(--bd);border-radius:var(--r);font-size:13px;background:var(--surface);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239A9B9D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.sel:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-soft);outline:none}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .12s;white-space:nowrap;font-family:inherit}
+.btn-p{background:var(--navy);color:#fff}.btn-p:hover{background:#1a3f84}
+.btn-o{background:transparent;border:1px solid var(--navy);color:var(--navy)}.btn-o:hover{background:var(--navy-soft)}
+.btn-g{background:transparent;border:1px solid var(--bd);color:var(--text2)}.btn-g:hover{background:var(--bg);border-color:var(--bd-em)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+/* Gary's choice cards */
+.choice{padding:14px 16px;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;position:relative;transition:border-color .12s,background .12s;user-select:none}
+.choice:hover{border-color:var(--bd-em);background:#FAFAFA}
+.choice.sel{border-color:var(--navy);background:var(--navy-soft);box-shadow:0 0 0 1px var(--navy)}
+.choice h4{margin:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.choice p{margin:4px 0 0;color:var(--text2);font-size:12px;line-height:1.4}
+.chk{position:absolute;top:11px;right:11px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bd);background:#fff;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:700;transition:all .12s;flex-shrink:0}
+.choice.sel .chk{background:var(--navy);border-color:var(--navy)}
+/* Gary's chips */
+.chip{border:1px solid var(--bd);background:var(--surface);border-radius:var(--pill);padding:5px 13px;font-size:12px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .12s;user-select:none}
+.chip:hover{border-color:var(--bd-em);background:var(--bg)}
+.chip.sel{background:var(--navy-soft);border-color:var(--navy);color:var(--navy);font-weight:500}
+/* Section headers with sub-step badges — Gary's style */
+.sec-h{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:9px;margin:32px 0 10px;line-height:1.3}
+.sec-h:first-child{margin-top:0}
+.sub-num{font-size:10px;font-weight:600;color:var(--navy);background:var(--navy-soft);border:1px solid var(--navy-border);border-radius:var(--rsm);padding:1px 6px;letter-spacing:.02em;white-space:nowrap;flex-shrink:0}
+/* Alert banners */
+.banner{border-radius:var(--r);padding:9px 13px;font-size:12px;display:flex;gap:8px;line-height:1.5}
+.banner-ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(66,121,0,.2)}
+.banner-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(147,100,4,.2)}
+.banner-err{background:var(--err-bg);color:var(--err);border:1px solid rgba(190,32,46,.2)}
+.banner-info{background:var(--info-bg);color:var(--info);border:1px solid rgba(9,90,189,.2)}
+/* layout helpers */
+.row{display:flex;gap:12px}.row.ac{align-items:center}.row.sb{justify-content:space-between}.row.wrap{flex-wrap:wrap}
+.col{display:flex;flex-direction:column}.g4{gap:4px}.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}.g24{gap:24px}.g32{gap:32px}
+.f1{flex:1}.fw{width:100%}
+.lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px}
+.hint{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:var(--rsm);font-size:11px;font-weight:600;letter-spacing:.2px}
+.b-pro{background:#FFF3CD;color:#92400E}.b-x{background:#E0E7FF;color:#3730A3}.b-rec{background:var(--ok-bg);color:var(--ok)}
+hr.dv{border:none;border-top:1px solid var(--bd);margin:24px 0}
+.scr{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#D1D5DB transparent}
+.scr::-webkit-scrollbar{width:5px}
+.scr::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+.fade{animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useMemo,useRef} = React;
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+
+const BUDGET_M = [50000,100000,150000,250000,500000,750000,1000000,2000000,5000000,10000000];
+const BUDGET_ML = ['$50K','$100K','$150K','$250K','$500K','$750K','$1M','$2M','$5M','$10M+'];
+const BUDGET_A = [500000,1000000,2000000,5000000,10000000,20000000,50000000,100000000,200000000];
+const BUDGET_AL = ['$500K','$1M','$2M','$5M','$10M','$20M','$50M','$100M','$200M+'];
+const REGIONS = ['US','UK','Germany','France','Canada','Other'];
+const MMP_LIST = ['appsflyer','adjust','singular','branch','kochava','other_none'];
+const MMP_LBL = {appsflyer:'AppsFlyer',adjust:'Adjust',singular:'Singular',branch:'Branch',kochava:'Kochava',other_none:'Other / None'};
+const STEP_NAMES = ['Your Team','Your Product','Marketing','Business & Funnel','Data Sources','External Factors','Objectives','Review'];
+
+const FUNNEL_DEFS = {
+  subscription:[
+    {id:'install',name:'Install',req:true,on:true,kpi:false},
+    {id:'registration',name:'Registration',req:false,on:true,kpi:false},
+    {id:'trial_start',name:'Trial Start',req:false,on:true,kpi:true},
+    {id:'subscription_start',name:'Subscription Start',req:false,on:false,kpi:false},
+    {id:'revenue',name:'Revenue',req:false,on:false,kpi:false},
+  ],
+  ecommerce:[
+    {id:'install',name:'Install',req:true,on:true,kpi:false},
+    {id:'registration',name:'Registration',req:false,on:true,kpi:false},
+    {id:'first_purchase',name:'First Purchase',req:true,on:true,kpi:true},
+    {id:'total_purchases',name:'Total Purchases',req:false,on:false,kpi:false},
+    {id:'revenue',name:'Revenue',req:false,on:false,kpi:false},
+  ],
+  gaming:[
+    {id:'install',name:'Install',req:true,on:true,kpi:false},
+    {id:'registration',name:'Registration',req:false,on:true,kpi:false},
+    {id:'first_purchase',name:'First Purchase',req:true,on:true,kpi:true},
+    {id:'total_purchases',name:'Total Purchases',req:false,on:false,kpi:false},
+    {id:'revenue',name:'Revenue',req:false,on:false,kpi:false},
+  ],
+};
+const WEB_FUNNEL = [
+  {id:'pageview',name:'Page View',req:true,on:true,kpi:false},
+  {id:'lead',name:'Lead / Sign-up',req:false,on:true,kpi:false},
+  {id:'purchase',name:'Purchase',req:false,on:true,kpi:true},
+];
+const MS_X = [
+  {id:1,label:'Kickoff call',w:0},{id:2,label:'Data access & credentials',w:1},
+  {id:3,label:'Data ingestion & QA',w:2},{id:4,label:'Model configuration',w:3},
+  {id:5,label:'Initial model run',w:4},{id:6,label:'Model review & refinement',w:5},
+  {id:7,label:'First insights delivery',w:7},
+];
+const MS_PRO = [...MS_X,{id:8,label:'Results review & optimisation',w:9}];
+const FACTORS = [
+  {id:'promotional',label:'Promotional activity'},{id:'competitor',label:'Competitor activity'},
+  {id:'product_launch',label:'Major product launch/rebrand'},{id:'pr_spike',label:'PR / earned media spike'},
+  {id:'macro_economic',label:'Macro economic event'},{id:'other',label:'Other'},
+];
+const DIG_TYPES = [
+  {id:'self_attributed',label:'Self-attributed (Meta, Google, TikTok, ASA)'},
+  {id:'dsp',label:'Standard attributed (DSP / programmatic)'},
+  {id:'affiliates',label:'Affiliates / partner networks'},
+  {id:'other',label:'Other'},
+];
+const ATTR_GAPS = [
+  {id:'offline',label:'Offline media'},{id:'dsp',label:'DSP'},{id:'affiliates',label:'Affiliates'},
+  {id:'branded',label:'Branded/awareness'},{id:'mobile_networks',label:'Mobile networks'},
+  {id:'influencer',label:'Influencer'},{id:'podcasts',label:'Podcasts'},
+  {id:'not_sure',label:'Not sure'},{id:'other',label:'Other'},
+];
+const WEB_ATTR = [
+  {id:'ga4',label:'Google Analytics 4'},{id:'google_drive',label:'Google Drive'},
+  {id:'s3',label:'S3'},{id:'database',label:'Database'},{id:'other',label:'Other'},
+];
+const SPEND_SRC = [
+  {id:'mmp_direct',label:'MMP direct'},{id:'supermetrics',label:'Supermetrics'},
+  {id:'google_drive',label:'Google Drive'},{id:'s3',label:'S3'},
+  {id:'database',label:'Database'},{id:'other',label:'Other'},
+];
+
+// ─── BUSINESS LOGIC ──────────────────────────────────────────────────────────
+
+function calcFlags(s) {
+  const {ua,ue,brand,campaignShare:cs} = s;
+  let uaUe = '';
+  if (ua||ue) {
+    if (ua&&ue) {
+      const u=cs?.ua||0,e=cs?.ue||0;
+      uaUe=(u>=10&&u<=90&&e>=10&&e<=90)?'aim_pro_eligible':'aim_x_preferred';
+    } else uaUe='aim_x_preferred';
+  }
+  return {uaUeRoutingFlag:uaUe,brandRoutingFlag:!!brand};
+}
+
+function recTier(s) {
+  const budget=s.budgetMonthly||0;
+  const hist=Object.values(s.platformHistory||{});
+  if (budget>=250000&&hist.length>0&&hist.some(h=>h)) return 'Pro';
+  const nonMmp=(s.webAttrSources||[]).length+(s.adSpendSources||[]).filter(x=>x!=='mmp_direct').length;
+  if (nonMmp>=2) return 'Pro';
+  if (s.uaUeRoutingFlag==='aim_pro_eligible') return 'Pro';
+  return 'X';
+}
+function effTier(s){return s.tierOverride||recTier(s);}
+function mCount(s){const p=s.platforms||[];if(!p.length)return 0;if(s.modelStructure==='separate'&&p.length>1)return p.length;return 1;}
+function nextMon(d){const x=new Date(d),dow=x.getDay();x.setDate(x.getDate()+(dow===1?0:dow===0?1:8-dow));return x;}
+function fmt(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function fmtM(n){if(!n)return '—';if(n>=1000000)return '$'+(n/1000000).toFixed(n%1000000===0?0:1)+'M';return '$'+(n/1000)+'K';}
+function getMilestones(tier,approvedAt){
+  const base=tier==='Pro'?MS_PRO:MS_X;
+  const start=approvedAt?new Date(approvedAt):new Date();
+  return base.map(m=>{const d=new Date(start);d.setDate(d.getDate()+m.w*7);return{...m,date:nextMon(d)};});
+}
+function buildSchema(s){
+  const auto=[],manual=[];
+  const mobile=s.platforms?.filter(p=>p!=='web')||[];
+  const web=s.platforms?.includes('web');
+  if(mobile.length&&s.mmp&&s.mmp!=='other_none'){
+    if(s.mmpCollection==='direct_api')auto.push({label:MMP_LBL[s.mmp]+' (MMP)',note:'Direct API'});
+    else manual.push({label:MMP_LBL[s.mmp]+' mobile events',fields:['date','campaign_id','campaign_name','installs','events','revenue']});
+  }
+  if(web)(s.webAttrSources||[]).forEach(src=>{
+    if(src==='ga4')auto.push({label:'Google Analytics 4',note:'Direct API'});
+    else manual.push({label:'Web attribution ('+src+')',fields:['date','source','medium','campaign','sessions','conversions']});
+  });
+  if(s.adSpendCollection==='direct_api')auto.push({label:'Ad spend',note:'Direct API'});
+  else manual.push({label:'Ad spend data',fields:['date','channel','campaign_id','spend','impressions','clicks']});
+  if(s.usesOffline)manual.push({label:'Offline media spend',fields:['date','channel','market','spend','impressions']});
+  if(s.wantsLtv&&s.ltvCohort!=='no')manual.push({label:'LTV cohort revenue',fields:['install_date','day_7_rev','day_30_rev','day_90_rev']});
+  return{auto,manual};
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+const INIT = {
+  companyName:'',projectLeads:[{name:'',email:''}],dataLeads:[{name:'',email:''}],dataLeadSameAsProject:false,
+  appName:'',platforms:[],conversionShare:{},spendSeparable:null,crossJourney:null,modelStructure:null,region:'',
+  budgetMonthly:null,budgetAnnual:null,budgetPeriod:'monthly',usesOffline:null,offlineSplit:20,
+  digitalMediaTypes:[],hasAttrGaps:null,attrGapCategories:[],coverageConfidence:null,
+  paidSplit:{ios:65,android:80,web:50},ua:false,ue:false,brand:false,campaignShare:{},campaignGrouping:null,
+  uaUeRoutingFlag:'',brandRoutingFlag:false,
+  business:null,gamingRevenue:null,funnel:null,webFunnel:null,wantsLtv:null,ltvCohort:null,
+  platformHistory:{},mmp:null,mmpCollection:null,appsFlyerCohort:null,
+  webAttrSources:[],adSpendCollection:null,adSpendSources:[],
+  additionalFactors:[],factorsDescription:'',
+  objectivesGoal:'',objectivesSuccess:'',objectivesMarketing:'',
+  approvedAt:null,approvedBy:{name:'',jobTitle:''},tierOverride:null,
+  milestoneStatuses:{},milestoneNotes:{},changeLog:[],timelineAuthor:'',mode:'client',
+};
+const DEMO = {
+  ...INIT,
+  companyName:'BrightFit Inc.',projectLeads:[{name:'Sarah Chen',email:'sarah.chen@brightfit.com'}],
+  dataLeads:[{name:'Marcus Webb',email:'marcus.webb@brightfit.com'}],
+  appName:'BrightFit',platforms:['ios','android'],conversionShare:{ios:60,android:40},region:'US',
+  budgetMonthly:500000,budgetPeriod:'monthly',usesOffline:false,
+  digitalMediaTypes:['self_attributed','dsp'],hasAttrGaps:'yes',attrGapCategories:['dsp','affiliates'],
+  coverageConfidence:'yes',paidSplit:{ios:70,android:85},ua:true,ue:true,brand:false,
+  campaignShare:{ua:65,ue:35},campaignGrouping:'yes',uaUeRoutingFlag:'aim_pro_eligible',
+  business:'subscription',
+  funnel:[
+    {id:'install',name:'Install',req:true,on:true,kpi:false},
+    {id:'registration',name:'Registration',req:false,on:true,kpi:false},
+    {id:'trial_start',name:'Trial Start',req:false,on:true,kpi:true},
+    {id:'subscription_start',name:'Subscription Start',req:false,on:true,kpi:false},
+  ],
+  wantsLtv:true,ltvCohort:'yes',
+  platformHistory:{ios:'24-36',android:'24-36'},mmp:'appsflyer',mmpCollection:'direct_api',appsFlyerCohort:'yes',
+  adSpendCollection:'direct_api',adSpendSources:['mmp_direct','supermetrics'],
+  additionalFactors:['promotional'],factorsDescription:'Seasonal promotions in Q4',
+  objectivesGoal:'Understand which channels drive paid subscriptions and reduce wasted spend',
+  objectivesSuccess:'Clear channel ROI view enabling confident budget shifts each quarter',
+  objectivesMarketing:'Grow paid subscriber base 40% YoY while keeping blended CPA below $18',
+};
+
+// ─── MICRO COMPONENTS ────────────────────────────────────────────────────────
+
+const FieldLabel = ({children,hint}) => (
+  <div style={{marginBottom:8}}>
+    <span className="lbl">{children}</span>
+    {hint&&<p className="hint" style={{marginTop:2,marginBottom:0}}>{hint}</p>}
+  </div>
+);
+
+const SH = ({num,children}) => (
+  <div className="sec-h">
+    {num&&<span className="sub-num">{num}</span>}
+    {children}
+  </div>
+);
+
+const Banner = ({type='info',children}) => (
+  <div className={`banner banner-${type}`}><span>{children}</span></div>
+);
+
+const YNS = ({value,onChange,opts=[['yes','Yes'],['no','No'],['not_sure','Not sure']]}) => (
+  <div className="row g10 wrap">
+    {opts.map(([v,l])=>(
+      <div key={v} className={`choice${value===v?' sel':''}`} style={{minWidth:90,padding:'10px 14px',textAlign:'center'}}
+        onClick={()=>onChange(v)}>
+        <div className="chk">✓</div>
+        <h4 style={{fontSize:13}}>{l}</h4>
+      </div>
+    ))}
+  </div>
+);
+
+const Chips = ({options,value=[],onChange,single=false}) => {
+  const toggle = id => {
+    if(single){onChange(value.includes(id)?[]:[ id]);return;}
+    onChange(value.includes(id)?value.filter(x=>x!==id):[...value,id]);
+  };
+  return (
+    <div className="row g8 wrap">
+      {options.map(o=>(
+        <div key={o.id} className={`chip${value.includes(o.id)?' sel':''}`} onClick={()=>toggle(o.id)}>
+          {value.includes(o.id)&&<span style={{fontSize:10}}>✓</span>}
+          {o.label}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const SliderRow = ({label,value,onChange,showPct=true,color='var(--navy)'}) => (
+  <div style={{marginBottom:12}}>
+    <div className="row ac sb" style={{marginBottom:5}}>
+      <span style={{fontSize:12,color:'var(--text2)'}}>{label}</span>
+      {showPct&&<span style={{fontSize:12,fontWeight:600,color}}>{value}%</span>}
+    </div>
+    <input type="range" min={0} max={100} value={value} onChange={e=>onChange(+e.target.value)}
+      style={{background:`linear-gradient(to right,${color} ${value}%,#E1E1E1 ${value}%)`}}/>
+  </div>
+);
+
+// ─── K4A PORTAL SHELL (matches screenshot) ───────────────────────────────────
+
+const K4A_NAV = [
+  {label:'Favorites',icon:'☆'},
+  {label:'MMM Insights',icon:'◈'},
+  {label:'Dashboard',icon:'⬚'},
+  {label:'Configuration',icon:'⚙',active:true},
+  {label:'Incrementality Tests',icon:'◫'},
+  {label:'App Configurations',icon:'⊞'},
+  {label:'Team',icon:'◻'},
+  {label:'Account Options',icon:'◉'},
+];
+
+function PortalShell({children}) {
+  return (
+    <div style={{display:'flex',height:'100vh',overflow:'hidden'}}>
+      {/* Sidebar — matches K4A screenshot */}
+      <div style={{width:136,background:'#1C2333',color:'#fff',display:'flex',flexDirection:'column',flexShrink:0}}>
+        {/* Logo */}
+        <div style={{padding:'14px 14px 12px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#fff',letterSpacing:.3}}>KOCHAVA <span style={{color:'#60A5FA'}}>★</span></div>
+        </div>
+        {/* Nav items */}
+        <div style={{flex:1,paddingTop:4,overflowY:'auto'}}>
+          {K4A_NAV.map(item=>(
+            <div key={item.label} style={{
+              display:'flex',alignItems:'center',gap:7,
+              padding:'7px 12px',
+              fontSize:11.5,fontWeight:item.active?600:400,
+              color:item.active?'#fff':'rgba(255,255,255,.5)',
+              background:item.active?'rgba(255,255,255,.1)':'transparent',
+              borderLeft:item.active?'3px solid #3B82F6':'3px solid transparent',
+              cursor:'pointer',lineHeight:1.3,
+            }}>
+              <span style={{fontSize:12,opacity:item.active?1:.7}}>{item.icon}</span>
+              {item.label}
+            </div>
+          ))}
+        </div>
+        <div style={{padding:'10px 12px',borderTop:'1px solid rgba(255,255,255,.08)',fontSize:11,color:'rgba(255,255,255,.3)'}}>
+          ClassPass ▾
+        </div>
+      </div>
+
+      {/* Main column */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',background:' #F5F6F8'}}>
+        {/* Top bar */}
+        <div style={{height:48,background:'var(--surface)',borderBottom:'1px solid var(--bd)',
+          display:'flex',alignItems:'center',padding:'0 20px',justifyContent:'space-between',flexShrink:0}}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <span style={{fontSize:13,fontWeight:600,color:'var(--text)'}}>Configuration</span>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <span style={{fontSize:11,color:'var(--text3)'}}>🔔</span>
+            <span style={{fontSize:11,color:'var(--text3)'}}>❓</span>
+            <span style={{fontSize:11,color:'var(--text3)'}}>⚙</span>
+            <div style={{width:26,height:26,borderRadius:'50%',background:'var(--navy)',
+              display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:10,fontWeight:700}}>MU</div>
+          </div>
+        </div>
+        {/* Content */}
+        <div style={{flex:1,overflow:'hidden'}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEPPER ─────────────────────────────────────────────────────────────────
+
+function Stepper({phase,onJump}) {
+  return (
+    <div style={{background:'var(--surface)',borderBottom:'1px solid var(--bd)',padding:'0 24px',flexShrink:0}}>
+      {/* Tab-style stepper — more K4A-like */}
+      <div style={{display:'flex',alignItems:'stretch',gap:0,overflowX:'auto'}}>
+        {STEP_NAMES.map((name,i)=>{
+          const step=i+1,done=phase>step,active=phase===step;
+          return (
+            <div key={step}
+              onClick={()=>{if(done||active)onJump(step);}}
+              style={{
+                display:'flex',alignItems:'center',gap:7,padding:'13px 16px',
+                borderBottom:active?'2px solid var(--navy)':'2px solid transparent',
+                cursor:done||active?'pointer':'default',
+                color:active?'var(--navy)':done?'var(--text2)':'var(--text3)',
+                fontSize:12,fontWeight:active?600:400,
+                whiteSpace:'nowrap',userSelect:'none',
+                background:active?'var(--navy-soft)':'transparent',
+                transition:'all .12s',
+              }}>
+              <div style={{
+                width:20,height:20,borderRadius:'50%',flexShrink:0,
+                background:done?'var(--navy)':active?'var(--navy)':'var(--bd)',
+                color:done||active?'#fff':'var(--text3)',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                fontSize:10,fontWeight:700,
+              }}>
+                {done?'✓':step}
+              </div>
+              {name}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── SETUP SUMMARY PANEL ─────────────────────────────────────────────────────
+
+function SummaryPanel({s}) {
+  const tier=effTier(s);
+  const mc=mCount(s);
+  const camps=[s.ua&&'UA',s.ue&&'UE',s.brand&&'Brand'].filter(Boolean);
+  const SRow=({k,v})=>(<div className="row ac sb" style={{padding:'5px 0',borderBottom:'1px solid var(--bd)'}}>
+    <span style={{fontSize:11,color:'var(--text3)'}}>{k}</span>
+    <span style={{fontSize:11,fontWeight:500,maxWidth:110,textAlign:'right',wordBreak:'break-word'}}>{v||'—'}</span>
+  </div>);
+  return (
+    <div style={{position:'absolute',right:20,top:24,width:210,
+      background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',
+      boxShadow:'var(--sh)',padding:'14px 16px',zIndex:10}}>
+      <div style={{fontSize:10,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:.8,marginBottom:10}}>
+        Setup Summary
+      </div>
+      <div className="col">
+        <SRow k="App" v={s.appName}/>
+        <SRow k="Platforms" v={(s.platforms||[]).map(p=>p.toUpperCase()).join(', ')}/>
+        <SRow k="Models" v={mc||undefined}/>
+        <SRow k="Market" v={s.region}/>
+        <SRow k="Budget/mo" v={fmtM(s.budgetMonthly)}/>
+        <SRow k="Campaigns" v={camps.join(', ')||undefined}/>
+        <div className="row ac sb" style={{paddingTop:8,marginTop:4}}>
+          <span style={{fontSize:11,color:'var(--text3)'}}>Tier</span>
+          <span className={`badge ${tier==='Pro'?'b-pro':'b-x'}`}>AIM {tier}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 1 ───────────────────────────────────────────────────────────────────
+
+function Step1({s,set}) {
+  const LeadRows=({type,label})=>(
+    <div>
+      <FieldLabel>{label}</FieldLabel>
+      <div className="col g8">
+        {s[type].map((l,i)=>(
+          <div key={i} className="row g8">
+            <input className="inp f1" placeholder="Full name" value={l.name}
+              onChange={e=>{const a=[...s[type]];a[i]={...a[i],name:e.target.value};set({[type]:a});}}/>
+            <input className="inp f1" placeholder="Email address" value={l.email}
+              onChange={e=>{const a=[...s[type]];a[i]={...a[i],email:e.target.value};set({[type]:a});}}/>
+            {s[type].length>1&&<button className="btn btn-g btn-xs" onClick={()=>set({[type]:s[type].filter((_,j)=>j!==i)})}>✕</button>}
+          </div>
+        ))}
+        <button className="btn btn-g btn-sm" style={{alignSelf:'flex-start'}}
+          onClick={()=>set({[type]:[...s[type],{name:'',email:''}]})}>+ Add another</button>
+      </div>
+    </div>
+  );
+  return (
+    <div className="col g24 fade">
+      <div>
+        <FieldLabel>Company name</FieldLabel>
+        <input className="inp" style={{maxWidth:400}} placeholder="e.g. Acme Corp" value={s.companyName} onChange={e=>set({companyName:e.target.value})}/>
+      </div>
+      <LeadRows type="projectLeads" label="Project lead(s)"/>
+      <div>
+        <FieldLabel hint="Who manages the data integration on your side">Data lead(s)</FieldLabel>
+        <label className="row ac g8" style={{marginBottom:10,cursor:'pointer',width:'fit-content'}}>
+          <input type="checkbox" checked={s.dataLeadSameAsProject}
+            onChange={e=>{const v=e.target.checked;set({dataLeadSameAsProject:v,dataLeads:v?[...s.projectLeads]:s.dataLeads});}}/>
+          <span style={{fontSize:13,color:'var(--text2)'}}>Same as project lead</span>
+        </label>
+        {!s.dataLeadSameAsProject&&(
+          <div className="col g8">
+            {s.dataLeads.map((l,i)=>(
+              <div key={i} className="row g8">
+                <input className="inp f1" placeholder="Full name" value={l.name}
+                  onChange={e=>{const a=[...s.dataLeads];a[i]={...a[i],name:e.target.value};set({dataLeads:a});}}/>
+                <input className="inp f1" placeholder="Email address" value={l.email}
+                  onChange={e=>{const a=[...s.dataLeads];a[i]={...a[i],email:e.target.value};set({dataLeads:a});}}/>
+                {s.dataLeads.length>1&&<button className="btn btn-g btn-xs" onClick={()=>set({dataLeads:s.dataLeads.filter((_,j)=>j!==i)})}>✕</button>}
+              </div>
+            ))}
+            <button className="btn btn-g btn-sm" style={{alignSelf:'flex-start'}}
+              onClick={()=>set({dataLeads:[...s.dataLeads,{name:'',email:''}]})}>+ Add another</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 2 ───────────────────────────────────────────────────────────────────
+
+function Step2({s,set}) {
+  const pf=s.platforms||[];
+  const hasWeb=pf.includes('web'),hasMobile=pf.some(p=>p!=='web');
+  const showSep=hasWeb&&hasMobile,showRec=showSep&&s.spendSeparable&&s.crossJourney;
+
+  const toggleP=(p)=>{
+    const next=pf.includes(p)?pf.filter(x=>x!==p):[...pf,p];
+    const share={};
+    if(next.length===1)share[next[0]]=100;
+    else if(next.length===2){share[next[0]]=50;share[next[1]]=50;}
+    else next.forEach(x=>share[x]=Math.round(100/next.length));
+    set({platforms:next,conversionShare:share,modelStructure:next.includes('web')?s.modelStructure:null});
+  };
+
+  const autoRec=()=>{
+    if(!showSep)return null;
+    if(s.spendSeparable==='no'||s.crossJourney==='yes')return 'unified';
+    if(s.spendSeparable==='yes'&&s.crossJourney==='no')return 'separate';
+    return null;
+  };
+  const rec=autoRec();
+
+  return (
+    <div className="col g24 fade">
+      <div>
+        <FieldLabel>App / brand name</FieldLabel>
+        <input className="inp" style={{maxWidth:360}} placeholder="e.g. MyApp" value={s.appName} onChange={e=>set({appName:e.target.value})}/>
+      </div>
+
+      <div>
+        <SH num="2.1">Platforms</SH>
+        <div className="row g12">
+          {[{k:'ios',l:'iOS',d:'ATT / SKAN modelling included',e:'🍎'},{k:'android',l:'Android',d:'',e:'🤖'},{k:'web',l:'Web',d:'',e:'🌐'}].map(p=>(
+            <div key={p.k} className={`choice${pf.includes(p.k)?' sel':''}`} style={{flex:1,paddingRight:32}}>
+              <div className="chk">✓</div>
+              <div style={{fontSize:17,marginBottom:5}}>{p.e}</div>
+              <h4>{p.l}</h4>
+              {p.d&&<p>{p.d}</p>}
+            </div>
+          ))}
+        </div>
+        {pf.includes('ios')&&<div style={{marginTop:10}}><Banner type="info">iOS models include ATT / SKAN modelling to handle post-privacy attribution gaps.</Banner></div>}
+      </div>
+
+      {pf.length>=2&&(
+        <div>
+          <SH num="2.2">Conversion share</SH>
+          <p className="hint" style={{marginBottom:12}}>Allocate the share of conversions across your platforms — must total 100%</p>
+          {pf.map(p=>(
+            <SliderRow key={p} label={p.toUpperCase()} value={s.conversionShare?.[p]||0}
+              onChange={v=>{
+                const cs={...s.conversionShare,[p]:v};
+                const others=pf.filter(x=>x!==p);
+                const rem=100-v,tot=others.reduce((a,x)=>a+(cs[x]||0),0);
+                if(tot>0)others.forEach(x=>cs[x]=Math.round((cs[x]||0)/tot*rem));
+                else{const ea=Math.round(rem/others.length);others.forEach(x=>cs[x]=ea);}
+                set({conversionShare:cs});
+              }}/>
+          ))}
+          <div style={{fontSize:12,fontWeight:600,color:Object.values(s.conversionShare||{}).reduce((a,b)=>a+b,0)===100?'var(--ok)':'var(--err)'}}>
+            Total: {Object.values(s.conversionShare||{}).reduce((a,b)=>a+b,0)}%
+          </div>
+        </div>
+      )}
+
+      {showSep&&(
+        <div>
+          <SH num="2.3">Is your spend separable by platform?</SH>
+          <p className="hint" style={{marginBottom:12}}>Can you attribute ad spend separately to web vs mobile?</p>
+          <YNS value={s.spendSeparable} onChange={v=>set({spendSeparable:v})}/>
+          {s.spendSeparable&&(
+            <div style={{marginTop:20}}>
+              <SH num="2.3">Cross-journey migration?</SH>
+              <p className="hint" style={{marginBottom:12}}>Do users typically start on one platform and convert on another?</p>
+              <YNS value={s.crossJourney} onChange={v=>set({crossJourney:v})}/>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showRec&&(
+        <div>
+          <SH num="2.4">Recommended model structure</SH>
+          <div className="row g12">
+            {['unified','separate'].map(m=>(
+              <div key={m} className={`choice${s.modelStructure===m?' sel':''}`} style={{flex:1,paddingRight:32}}
+                onClick={()=>set({modelStructure:m})}>
+                <div className="chk">✓</div>
+                <h4 style={{textTransform:'capitalize'}}>{m}</h4>
+                <p>{m==='unified'?'One model across all platforms':'Separate model per platform'}</p>
+                {rec===m&&<div style={{marginTop:8}}><span className="badge b-rec">Recommended</span></div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <SH num="2.5">Primary market</SH>
+        <select className="sel" style={{maxWidth:260}} value={s.region} onChange={e=>set({region:e.target.value})}>
+          <option value="">Select market…</option>
+          {REGIONS.map(r=><option key={r} value={r}>{r}</option>)}
+        </select>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 3 ───────────────────────────────────────────────────────────────────
+
+function Step3({s,set}) {
+  const bList=s.budgetPeriod==='monthly'?BUDGET_M:BUDGET_A;
+  const bLbls=s.budgetPeriod==='monthly'?BUDGET_ML:BUDGET_AL;
+  const idx=bList.findIndex(x=>x===(s.budgetPeriod==='monthly'?s.budgetMonthly:s.budgetAnnual));
+  const curIdx=idx>=0?idx:0;
+  const pf=s.platforms||[];
+  const activeCamps=[s.ua&&'ua',s.ue&&'ue',s.brand&&'brand'].filter(Boolean);
+  const campLbls={ua:'User Acquisition',ue:'User Engagement',brand:'Brand'};
+
+  const toggleCamp=(type)=>{
+    const nv={ua:s.ua,ue:s.ue,brand:s.brand,[type]:!s[type]};
+    const active=[nv.ua&&'ua',nv.ue&&'ue',nv.brand&&'brand'].filter(Boolean);
+    const cs={};
+    if(active.length===1)cs[active[0]]=100;
+    else if(active.length===2){cs[active[0]]=50;cs[active[1]]=50;}
+    else{cs.ua=34;cs.ue=33;cs.brand=33;}
+    set({...nv,campaignShare:cs,...calcFlags({...s,...nv,campaignShare:cs})});
+  };
+
+  const updateShare=(type,val)=>{
+    if(activeCamps.length<2){set({campaignShare:{[type]:100}});return;}
+    const cs={...s.campaignShare,[type]:val};
+    const others=activeCamps.filter(x=>x!==type);
+    const rem=100-val,tot=others.reduce((a,x)=>a+(cs[x]||0),0);
+    if(tot>0)others.forEach(x=>cs[x]=Math.round((cs[x]||0)/tot*rem));
+    else{const ea=Math.round(rem/others.length);others.forEach(x=>cs[x]=ea);}
+    set({campaignShare:cs,...calcFlags({...s,campaignShare:cs})});
+  };
+
+  return (
+    <div className="col g24 fade">
+      <div>
+        <SH num="3.1">Total paid media budget</SH>
+        <div className="row g8" style={{marginBottom:12}}>
+          {['monthly','annual'].map(p=>(
+            <button key={p} className={`btn btn-sm ${s.budgetPeriod===p?'btn-p':'btn-g'}`}
+              onClick={()=>set({budgetPeriod:p})}>{p.charAt(0).toUpperCase()+p.slice(1)}</button>
+          ))}
+        </div>
+        <input type="range" min={0} max={bList.length-1} value={curIdx}
+          onChange={e=>{const v=bList[+e.target.value];set(s.budgetPeriod==='monthly'?{budgetMonthly:v}:{budgetAnnual:v});}}
+          style={{background:`linear-gradient(to right,#1E4B97 ${curIdx/(bList.length-1)*100}%,#E1E1E1 ${curIdx/(bList.length-1)*100}%)`}}/>
+        <div className="row ac sb" style={{marginTop:6}}>
+          <span style={{fontSize:11,color:'var(--text3)'}}>{bLbls[0]}</span>
+          <span style={{fontSize:16,fontWeight:700,color:'var(--navy)'}}>{bLbls[curIdx]||'—'}</span>
+          <span style={{fontSize:11,color:'var(--text3)'}}>{bLbls[bLbls.length-1]}</span>
+        </div>
+        {s.budgetMonthly>=250000&&<div style={{marginTop:8}}><Banner type="ok">✓ Budget qualifies for AIM Pro tier consideration</Banner></div>}
+      </div>
+
+      <div>
+        <SH num="3.2">Do you run offline media?</SH>
+        <YNS value={s.usesOffline===null?null:s.usesOffline?'yes':'no'} opts={[['yes','Yes'],['no','No']]}
+          onChange={v=>set({usesOffline:v==='yes'})}/>
+        {s.usesOffline&&(
+          <div style={{marginTop:14}}>
+            <SliderRow label="Offline spend %" value={s.offlineSplit} onChange={v=>set({offlineSplit:v})}/>
+            <div style={{fontSize:12,color:'var(--text3)'}}>Digital: {100-s.offlineSplit}% / Offline: {s.offlineSplit}%</div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <SH num="3.3">Digital media types</SH>
+        <Chips options={DIG_TYPES} value={s.digitalMediaTypes} onChange={v=>set({digitalMediaTypes:v})}/>
+      </div>
+
+      <div>
+        <SH num="3.4">Attribution data reliability</SH>
+        <p className="hint" style={{marginBottom:10}}>Do you have significant gaps in your MMP attribution?</p>
+        <YNS value={s.hasAttrGaps} onChange={v=>set({hasAttrGaps:v})}/>
+        {(s.hasAttrGaps==='yes'||s.hasAttrGaps==='not_sure')&&(
+          <div style={{marginTop:12}}>
+            <p style={{fontSize:12,color:'var(--text2)',marginBottom:8}}>Which areas have gaps?</p>
+            <Chips options={ATTR_GAPS} value={s.attrGapCategories} onChange={v=>set({attrGapCategories:v})}/>
+            {s.hasAttrGaps==='not_sure'&&<div style={{marginTop:10}}><Banner type="info">Gaps are normal — AIM is designed to model through attribution gaps.</Banner></div>}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <SH num="3.5">MMP coverage confidence</SH>
+        <p className="hint" style={{marginBottom:10}}>Are you confident your MMP captures the majority of installs?</p>
+        <YNS value={s.coverageConfidence} onChange={v=>set({coverageConfidence:v})}/>
+      </div>
+
+      {pf.length>0&&(
+        <div>
+          <SH num="3.6">Organic vs paid split</SH>
+          <p className="hint" style={{marginBottom:12}}>% of installs that come from paid channels per platform</p>
+          {pf.map(p=>(
+            <SliderRow key={p} label={p.toUpperCase()+' — paid %'}
+              value={s.paidSplit?.[p]??{ios:65,android:80,web:50}[p]}
+              onChange={v=>set({paidSplit:{...s.paidSplit,[p]:v}})}/>
+          ))}
+        </div>
+      )}
+
+      <div>
+        <SH num="3.7">Campaign types</SH>
+        <div className="row g12">
+          {[{k:'ua',l:'User Acquisition',d:'Drive new installs'},{k:'ue',l:'User Engagement',d:'Re-engage existing users'},{k:'brand',l:'Brand',d:'Awareness & consideration'}].map(c=>(
+            <div key={c.k} className={`choice${s[c.k]?' sel':''}`} style={{flex:1,paddingRight:30}} onClick={()=>toggleCamp(c.k)}>
+              <div className="chk">✓</div>
+              <h4>{c.l}</h4><p>{c.d}</p>
+            </div>
+          ))}
+        </div>
+        {s.uaUeRoutingFlag==='aim_pro_eligible'&&<div style={{marginTop:10}}><Banner type="ok">✓ UA + UE split qualifies for AIM Pro tier routing</Banner></div>}
+      </div>
+
+      {activeCamps.length>=2&&(
+        <div>
+          <SH num="3.8">Budget split across campaign types</SH>
+          {activeCamps.map(c=>(
+            <SliderRow key={c} label={campLbls[c]} value={s.campaignShare?.[c]||0} onChange={v=>updateShare(c,v)}/>
+          ))}
+          <div style={{fontSize:12,fontWeight:600,color:activeCamps.reduce((a,c)=>a+(s.campaignShare?.[c]||0),0)===100?'var(--ok)':'var(--err)'}}>
+            Total: {activeCamps.reduce((a,c)=>a+(s.campaignShare?.[c]||0),0)}%
+          </div>
+        </div>
+      )}
+
+      <div>
+        <SH num="3.9">Campaign grouping</SH>
+        <p className="hint" style={{marginBottom:10}}>Should similar campaigns be grouped together in the model?</p>
+        <YNS value={s.campaignGrouping} onChange={v=>set({campaignGrouping:v})}/>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 4 ───────────────────────────────────────────────────────────────────
+
+function Step4({s,set}) {
+  const biz=s.business;
+  const funnel=s.funnel||(biz?FUNNEL_DEFS[biz]:[]);
+  const webFunnel=s.webFunnel||WEB_FUNNEL;
+  const hasWeb=s.platforms?.includes('web');
+
+  return (
+    <div className="col g24 fade">
+      <div>
+        <SH>Business model</SH>
+        <div className="row g12">
+          {[{k:'subscription',l:'Subscription',d:'SaaS / membership / recurring revenue',e:'📱'},
+            {k:'ecommerce',l:'E-commerce',d:'Direct purchase / transactional',e:'🛒'},
+            {k:'gaming',l:'Gaming',d:'IAP, in-app ads, or both',e:'🎮'}].map(b=>(
+            <div key={b.k} className={`choice${s.business===b.k?' sel':''}`} style={{flex:1,paddingRight:32}}
+              onClick={()=>set({business:b.k,funnel:FUNNEL_DEFS[b.k]||[],gamingRevenue:null})}>
+              <div className="chk">✓</div>
+              <div style={{fontSize:20,marginBottom:6}}>{b.e}</div>
+              <h4>{b.l}</h4><p>{b.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {biz==='gaming'&&(
+        <div>
+          <SH>Gaming revenue type</SH>
+          <YNS value={s.gamingRevenue} opts={[['iap','In-app purchases'],['ads','In-app ads'],['both','Both']]}
+            onChange={v=>set({gamingRevenue:v})}/>
+        </div>
+      )}
+
+      {biz&&funnel.length>0&&(
+        <div>
+          <SH>App funnel events</SH>
+          <p className="hint" style={{marginBottom:12}}>Required events are pre-selected. Toggle optional events on/off. Set one event as your primary KPI.</p>
+          <div className="col g6">
+            {funnel.map((e,i)=>(
+              <div key={e.id}>
+                {i>0&&<div style={{width:2,height:10,background:e.on?'var(--navy)':'var(--bd)',margin:'0 14px'}}/>}
+                <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',
+                  border:`1.5px solid ${e.on?(e.kpi?'var(--navy)':'#93A8D4'):'var(--bd)'}`,
+                  borderRadius:'var(--r)',background:e.on?(e.kpi?'var(--navy-soft)':'#FAFCFF'):'#FAFAFA',
+                  opacity:e.on?1:.55,transition:'all .12s'}}>
+                  <input type="checkbox" checked={e.on} disabled={e.req}
+                    onChange={()=>set({funnel:funnel.map(f=>f.id===e.id&&!f.req?{...f,on:!f.on}:f)})}/>
+                  <input className="inp f1" value={e.name}
+                    onChange={ev=>set({funnel:funnel.map(f=>f.id===e.id?{...f,name:ev.target.value}:f)})}
+                    style={{border:'none',background:'transparent',padding:0,fontWeight:e.kpi?600:400,fontSize:13}}/>
+                  {e.req&&<span style={{fontSize:10,color:'var(--text3)',fontWeight:600,letterSpacing:.3}}>REQUIRED</span>}
+                  {e.on&&!e.req&&(
+                    <button className={`btn btn-xs ${e.kpi?'btn-p':'btn-g'}`}
+                      onClick={()=>set({funnel:funnel.map(f=>({...f,kpi:f.id===e.id}))})}>
+                      {e.kpi?'✓ Primary KPI':'Set as KPI'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {hasWeb&&biz&&(
+        <div>
+          <SH>Web funnel events</SH>
+          <div className="col g6">
+            {webFunnel.map(e=>(
+              <div key={e.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',
+                border:`1.5px solid ${e.on?'#93A8D4':'var(--bd)'}`,borderRadius:'var(--r)',
+                background:e.on?'#FAFCFF':'#FAFAFA',opacity:e.on?1:.55}}>
+                <input type="checkbox" checked={e.on} disabled={e.req}
+                  onChange={()=>set({webFunnel:webFunnel.map(f=>f.id===e.id&&!f.req?{...f,on:!f.on}:f)})}/>
+                <span style={{fontSize:13,flex:1}}>{e.name}</span>
+                {e.kpi&&<span className="badge b-rec">KPI</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {biz&&(
+        <div>
+          <SH>LTV model</SH>
+          <YNS value={s.wantsLtv===null?null:s.wantsLtv?'yes':'no'} opts={[['yes','Yes, include LTV'],['no','No thanks']]}
+            onChange={v=>set({wantsLtv:v==='yes',ltvCohort:null})}/>
+          {s.wantsLtv&&(
+            <div style={{marginTop:14}}>
+              <p style={{fontSize:13,color:'var(--text2)',marginBottom:10}}>Cohort revenue data available?</p>
+              <YNS value={s.ltvCohort} opts={[['yes','Yes'],['no','No'],['partial','Partial']]}
+                onChange={v=>set({ltvCohort:v})}/>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── STEP 5 ───────────────────────────────────────────────────────────────────
+
+function Step5({s,set}) {
+  const pf=s.platforms||[];
+  const hasMobile=pf.some(p=>p!=='web'),hasWeb=pf.includes('web');
+  const histLbls={'12-24':'12–24 months','24-36':'24–36 months','36+':'36+ months'};
+
+  return (
+    <div className="col g24 fade">
+      {pf.length>0&&(
+        <div>
+          <SH num="5.0">Historical data per platform</SH>
+          {pf.map(p=>(
+            <div key={p} style={{marginBottom:16}}>
+              <p style={{fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:8}}>{p.toUpperCase()}</p>
+              <div className="row g10">
+                {Object.entries(histLbls).map(([k,l])=>(
+                  <div key={k} className={`choice${s.platformHistory?.[p]===k?' sel':''}`}
+                    style={{flex:1,padding:'10px 10px',textAlign:'center',paddingRight:30}}
+                    onClick={()=>set({platformHistory:{...s.platformHistory,[p]:k}})}>
+                    <div className="chk">✓</div>
+                    <h4 style={{fontSize:12}}>{l}</h4>
+                  </div>
+                ))}
+              </div>
+              {s.platformHistory?.[p]==='12-24'&&<div style={{marginTop:8}}><Banner type="warn">⚠ Seasonality will be partially modelled with 12–24 months of history.</Banner></div>}
+              {s.platformHistory?.[p]&&s.platformHistory[p]!=='12-24'&&<div style={{marginTop:8}}><Banner type="ok">✓ Full seasonal coverage</Banner></div>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasMobile&&(
+        <>
+          <div>
+            <SH num="5.1">Mobile Measurement Partner</SH>
+            <div className="row g8 wrap">
+              {MMP_LIST.map(m=>(
+                <div key={m} className={`chip${s.mmp===m?' sel':''}`}
+                  onClick={()=>set({mmp:m,mmpCollection:null,appsFlyerCohort:null})}>
+                  {MMP_LBL[m]}
+                </div>
+              ))}
+            </div>
+          </div>
+          {s.mmp&&s.mmp!=='other_none'&&(
+            <div>
+              <SH>MMP data collection method</SH>
+              <div className="row g12">
+                {[{k:'direct_api',l:'Direct API',d:'Kochava connects automatically'},{k:'file',l:'File upload',d:'You provide CSV / Excel'},{k:'cloud',l:'Cloud storage',d:'S3 or Google Drive'}].map(m=>(
+                  <div key={m.k} className={`choice${s.mmpCollection===m.k?' sel':''}`} style={{flex:1,paddingRight:30}}
+                    onClick={()=>set({mmpCollection:m.k})}>
+                    <div className="chk">✓</div>
+                    <h4>{m.l}</h4><p>{m.d}</p>
+                    {m.k==='direct_api'&&<div style={{marginTop:6}}><span className="badge b-rec">Recommended</span></div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {s.mmp==='appsflyer'&&(
+            <div>
+              <SH>AppsFlyer cohort access</SH>
+              <p className="hint" style={{marginBottom:10}}>Required for cohort-level LTV modelling</p>
+              <YNS value={s.appsFlyerCohort} opts={[['yes','Yes'],['no','No']]} onChange={v=>set({appsFlyerCohort:v})}/>
+            </div>
+          )}
+        </>
+      )}
+
+      {hasWeb&&(
+        <div>
+          <SH num="5.2">Web attribution sources</SH>
+          <Chips options={WEB_ATTR} value={s.webAttrSources} onChange={v=>set({webAttrSources:v})}/>
+        </div>
+      )}
+
+      <div>
+        <SH num="5.3">Ad spend data</SH>
+        <div className="row g12" style={{marginBottom:14}}>
+          {[{k:'direct_api',l:'Direct API',d:'Kochava pulls automatically'},{k:'file',l:'File upload',d:'Manual CSV / Excel'},{k:'manual',l:'Manual entry',d:'Entered in-platform'}].map(m=>(
+            <div key={m.k} className={`choice${s.adSpendCollection===m.k?' sel':''}`} style={{flex:1,paddingRight:30}}
+              onClick={()=>set({adSpendCollection:m.k})}>
+              <div className="chk">✓</div>
+              <h4>{m.l}</h4><p>{m.d}</p>
+              {m.k==='direct_api'&&<div style={{marginTop:6}}><span className="badge b-rec">Recommended</span></div>}
+            </div>
+          ))}
+        </div>
+        {s.adSpendCollection&&(
+          <div>
+            <p style={{fontSize:12,color:'var(--text2)',marginBottom:8}}>Ad spend sources</p>
+            <Chips options={SPEND_SRC} value={s.adSpendSources} onChange={v=>set({adSpendSources:v})}/>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 6 ───────────────────────────────────────────────────────────────────
+
+function Step6({s,set}) {
+  // BUG FIX 3: reads platformHistory from Step 5
+  const histVals=Object.values(s.platformHistory||{});
+  const partial=histVals.some(h=>h==='12-24');
+  const full=histVals.length>0&&!partial;
+
+  return (
+    <div className="col g24 fade">
+      <div>
+        <SH num="6.1">Auto-included factors</SH>
+        <div className="row g12">
+          <div style={{flex:1,padding:'14px 16px',background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',
+            borderLeft:`3px solid ${full?'var(--ok)':partial?'var(--warn)':'var(--bd)'}`}}>
+            <div style={{fontSize:13,fontWeight:600,marginBottom:4}}>Seasonality</div>
+            {full&&<div style={{fontSize:12,color:'var(--ok)'}}>✓ Included — full coverage</div>}
+            {partial&&<div style={{fontSize:12,color:'var(--warn)'}}>⚠ Partial — 12–24 months history</div>}
+            {!full&&!partial&&<div style={{fontSize:12,color:'var(--text3)'}}>Set in Step 5 (data history)</div>}
+          </div>
+          <div style={{flex:1,padding:'14px 16px',background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',borderLeft:'3px solid var(--ok)'}}>
+            <div style={{fontSize:13,fontWeight:600,marginBottom:4}}>National holidays</div>
+            <div style={{fontSize:12,color:'var(--ok)'}}>✓ Included — {s.region||'all markets'}</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <SH num="6.2">Additional external factors <span style={{fontSize:11,fontWeight:400,color:'var(--text3)'}}>optional</span></SH>
+        <p className="hint" style={{marginBottom:12}}>Flag any external events AIM can't detect from data. You'll need to supply data for flagged factors.</p>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+          {FACTORS.map(f=>(
+            <div key={f.id} className={`choice${(s.additionalFactors||[]).includes(f.id)?' sel':''}`}
+              style={{padding:'10px 12px',paddingRight:32}}
+              onClick={()=>{
+                const next=(s.additionalFactors||[]).includes(f.id)
+                  ?(s.additionalFactors||[]).filter(x=>x!==f.id)
+                  :[...(s.additionalFactors||[]),f.id];
+                set({additionalFactors:next});
+              }}>
+              <div className="chk">✓</div>
+              <h4 style={{fontSize:12}}>{f.label}</h4>
+            </div>
+          ))}
+        </div>
+        {(s.additionalFactors||[]).length>0&&<div style={{marginTop:10}}><Banner type="warn">⚠ You'll need to provide data for these factors at the data ingestion stage.</Banner></div>}
+      </div>
+      {(s.additionalFactors||[]).length>0&&(
+        <div>
+          <FieldLabel hint="Brief description — what happened, which market, rough significance">Notes on external factors</FieldLabel>
+          <textarea className="ta" placeholder="e.g. Major promotional campaign in Q4 US, typically 30–40% uplift in conversions…"
+            value={s.factorsDescription} onChange={e=>set({factorsDescription:e.target.value})}/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── STEP 7 ───────────────────────────────────────────────────────────────────
+
+function Step7({s,set}) {
+  return (
+    <div className="col g24 fade">
+      <Banner type="info">All fields are optional — your answers are shared with your onboarding manager to frame the kickoff call.</Banner>
+      <div>
+        <FieldLabel hint="e.g. understand which channels are driving subscriptions, reduce wasted spend">What are you hoping to achieve with AIM?</FieldLabel>
+        <textarea className="ta" placeholder="We want to understand which channels are driving our paid subscriptions…"
+          value={s.objectivesGoal} onChange={e=>set({objectivesGoal:e.target.value})}/>
+      </div>
+      <div>
+        <FieldLabel hint="e.g. a clear view of channel ROI, confident budget decisions">What does success look like?</FieldLabel>
+        <textarea className="ta" placeholder="We'd consider this successful if we can confidently shift budget between channels…"
+          value={s.objectivesSuccess} onChange={e=>set({objectivesSuccess:e.target.value})}/>
+      </div>
+      <div>
+        <FieldLabel hint="e.g. grow paid subscribers by 40%, reduce CPA by 20%">Marketing goals for the next 12 months</FieldLabel>
+        <textarea className="ta" placeholder="Grow paid subscriber base by 40% YoY while maintaining or improving blended CPA…"
+          value={s.objectivesMarketing} onChange={e=>set({objectivesMarketing:e.target.value})}/>
+      </div>
+    </div>
+  );
+}
+
+// ─── STEP 8 ───────────────────────────────────────────────────────────────────
+
+function Step8({s,onJump}) {
+  const D=v=>v||<span style={{color:'var(--text3)'}}>—</span>;
+  const RevSec=({title,step,rows})=>(
+    <div style={{marginBottom:12,background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',overflow:'hidden'}}>
+      <div className="row ac sb" style={{padding:'12px 16px',borderBottom:'1px solid var(--bd)',background:'var(--bg)'}}>
+        <span style={{fontSize:13,fontWeight:600}}>{title}</span>
+        <button className="btn btn-g btn-xs" onClick={()=>onJump(step)}>Edit</button>
+      </div>
+      <div style={{padding:'4px 16px'}}>
+        {rows.map(([k,v])=>(
+          <div key={k} className="row ac sb" style={{padding:'8px 0',borderBottom:'1px solid var(--bd)'}}>
+            <span style={{fontSize:12,color:'var(--text3)'}}>{k}</span>
+            <span style={{fontSize:12,fontWeight:500,maxWidth:'55%',textAlign:'right'}}>{D(v)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+  const kpi=(s.funnel||[]).find(e=>e.kpi);
+  const hist=Object.entries(s.platformHistory||{}).map(([p,h])=>`${p.toUpperCase()}: ${h}`).join(', ');
+  return (
+    <div className="fade">
+      <Banner type="info">Review your answers before generating outputs. Click Edit on any section to make changes.</Banner>
+      <div style={{marginTop:20}}>
+        <RevSec title="Your Team" step={1} rows={[['Company',s.companyName],['Project lead',(s.projectLeads||[]).map(l=>l.name).filter(Boolean).join(', ')],['Data lead',s.dataLeadSameAsProject?'Same as project lead':(s.dataLeads||[]).map(l=>l.name).filter(Boolean).join(', ')]]}/>
+        <RevSec title="Your Product" step={2} rows={[['App',s.appName],['Platforms',(s.platforms||[]).join(', ').toUpperCase()],['Market',s.region],['Model',s.modelStructure]]}/>
+        <RevSec title="Marketing" step={3} rows={[['Budget/mo',fmtM(s.budgetMonthly)],['Offline',s.usesOffline===null?null:s.usesOffline?`Yes (${s.offlineSplit}% offline)`:'No'],['Campaigns',[s.ua&&'UA',s.ue&&'UE',s.brand&&'Brand'].filter(Boolean).join(', ')],['Attribution gaps',s.hasAttrGaps]]}/>
+        <RevSec title="Business & Funnel" step={4} rows={[['Business',s.business],['Primary KPI',kpi?.name],['Events',(s.funnel||[]).filter(e=>e.on).map(e=>e.name).join(', ')],['LTV',s.wantsLtv===null?null:s.wantsLtv?'Yes':'No']]}/>
+        <RevSec title="Data Sources" step={5} rows={[['History',hist],['MMP',s.mmp?MMP_LBL[s.mmp]:null],['MMP method',s.mmpCollection],['Ad spend',s.adSpendCollection]]}/>
+        <RevSec title="External Factors" step={6} rows={[['Factors',(s.additionalFactors||[]).length?s.additionalFactors.join(', '):'None'],['Notes',s.factorsDescription]]}/>
+        <RevSec title="Objectives" step={7} rows={[['Goal',s.objectivesGoal],['Success',s.objectivesSuccess],['12-mo target',s.objectivesMarketing]]}/>
+      </div>
+    </div>
+  );
+}
+
+// ─── LOADING ──────────────────────────────────────────────────────────────────
+
+function Loading() {
+  return (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:20}}>
+      <div style={{width:44,height:44,border:'3px solid var(--bd)',borderTopColor:'var(--navy)',borderRadius:'50%'}} className="spin"/>
+      <div style={{fontSize:16,fontWeight:600,color:'var(--navy)'}}>Generating your AIM setup…</div>
+      <div style={{fontSize:13,color:'var(--text3)'}}>Analysing your answers and building outputs</div>
+    </div>
+  );
+}
+
+// ─── OUTPUT TABS ──────────────────────────────────────────────────────────────
+
+function TabSoW({s,set}) {
+  const tier=effTier(s);
+  const kpi=(s.funnel||[]).find(e=>e.kpi);
+  const [name,setName]=useState(s.approvedBy?.name||'');
+  const [title,setTitle]=useState(s.approvedBy?.jobTitle||'');
+  const [done,setDone]=useState(!!s.approvedAt);
+  const S=({label,val})=>(
+    <div style={{marginBottom:18}}>
+      <div style={{fontSize:10,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:.8,marginBottom:6}}>{label}</div>
+      <div style={{fontSize:13,lineHeight:1.7,color:'var(--text)',whiteSpace:'pre-line'}}>{val||'—'}</div>
+    </div>
+  );
+  const pf=(s.platforms||[]).join(', ').toUpperCase()||'—';
+  const camps=[s.ua&&'User Acquisition',s.ue&&'User Engagement',s.brand&&'Brand'].filter(Boolean).join(', ')||'—';
+  const funnel=(s.funnel||[]).filter(e=>e.on).map(e=>e.name).join(' → ')||'—';
+  return (
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <div style={{background:'var(--navy)',color:'#fff',borderRadius:'8px 8px 0 0',padding:'20px 28px'}}>
+        <div style={{fontSize:10,letterSpacing:2,opacity:.6,marginBottom:4}}>SCOPE OF WORK</div>
+        <div style={{fontSize:20,fontWeight:700}}>{s.appName||s.companyName||'AIM Engagement'}</div>
+        <div style={{fontSize:12,opacity:.7,marginTop:3}}>{s.companyName} · {s.region} · AIM {tier}</div>
+      </div>
+      <div style={{background:'var(--surface)',border:'1px solid var(--bd)',borderTop:'none',borderRadius:'0 0 8px 8px',padding:'24px 28px'}}>
+        <S label="Engagement details" val={`Company: ${s.companyName||'—'}\nProject leads: ${(s.projectLeads||[]).map(l=>l.name+' ('+l.email+')').join(', ')||'—'}\nData leads: ${s.dataLeadSameAsProject?'Same as project leads':(s.dataLeads||[]).map(l=>l.name).join(', ')||'—'}`}/>
+        <S label="Platform & region" val={`Platforms: ${pf}\nPrimary market: ${s.region||'—'}\nModel structure: ${s.modelStructure||'—'}\nEstimated models: ${mCount(s)||'—'}`}/>
+        <S label="Campaign types" val={camps+(s.campaignGrouping?'\nCampaign grouping: '+s.campaignGrouping:'')}/>
+        <S label="Business model & KPI" val={`Business: ${s.business||'—'}\nPrimary KPI: ${kpi?.name||'—'}\nFunnel: ${funnel}\nLTV: ${s.wantsLtv?'Included':'Not included'}`}/>
+        <S label="Data sources" val={`MMP: ${s.mmp?MMP_LBL[s.mmp]:'—'} (${s.mmpCollection||'—'})\nAd spend: ${s.adSpendCollection||'—'}\nOffline media: ${s.usesOffline?'Included':'Not included'}`}/>
+        <S label="External factors" val={(s.additionalFactors||[]).length?s.additionalFactors.join(', ')+(s.factorsDescription?'\n'+s.factorsDescription:''):'None flagged'}/>
+        {/* BUG FIX 4: objectives in SoW */}
+        {(s.objectivesGoal||s.objectivesSuccess||s.objectivesMarketing)&&(
+          <S label="Client objectives" val={[s.objectivesGoal&&'Goal: '+s.objectivesGoal,s.objectivesSuccess&&'Success: '+s.objectivesSuccess,s.objectivesMarketing&&'12-month target: '+s.objectivesMarketing].filter(Boolean).join('\n')}/>
+        )}
+        <hr className="dv"/>
+        <div style={{background:'var(--bg)',borderRadius:'var(--r)',padding:'18px 20px'}}>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:14}}>Approve Scope of Work</div>
+          {done?(
+            <Banner type="ok">✓ Approved by {s.approvedBy?.name} ({s.approvedBy?.jobTitle}) on {fmt(s.approvedAt)}</Banner>
+          ):(
+            <>
+              <div className="row g12" style={{marginBottom:12}}>
+                <div className="f1"><label className="lbl">Your name</label><input className="inp" placeholder="Full name" value={name} onChange={e=>setName(e.target.value)}/></div>
+                <div className="f1"><label className="lbl">Job title</label><input className="inp" placeholder="e.g. Head of Marketing" value={title} onChange={e=>setTitle(e.target.value)}/></div>
+              </div>
+              <button className="btn btn-p" disabled={!name||!title}
+                onClick={()=>{set({approvedAt:new Date().toISOString(),approvedBy:{name,jobTitle:title}});setDone(true);}}>
+                ✓ Approve Scope of Work
+              </button>
+              <p className="hint" style={{marginTop:8}}>Approving confirms agreement to the scope above and starts the delivery timeline.</p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabTimeline({s,set}) {
+  const tier=effTier(s);
+  const ms=getMilestones(tier,s.approvedAt);
+  const [author,setAuthor]=useState(s.timelineAuthor||'');
+  const [statuses,setStatuses]=useState(s.milestoneStatuses||{});
+  const [notes,setNotes]=useState(s.milestoneNotes||{});
+  const [log,setLog]=useState(s.changeLog||[]);
+
+  const addLog=action=>{
+    const e={ts:new Date().toISOString(),user:author||'Unknown',action};
+    const n=[...log,e];setLog(n);set({changeLog:n});
+  };
+  const updStatus=(id,v)=>{
+    const n={...statuses,[id]:v};setStatuses(n);set({milestoneStatuses:n});
+    addLog(`"${ms.find(m=>m.id===id)?.label}" → ${v||'not started'}`);
+  };
+
+  return (
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <div style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'16px 20px',marginBottom:16}}>
+        <div className="row ac sb">
+          <div>
+            <div style={{fontSize:15,fontWeight:700}}>Delivery Timeline</div>
+            <div style={{fontSize:12,color:'var(--text3)',marginTop:2}}>AIM {tier} · {ms.length} milestones · ~{tier==='Pro'?9:7} weeks</div>
+          </div>
+          {!s.approvedAt&&<Banner type="warn">⚠ Approve SoW to anchor dates</Banner>}
+        </div>
+        <div style={{marginTop:12}}>
+          <label className="lbl">Your name (for change log)</label>
+          <input className="inp" style={{maxWidth:240}} placeholder="Your name…" value={author}
+            onChange={e=>{setAuthor(e.target.value);set({timelineAuthor:e.target.value});}}/>
+        </div>
+      </div>
+      {ms.map((m,i)=>(
+        <div key={m.id} style={{display:'flex',gap:14,marginBottom:4}}>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',paddingTop:14}}>
+            <div style={{width:26,height:26,borderRadius:'50%',flexShrink:0,
+              background:statuses[m.id]==='complete'?'var(--ok)':statuses[m.id]==='in_progress'?'var(--navy)':statuses[m.id]==='delayed'?'var(--err)':'var(--bd)',
+              color:statuses[m.id]?'#fff':'var(--text3)',display:'flex',alignItems:'center',justifyContent:'center',
+              fontSize:10,fontWeight:700}}>
+              {statuses[m.id]==='complete'?'✓':m.id}
+            </div>
+            {i<ms.length-1&&<div style={{width:2,flex:1,background:'var(--bd)',margin:'4px 0'}}/>}
+          </div>
+          <div style={{flex:1,background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'12px 16px',marginBottom:8}}>
+            <div className="row ac sb" style={{marginBottom:8}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:600}}>{m.label}</div>
+                <div style={{fontSize:11,color:'var(--text3)',marginTop:2}}>{fmt(m.date)}</div>
+              </div>
+              <select className="sel" style={{width:130,fontSize:12}} value={statuses[m.id]||''} onChange={e=>updStatus(m.id,e.target.value)}>
+                <option value="">Not started</option>
+                <option value="in_progress">In progress</option>
+                <option value="complete">Complete</option>
+                <option value="delayed">Delayed</option>
+              </select>
+            </div>
+            <textarea className="ta" style={{minHeight:44,fontSize:12}} placeholder="Add notes…"
+              value={notes[m.id]||''} onChange={e=>{const n={...notes,[m.id]:e.target.value};setNotes(n);set({milestoneNotes:n});}}/>
+          </div>
+        </div>
+      ))}
+      {log.length>0&&(
+        <div style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'14px 18px',marginTop:8}}>
+          <div style={{fontSize:12,fontWeight:600,marginBottom:10}}>Change Log</div>
+          {[...log].reverse().map((e,i)=>(
+            <div key={i} style={{fontSize:11,color:'var(--text2)',display:'flex',gap:8,padding:'4px 0',borderBottom:'1px solid var(--bd)'}}>
+              <span style={{color:'var(--text3)',flexShrink:0}}>{fmt(e.ts)}</span>
+              <span style={{fontWeight:500}}>{e.user}</span>
+              <span>{e.action}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabSchema({s}) {
+  const {auto,manual}=buildSchema(s);
+  return (
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      {manual.length===0&&<Banner type="ok">✓ All your data sources connect via direct API — no file uploads required.</Banner>}
+      {auto.length>0&&(
+        <div style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'16px 20px',marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:'var(--ok)',marginBottom:12}}>✓ Kochava collects automatically</div>
+          {auto.map((a,i)=>(
+            <div key={i} className="row ac sb" style={{padding:'8px 0',borderBottom:i<auto.length-1?'1px solid var(--bd)':'none'}}>
+              <span style={{fontSize:13,fontWeight:500}}>{a.label}</span>
+              <span style={{fontSize:11,color:'var(--ok)'}}>{a.note}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {manual.map((item,i)=>(
+        <div key={i} style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'16px 20px',marginBottom:12}}>
+          <div className="row ac sb" style={{marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:600}}>{item.label}</div>
+            <div className="row g8 ac">
+              <span style={{fontSize:11,color:'var(--warn)'}}>⚠ File upload required</span>
+              <button className="btn btn-g btn-xs">↓ CSV template</button>
+            </div>
+          </div>
+          <div style={{background:'var(--bg)',borderRadius:6,overflow:'hidden',border:'1px solid var(--bd)'}}>
+            <div style={{display:'grid',gridTemplateColumns:`repeat(${item.fields.length},1fr)`,background:'var(--navy)',color:'#fff'}}>
+              {item.fields.map(f=><div key={f} style={{padding:'7px 10px',fontSize:11,fontWeight:600,borderRight:'1px solid rgba(255,255,255,.1)'}}>{f}</div>)}
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:`repeat(${item.fields.length},1fr)`}}>
+              {item.fields.map(f=><div key={f} style={{padding:'6px 10px',fontSize:11,color:'var(--text3)',borderRight:'1px solid var(--bd)'}}>{f.includes('date')?'2024-01-15':f.includes('rev')||f.includes('spend')?'1250.00':f.includes('id')?'camp_123':'example'}</div>)}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TabConfig({s}) {
+  const tier=effTier(s);
+  const kpi=(s.funnel||[]).find(e=>e.kpi);
+  const depVars=(s.funnel||[]).filter(e=>e.on&&!e.req).map(e=>e.id);
+  // BUG FIX 2: reads paidSplit from step 3
+  const splitStr=Object.entries(s.paidSplit||{}).map(([p,v])=>`${p.toUpperCase()}: ${v}% paid / ${100-v}% organic`).join('\n');
+  const R=({k,v})=>(
+    <div className="row" style={{padding:'8px 0',borderBottom:'1px solid var(--bd)',gap:16}}>
+      <span style={{fontSize:12,color:'var(--text3)',minWidth:160,flexShrink:0}}>{k}</span>
+      <span style={{fontSize:12,fontWeight:500,whiteSpace:'pre-line'}}>{v||'—'}</span>
+    </div>
+  );
+  const Card=({title,children})=>(
+    <div style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'16px 20px',marginBottom:12}}>
+      <div style={{fontSize:13,fontWeight:700,marginBottom:12}}>{title}</div>
+      {children}
+    </div>
+  );
+  return (
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <Banner type="warn">🔒 Internal document — CSM & Data Science only. Not visible to clients.</Banner>
+      <div style={{marginTop:16}}>
+        <Card title="Model Configuration">
+          <R k="Fitting method" v="Bayesian MMM (Robyn-based)"/>
+          <R k="Tier" v={`AIM ${tier}`}/>
+          <R k="Platforms" v={(s.platforms||[]).join(', ').toUpperCase()}/>
+          <R k="Region" v={s.region}/>
+          <R k="Modelling approach" v={s.modelStructure}/>
+          <R k="Estimated models" v={String(mCount(s))}/>
+        </Card>
+        <Card title="Campaign Routing">
+          <R k="Campaign types" v={[s.ua&&'UA',s.ue&&'UE',s.brand&&'Brand'].filter(Boolean).join(', ')}/>
+          <R k="UA/UE routing flag" v={s.uaUeRoutingFlag||'—'}/>
+          <R k="Brand routing flag" v={s.brandRoutingFlag?'true':'false'}/>
+          <R k="Campaign grouping" v={s.campaignGrouping}/>
+        </Card>
+        <Card title="Funnel & Events">
+          <R k="Primary KPI (dep_var)" v={kpi?.id}/>
+          <R k="Additional dep_vars" v={depVars.join(', ')||'—'}/>
+          <R k="Business type" v={s.business}/>
+          <R k="LTV scope" v={s.wantsLtv?`Yes — cohort: ${s.ltvCohort}`:'No'}/>
+        </Card>
+        <Card title="Data & Organic Split">
+          <R k="MMP" v={s.mmp?MMP_LBL[s.mmp]:null}/>
+          <R k="MMP collection" v={s.mmpCollection}/>
+          <R k="Ad spend" v={s.adSpendCollection}/>
+          <R k="Offline media" v={s.usesOffline?`Yes (${s.offlineSplit}% offline)`:'No'}/>
+          <R k="Organic vs paid split" v={splitStr}/>
+          {s.platforms?.includes('ios')&&<R k="SKAN modelling" v="Required — iOS ATT/SKAN signal gap modelling"/>}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ─── OUTPUT SCREEN ────────────────────────────────────────────────────────────
+
+function OutputScreen({s,set,onEdit}) {
+  const [tab,setTab]=useState('sow');
+  const tier=effTier(s),rec=recTier(s);
+  const isCsm=s.mode==='csm';
+  const TABS=[{id:'sow',l:'Scope of Work'},{id:'timeline',l:'Timeline'},{id:'schema',l:'Data Schema'},...(isCsm?[{id:'config',l:'Model Config 🔒'}]:[])];
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%',overflow:'hidden'}}>
+      <div style={{background:'var(--surface)',borderBottom:'1px solid var(--bd)',padding:'14px 24px',flexShrink:0}}>
+        <div className="row ac sb" style={{flexWrap:'wrap',gap:12,marginBottom:14}}>
+          <div>
+            <div style={{fontSize:17,fontWeight:700}}>{s.appName||s.companyName||'AIM Setup'}</div>
+            <div style={{fontSize:12,color:'var(--text3)',marginTop:2}}>{s.companyName} · {s.region}</div>
+          </div>
+          <div className="row g10 ac wrap">
+            <div className="row ac g8" style={{background:'var(--bg)',padding:'7px 12px',borderRadius:'var(--r)',border:'1px solid var(--bd)'}}>
+              <span style={{fontSize:11,color:'var(--text3)'}}>Tier</span>
+              <span className={`badge ${tier==='Pro'?'b-pro':'b-x'}`}>AIM {tier}</span>
+              {s.tierOverride&&<span style={{fontSize:10,color:'var(--text3)'}}>Overridden</span>}
+              {rec==='Pro'&&['X','Pro'].map(t=>(
+                <button key={t} className={`btn btn-xs ${tier===t?'btn-p':'btn-g'}`}
+                  onClick={()=>set({tierOverride:t===rec?null:t})}>{t}</button>
+              ))}
+            </div>
+            {/* BUG FIX 5: CSM toggle */}
+            <button className={`btn btn-sm ${isCsm?'btn-p':'btn-o'}`}
+              onClick={()=>set({mode:isCsm?'client':'csm'})}>
+              👤 {isCsm?'Client view':'CSM view'}
+            </button>
+            <button className="btn btn-g btn-sm" onClick={onEdit}>← Edit answers</button>
+          </div>
+        </div>
+        <div style={{display:'flex',borderBottom:'1px solid var(--bd)',marginBottom:-1}}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{
+              padding:'8px 16px',fontSize:12,fontWeight:tab===t.id?600:400,
+              color:tab===t.id?'var(--navy)':'var(--text3)',
+              background:'transparent',border:'none',
+              borderBottom:tab===t.id?'2px solid var(--navy)':'2px solid transparent',
+              cursor:'pointer',fontFamily:'inherit',transition:'all .12s',
+            }}>{t.l}</button>
+          ))}
+        </div>
+      </div>
+      <div style={{flex:1,overflow:'auto',padding:'24px'}} className="scr">
+        {tab==='sow'&&<TabSoW s={s} set={set}/>}
+        {tab==='timeline'&&<TabTimeline s={s} set={set}/>}
+        {tab==='schema'&&<TabSchema s={s}/>}
+        {tab==='config'&&isCsm&&<TabConfig s={s}/>}
+      </div>
+    </div>
+  );
+}
+
+// ─── LANDING ──────────────────────────────────────────────────────────────────
+
+function Landing({onStart,onContinue,onDemo,hasSaved}) {
+  return (
+    <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',padding:40}}>
+      <div style={{maxWidth:520,textAlign:'center'}}>
+        <div style={{fontSize:11,fontWeight:600,color:'var(--navy)',letterSpacing:1.5,textTransform:'uppercase',marginBottom:10}}>AIM Onboarding</div>
+        <h1 style={{fontSize:27,fontWeight:700,lineHeight:1.2,marginBottom:14,color:'var(--text)'}}>Set up your AIM model in 10 minutes</h1>
+        <p style={{fontSize:14,color:'var(--text2)',lineHeight:1.7,marginBottom:32}}>
+          Answer a few questions about your app, marketing, and data — and we'll generate your Scope of Work, Data Schema, Delivery Timeline, and Model Config automatically.
+        </p>
+        <div className="row g10" style={{justifyContent:'center',flexWrap:'wrap',marginBottom:40}}>
+          {hasSaved?(
+            <>
+              <button className="btn btn-p" style={{padding:'10px 24px',fontSize:14}} onClick={onContinue}>Continue saved progress →</button>
+              <button className="btn btn-o" style={{padding:'10px 20px',fontSize:14}} onClick={onStart}>Start fresh</button>
+            </>
+          ):(
+            <button className="btn btn-p" style={{padding:'10px 24px',fontSize:14}} onClick={onStart}>Start onboarding →</button>
+          )}
+          <button className="btn btn-g" style={{padding:'10px 20px',fontSize:14}} onClick={onDemo}>✦ Load demo (BrightFit)</button>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12}}>
+          {[['📋','Scope of Work','Auto-generated'],['📅','Timeline','Milestone plan'],['🗄','Data Schema','Tailored to you'],['⚙','Model Config','For data science']].map(([ic,t,d])=>(
+            <div key={t} style={{background:'var(--surface)',border:'1px solid var(--bd)',borderRadius:'var(--r)',padding:'14px 10px',textAlign:'center'}}>
+              <div style={{fontSize:20,marginBottom:6}}>{ic}</div>
+              <div style={{fontSize:12,fontWeight:600,marginBottom:2}}>{t}</div>
+              <div style={{fontSize:11,color:'var(--text3)'}}>{d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── WIZARD SHELL ─────────────────────────────────────────────────────────────
+
+const STEP_COMPS = [null,Step1,Step2,Step3,Step4,Step5,Step6,Step7,Step8];
+
+function WizardShell({phase,s,set,onNext,onBack,onJump,saved}) {
+  const SC=STEP_COMPS[phase];
+  const showPanel=phase>=2&&phase<=6;
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%',overflow:'hidden'}}>
+      <Stepper phase={phase} onJump={onJump}/>
+      <div style={{flex:1,overflow:'hidden',position:'relative'}}>
+        {/* Stage — matches Gary's layout: white card, max-width, proper padding */}
+        <div style={{height:'100%',overflow:'auto',background:'var(--bg)'}} className="scr">
+          <div style={{maxWidth:760,margin:'0 auto',background:'var(--surface)',minHeight:'100%',
+            padding:'40px 28px 80px 48px',
+            marginRight:showPanel?'calc(50% - 380px + 230px)':'auto',
+          }}>
+            <div style={{marginBottom:6}}>
+              <h2 style={{fontSize:22,fontWeight:700,letterSpacing:-.01,lineHeight:1.3,color:'var(--text)'}}>{STEP_NAMES[phase-1]}</h2>
+              <p style={{fontSize:13,color:'var(--text3)',marginTop:4}}>Step {phase} of 8</p>
+            </div>
+            <hr className="dv" style={{margin:'20px 0'}}/>
+            {SC&&<SC s={s} set={set} onJump={onJump}/>}
+          </div>
+        </div>
+        {showPanel&&(
+          <div style={{position:'absolute',right:20,top:24,zIndex:10}}>
+            <SummaryPanel s={s}/>
+          </div>
+        )}
+      </div>
+      {/* Footer nav */}
+      <div style={{background:'var(--surface)',borderTop:'1px solid var(--bd)',padding:'12px 24px',
+        display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+        <button className="btn btn-g" onClick={onBack} disabled={phase===1}>← Back</button>
+        <div className="row ac g12">
+          {saved&&<span style={{fontSize:11,color:'var(--ok)'}}>✓ Saved</span>}
+          <button className="btn btn-p" onClick={onNext}>
+            {phase===8?'Generate my AIM setup →':'Next →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+
+function App() {
+  const [phase,setPhase]=useState(0);
+  const [state,setState]=useState(INIT);
+  const [saved,setSaved]=useState(false);
+  const hasSaved=useMemo(()=>{try{return!!localStorage.getItem('aim_k4a_v2');}catch{return false;}},[]);
+
+  useEffect(()=>{
+    if(phase>0&&phase<9){
+      try{
+        localStorage.setItem('aim_k4a_v2',JSON.stringify({phase,state}));
+        setSaved(true);const t=setTimeout(()=>setSaved(false),1500);return()=>clearTimeout(t);
+      }catch{}
+    }
+  },[phase,state]);
+
+  const set=useCallback(patch=>setState(prev=>{const n={...prev,...patch};return{...n,...calcFlags(n)};}), []);
+  const onStart=()=>{setState(INIT);setPhase(1);};
+  const onContinue=()=>{try{const d=JSON.parse(localStorage.getItem('aim_k4a_v2'));if(d){setState(d.state);setPhase(d.phase);}}catch{}};
+  const onDemo=()=>{setState(DEMO);setPhase(10);};
+  const onNext=()=>{if(phase===8){setPhase(9);setTimeout(()=>setPhase(10),1600);}else setPhase(p=>Math.min(p+1,8));};
+  const onBack=()=>setPhase(p=>Math.max(p-1,1));
+  const onEdit=()=>setPhase(8);
+
+  return (
+    <PortalShell>
+      {phase===0&&<Landing onStart={onStart} onContinue={onContinue} onDemo={onDemo} hasSaved={hasSaved}/>}
+      {phase>=1&&phase<=8&&<WizardShell phase={phase} s={state} set={set} onNext={onNext} onBack={onBack} onJump={setPhase} saved={saved}/>}
+      {phase===9&&<div style={{height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}><Loading/></div>}
+      {phase===10&&<OutputScreen s={state} set={set} onEdit={onEdit}/>}
+    </PortalShell>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
