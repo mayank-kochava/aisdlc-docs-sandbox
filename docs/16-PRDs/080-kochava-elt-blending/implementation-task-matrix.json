@@ -1,0 +1,6328 @@
+{
+  "matrix_id": "wi_prd080_267b60-r1",
+  "prd": {
+    "id": "wi_prd080_267b60",
+    "folder": "docs/16-PRDs/080-kochava-elt-blending",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-10-07T21:11:01.569914Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Create `airbyte-blend-combiner` Gradle module skeleton (`build.gradle.kts`, `settings.gradle.kts` registration) — houses the combine Job binary separately from `airbyte-server` so `duckdb_jdbc` never enters that module's classpath",
+      "title_clean": "Create airbyte-blend-combiner Gradle module skeleton (build.gradle.kts, settings.gradle.kts registration) — houses the…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `airbyte-blend-combiner` Gradle module skeleton (`build.gradle.kts`,\n`settings.gradle.kts` registration) — houses the combine Job binary separately from\n`airbyte-server` so `duckdb_jdbc` never enters that module's classpath",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T001 [P] Create `airbyte-blend-combiner` Gradle module skeleton (`build.gradle.kts`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T002",
+      "title": "Pin `org.duckdb:duckdb_jdbc` version in `deps.toml`'s version catalog, following the existing `module = \"...\", version = \"...\"` pattern Checkpoint: New module builds empty, dependency resolves",
+      "title_clean": "Pin org.duckdb:duckdb_jdbc version in deps.toml's version catalog, following the existing module = \"...\", version =…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: duckdb_jdbc version pin in T002"
+        }
+      ],
+      "description": "Pin `org.duckdb:duckdb_jdbc` version in `deps.toml`'s version catalog,\nfollowing the existing `module = \"...\", version = \"...\"` pattern\n\nCheckpoint: New module builds empty, dependency resolves",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T002 [P] Pin `org.duckdb:duckdb_jdbc` version in `deps.toml`'s version catalog,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T003",
+      "title": "Write Flyway migration `V1_0_0_018__CreateBlendCoreTables.kt` — `blends`, `blend_sources` tables + `blend_type`/`blend_status` enums (see [data-model.md](./data-model.md) Blend, BlendSource)",
+      "title_clean": "Write Flyway migration V1_0_0_018__CreateBlendCoreTables.kt — blends, blend_sources tables + blend_type/blend_status…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_018__CreateBlendCoreTables.kt` —\n`blends`, `blend_sources` tables + `blend_type`/`blend_status` enums (see\n[data-model.md](./data-model.md) Blend, BlendSource)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T003 Write Flyway migration `V1_0_0_018__CreateBlendCoreTables.kt` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "data-model.md",
+          "./data-model.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T004",
+      "title": "Write Flyway migration `V1_0_0_019__CreateCanonicalFieldTables.kt` — `canonical_fields`, `ratio_metric_components`, `canonical_mappings`",
+      "title_clean": "Write Flyway migration V1_0_0_019__CreateCanonicalFieldTables.kt — canonical_fields, ratio_metric_components…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_019__CreateCanonicalFieldTables.kt` —\n`canonical_fields`, `ratio_metric_components`, `canonical_mappings`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T004 [P] Write Flyway migration `V1_0_0_019__CreateCanonicalFieldTables.kt` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T005",
+      "title": "Write Flyway migration `V1_0_0_020__CreateJoinUnionConfigTables.kt` — `join_configs`, `join_key_pairs`, `union_row_identities`, `union_aggregation_rules`, `missing_value_handling`",
+      "title_clean": "Write Flyway migration V1_0_0_020__CreateJoinUnionConfigTables.kt — join_configs, join_key_pairs…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_020__CreateJoinUnionConfigTables.kt` —\n`join_configs`, `join_key_pairs`, `union_row_identities`, `union_aggregation_rules`,\n`missing_value_handling`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T005 [P] Write Flyway migration `V1_0_0_020__CreateJoinUnionConfigTables.kt` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T006",
+      "title": "Write Flyway migration `V1_0_0_021__CreateRunOutcomeTables.kt` — `partial_failure_policies`, `blend_run_outcomes`, `connector_blend_dependency`",
+      "title_clean": "Write Flyway migration V1_0_0_021__CreateRunOutcomeTables.kt — partial_failure_policies, blend_run_outcomes…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_021__CreateRunOutcomeTables.kt` —\n`partial_failure_policies`, `blend_run_outcomes`, `connector_blend_dependency`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T006 [P] Write Flyway migration `V1_0_0_021__CreateRunOutcomeTables.kt` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T007",
+      "title": "Write Flyway migration `V1_0_0_022__AddBlendColumnsToPipelines.kt` — adds `blend_id`, `schedule_cron`, `schedule_enabled` to the existing `pipelines` table",
+      "title_clean": "Write Flyway migration V1_0_0_022__AddBlendColumnsToPipelines.kt — adds blend_id, schedule_cron, schedule_enabled to…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_022__AddBlendColumnsToPipelines.kt` — adds\n`blend_id`, `schedule_cron`, `schedule_enabled` to the existing `pipelines` table",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T007 Write Flyway migration `V1_0_0_022__AddBlendColumnsToPipelines.kt` — adds",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T006"
+      ],
+      "inferred_depends_on": [
+        "T006"
+      ],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T008",
+      "title": "Create `Blend.kt`, `BlendSource.kt` entities + repositories in `airbyte-kochava-data/src/main/kotlin/io/airbyte/kochava/data/repositories/`, following `Pipeline.kt`'s exact `@MappedEntity` pattern",
+      "title_clean": "Create Blend.kt, BlendSource.kt entities + repositories in airbyte-kochava-data/src/main/kotlin/io/airbyte/kochava/data…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `Blend.kt`, `BlendSource.kt` entities + repositories in\n`airbyte-kochava-data/src/main/kotlin/io/airbyte/kochava/data/repositories/`, following\n`Pipeline.kt`'s exact `@MappedEntity` pattern",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T008 [P] Create `Blend.kt`, `BlendSource.kt` entities + repositories in",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "airbyte-kochava-data/src/main/kotlin/io/airbyte/kochava/data/repositories"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T009",
+      "title": "Create `CanonicalField.kt`, `RatioMetricComponent.kt`, `CanonicalMapping.kt` entities + repositories",
+      "title_clean": "Create CanonicalField.kt, RatioMetricComponent.kt, CanonicalMapping.kt entities + repositories",
+      "summary": "",
+      "flags": [],
+      "description": "Create `CanonicalField.kt`, `RatioMetricComponent.kt`, `CanonicalMapping.kt`\nentities + repositories",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T009 [P] Create `CanonicalField.kt`, `RatioMetricComponent.kt`, `CanonicalMapping.kt`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T010",
+      "title": "Create `JoinConfig.kt`, `JoinKeyPair.kt`, `UnionRowIdentity.kt`, `UnionAggregationRule.kt`, `MissingValueHandling.kt` entities + repositories",
+      "title_clean": "Create JoinConfig.kt, JoinKeyPair.kt, UnionRowIdentity.kt, UnionAggregationRule.kt, MissingValueHandling.kt entities +…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `JoinConfig.kt`, `JoinKeyPair.kt`, `UnionRowIdentity.kt`,\n`UnionAggregationRule.kt`, `MissingValueHandling.kt` entities + repositories",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T010 [P] Create `JoinConfig.kt`, `JoinKeyPair.kt`, `UnionRowIdentity.kt`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T011",
+      "title": "Create `PartialFailurePolicy.kt`, `BlendRunOutcome.kt`, `ConnectorBlendDependency.kt` entities + repositories",
+      "title_clean": "Create PartialFailurePolicy.kt, BlendRunOutcome.kt, ConnectorBlendDependency.kt entities + repositories",
+      "summary": "",
+      "flags": [],
+      "description": "Create `PartialFailurePolicy.kt`, `BlendRunOutcome.kt`,\n`ConnectorBlendDependency.kt` entities + repositories",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T011 [P] Create `PartialFailurePolicy.kt`, `BlendRunOutcome.kt`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T012",
+      "title": "Add `blendId`/`scheduleCron`/`scheduleEnabled` fields to existing `Pipeline.kt` Checkpoint: All tables migrate cleanly against a real Postgres instance; entities compile",
+      "title_clean": "Add blendId/scheduleCron/scheduleEnabled fields to existing Pipeline.kt",
+      "summary": "",
+      "flags": [],
+      "description": "Add `blendId`/`scheduleCron`/`scheduleEnabled` fields to existing `Pipeline.kt`\n\nCheckpoint: All tables migrate cleanly against a real Postgres instance; entities compile",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T012 Add `blendId`/`scheduleCron`/`scheduleEnabled` fields to existing `Pipeline.kt`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          ""
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T011"
+      ],
+      "inferred_depends_on": [
+        "T011"
+      ],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T013",
+      "title": "Create `BlendModels.kt` DTOs (`BlendRead`, `BlendListRequest/Response`, `CreateBlendDraftRequest`, `UpdateBlendRequest`, `BlendIdRequest`) in `airbyte-server/.../handlers/kochava/`, following `PipelineModels.kt`'s pattern exactly (plain data classes, `accountId` on every request)",
+      "title_clean": "Create BlendModels.kt DTOs (BlendRead, BlendListRequest/Response, CreateBlendDraftRequest, UpdateBlendRequest…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendModels.kt` DTOs (`BlendRead`, `BlendListRequest/Response`,\n`CreateBlendDraftRequest`, `UpdateBlendRequest`, `BlendIdRequest`) in\n`airbyte-server/.../handlers/kochava/`, following `PipelineModels.kt`'s pattern exactly\n(plain data classes, `accountId` on every request)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T013 [US1] Create `BlendModels.kt` DTOs (`BlendRead`, `BlendListRequest/Response`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "BlendListRequest/Response",
+          "airbyte-server/.../handlers/kochava"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T012",
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010"
+      ],
+      "inferred_depends_on": [
+        "T012",
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T014",
+      "title": "Create `BlendHandler.kt` — list/get/createDraft/update/delete/duplicate, account-scoped per `PipelineHandler.kt`'s `requirePipeline`-equivalent pattern",
+      "title_clean": "Create BlendHandler.kt — list/get/createDraft/update/delete/duplicate, account-scoped per PipelineHandler.kt's…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendHandler.kt` — list/get/createDraft/update/delete/duplicate,\naccount-scoped per `PipelineHandler.kt`'s `requirePipeline`-equivalent pattern",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T014 [US1] Create `BlendHandler.kt` — list/get/createDraft/update/delete/duplicate,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T013"
+      ],
+      "inferred_depends_on": [
+        "T013"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T015",
+      "title": "Create `CanonicalMappingModels.kt` DTOs (`CanonicalMappingRead`, `UpdateCanonicalMappingRequest` with `expectedRevision`)",
+      "title_clean": "Create CanonicalMappingModels.kt DTOs (CanonicalMappingRead, UpdateCanonicalMappingRequest with expectedRevision)",
+      "summary": "",
+      "flags": [],
+      "description": "Create `CanonicalMappingModels.kt` DTOs (`CanonicalMappingRead`,\n`UpdateCanonicalMappingRequest` with `expectedRevision`)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T015 [US1] [P] Create `CanonicalMappingModels.kt` DTOs (`CanonicalMappingRead`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T016",
+      "title": "Create `CanonicalMappingHandler.kt` — get/update with revision-based optimistic concurrency (FR-056), field-in-use exclusion block (BR-15/FR-048)",
+      "title_clean": "Create CanonicalMappingHandler.kt — get/update with revision-based optimistic concurrency (FR-056), field-in-use…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `CanonicalMappingHandler.kt` — get/update with revision-based\noptimistic concurrency (FR-056), field-in-use exclusion block (BR-15/FR-048)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T016 [US1] Create `CanonicalMappingHandler.kt` — get/update with revision-based",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T015"
+      ],
+      "inferred_depends_on": [
+        "T015"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T017",
+      "title": "Create `CompositionGraphValidator.kt` — `WITH RECURSIVE` depth/duplicate/ cycle checks for authoring-time candidate-selection (FR-004, FR-050, FR-051)",
+      "title_clean": "Create CompositionGraphValidator.kt — WITH RECURSIVE depth/duplicate/ cycle checks for authoring-time…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `CompositionGraphValidator.kt` — `WITH RECURSIVE` depth/duplicate/\ncycle checks for authoring-time candidate-selection (FR-004, FR-050, FR-051)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T017 [US1] Create `CompositionGraphValidator.kt` — `WITH RECURSIVE` depth/duplicate/",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T016"
+      ],
+      "inferred_depends_on": [
+        "T016"
+      ],
+      "wave": 4,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T018",
+      "title": "Wire `ConnectorBlendDependency` reverse-index maintenance into `BlendHandler`'s save path, cascading to ancestor blends on nested edits (FR-052/BR-20)",
+      "title_clean": "Wire ConnectorBlendDependency reverse-index maintenance into BlendHandler's save path, cascading to ancestor blends on…",
+      "summary": "",
+      "flags": [],
+      "description": "Wire `ConnectorBlendDependency` reverse-index maintenance into\n`BlendHandler`'s save path, cascading to ancestor blends on nested edits (FR-052/BR-20)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T018 [US1] Wire `ConnectorBlendDependency` reverse-index maintenance into",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T017"
+      ],
+      "inferred_depends_on": [
+        "T017"
+      ],
+      "wave": 5,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T019",
+      "title": "Implement BR-08/FR-033/FR-034 dependent-block logic in `BlendHandler` update/delete — structured `DependencyConflict` response, not a formatted string",
+      "title_clean": "Implement BR-08/FR-033/FR-034 dependent-block logic in BlendHandler update/delete — structured DependencyConflict…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement BR-08/FR-033/FR-034 dependent-block logic in `BlendHandler`\nupdate/delete — structured `DependencyConflict` response, not a formatted string",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T019 [US1] Implement BR-08/FR-033/FR-034 dependent-block logic in `BlendHandler`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T018"
+      ],
+      "inferred_depends_on": [
+        "T018"
+      ],
+      "wave": 6,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T020",
+      "title": "Create `BlendController.kt` — POST endpoints per [contracts/api.yaml](./contracts/api.yaml)'s `/api/v1/kochava/blends/*` paths",
+      "title_clean": "Create BlendController.kt — POST endpoints per contracts/api.yaml's /api/v1/kochava/blends/* paths",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendController.kt` — POST endpoints per\n[contracts/api.yaml](./contracts/api.yaml)'s `/api/v1/kochava/blends/*` paths",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T020 [US1] Create `BlendController.kt` — POST endpoints per",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "/api/v1/kochava/blends/*",
+          "contracts/api.yaml",
+          "./contracts/api.yaml"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T019"
+      ],
+      "inferred_depends_on": [
+        "T019"
+      ],
+      "wave": 7,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T021",
+      "title": "Create `CanonicalMappingController.kt` — `/api/v1/kochava/canonical_mappings/*`",
+      "title_clean": "Create CanonicalMappingController.kt — /api/v1/kochava/canonical_mappings/*",
+      "summary": "",
+      "flags": [],
+      "description": "Create `CanonicalMappingController.kt` — `/api/v1/kochava/canonical_mappings/*`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T021 [US1] Create `CanonicalMappingController.kt` — `/api/v1/kochava/canonical_mappings/*`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "/api/v1/kochava/canonical_mappings/*"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T020"
+      ],
+      "inferred_depends_on": [
+        "T020"
+      ],
+      "wave": 8,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T022",
+      "title": "Unit tests for `BlendHandler` (MockK-based, `AlertRuleHandlerTest.kt` pattern)",
+      "title_clean": "Unit tests for BlendHandler (MockK-based, AlertRuleHandlerTest.kt pattern)",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `BlendHandler` (MockK-based, `AlertRuleHandlerTest.kt`\npattern)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T022 [US1] [P] Unit tests for `BlendHandler` (MockK-based, `AlertRuleHandlerTest.kt`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T023",
+      "title": "Unit tests for `CanonicalMappingHandler`, including concurrent-edit and field-in-use conflict scenarios",
+      "title_clean": "Unit tests for CanonicalMappingHandler, including concurrent-edit and field-in-use conflict scenarios",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `CanonicalMappingHandler`, including concurrent-edit and\nfield-in-use conflict scenarios",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T023 [US1] [P] Unit tests for `CanonicalMappingHandler`, including concurrent-edit and",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T024",
+      "title": "Unit tests for `CompositionGraphValidator` — depth/duplicate/cycle edge cases (this validator gates a lot of downstream correctness, per `eng-plan.md`'s Risks)",
+      "title_clean": "Unit tests for CompositionGraphValidator — depth/duplicate/cycle edge cases (this validator gates a lot of downstream…",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `CompositionGraphValidator` — depth/duplicate/cycle edge\ncases (this validator gates a lot of downstream correctness, per `eng-plan.md`'s Risks)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T024 [US1] [P] Unit tests for `CompositionGraphValidator` — depth/duplicate/cycle edge",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "eng-plan.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T025",
+      "title": "Integration tests for all new repositories against a real Postgres instance (Testcontainers) Checkpoint: Blend CRUD fully functional and tested — shippable as a standalone milestone",
+      "title_clean": "Integration tests for all new repositories against a real Postgres instance (Testcontainers)",
+      "summary": "",
+      "flags": [],
+      "description": "Integration tests for all new repositories against a real Postgres\ninstance (Testcontainers)\n\nCheckpoint: Blend CRUD fully functional and tested — shippable as a standalone milestone",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T025 [US1] [P] Integration tests for all new repositories against a real Postgres",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T026",
+      "title": "Create `BlendScheduler.kt` — Kochava-owned cron scheduler for blend-backed pipelines (no native Airbyte Connection to route through — genuinely new territory, no existing precedent to mirror closely, per `eng-plan.md`'s Risks)",
+      "title_clean": "Create BlendScheduler.kt — Kochava-owned cron scheduler for blend-backed pipelines (no native Airbyte Connection to…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendScheduler.kt` — Kochava-owned cron scheduler for blend-backed\npipelines (no native Airbyte Connection to route through — genuinely new territory, no\nexisting precedent to mirror closely, per `eng-plan.md`'s Risks)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T026 [US2] Create `BlendScheduler.kt` — Kochava-owned cron scheduler for blend-backed",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "eng-plan.md"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T021"
+      ],
+      "inferred_depends_on": [
+        "T021"
+      ],
+      "wave": 9,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T027",
+      "title": "Implement the staging writer — concurrent pull from all N contributing sources into `blend-staging/` GCS Parquet files, triggered by `BlendScheduler`",
+      "title_clean": "Implement the staging writer — concurrent pull from all N contributing sources into blend-staging/ GCS Parquet files…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement the staging writer — concurrent pull from all N contributing\nsources into `blend-staging/` GCS Parquet files, triggered by `BlendScheduler`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T027 [US2] Implement the staging writer — concurrent pull from all N contributing",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "blend-staging"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T026"
+      ],
+      "inferred_depends_on": [
+        "T026"
+      ],
+      "wave": 10,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T028",
+      "title": "Implement `BlendCombineJob.kt` in `airbyte-blend-combiner` — DuckDB `httpfs` reads of staged Parquet, Union compute (row-identity merge, missing-value handling per BR-36/FR-066/067)",
+      "title_clean": "Implement BlendCombineJob.kt in airbyte-blend-combiner — DuckDB httpfs reads of staged Parquet, Union compute…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement `BlendCombineJob.kt` in `airbyte-blend-combiner` — DuckDB\n`httpfs` reads of staged Parquet, Union compute (row-identity merge, missing-value\nhandling per BR-36/FR-066/067)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T028 [US2] Implement `BlendCombineJob.kt` in `airbyte-blend-combiner` — DuckDB",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T027"
+      ],
+      "inferred_depends_on": [
+        "T027"
+      ],
+      "wave": 11,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T029",
+      "title": "Implement Join compute logic in `BlendCombineJob.kt` — all 4 directions (BR-13), composite key evaluation",
+      "title_clean": "Implement Join compute logic in BlendCombineJob.kt — all 4 directions (BR-13), composite key evaluation",
+      "summary": "",
+      "flags": [],
+      "description": "Implement Join compute logic in `BlendCombineJob.kt` — all 4 directions\n(BR-13), composite key evaluation",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T029 [US2] Implement Join compute logic in `BlendCombineJob.kt` — all 4 directions",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T028"
+      ],
+      "inferred_depends_on": [
+        "T028"
+      ],
+      "wave": 12,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T030",
+      "title": "Implement aggregation-rule execution (sum/weighted_avg/max/min/ recompute_from_components — FR-020-025, BR-06/BR-07)",
+      "title_clean": "Implement aggregation-rule execution (sum/weighted_avg/max/min/ recompute_from_components — FR-020-025, BR-06/BR-07)",
+      "summary": "",
+      "flags": [],
+      "description": "Implement aggregation-rule execution (sum/weighted_avg/max/min/\nrecompute_from_components — FR-020-025, BR-06/BR-07)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T030 [US2] Implement aggregation-rule execution (sum/weighted_avg/max/min/",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T029"
+      ],
+      "inferred_depends_on": [
+        "T029"
+      ],
+      "wave": 13,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T031",
+      "title": "Implement `BlendRunOutcome` write-back — three-outcome model + `resource_limit_exceeded` failure category (FR-040-045, FR-061-062)",
+      "title_clean": "Implement BlendRunOutcome write-back — three-outcome model + resource_limit_exceeded failure category (FR-040-045…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement `BlendRunOutcome` write-back — three-outcome model +\n`resource_limit_exceeded` failure category (FR-040-045, FR-061-062)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T031 [US2] Implement `BlendRunOutcome` write-back — three-outcome model +",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T030"
+      ],
+      "inferred_depends_on": [
+        "T030"
+      ],
+      "wave": 14,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T032",
+      "title": "Implement retry-then-fallback policy execution (FR-042) — a retry re-triggers the whole atomic pull-then-combine unit, per the resolved run-boundary semantics, not a per-source sub-retry",
+      "title_clean": "Implement retry-then-fallback policy execution (FR-042) — a retry re-triggers the whole atomic pull-then-combine unit…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement retry-then-fallback policy execution (FR-042) — a retry\nre-triggers the whole atomic pull-then-combine unit, per the resolved run-boundary\nsemantics, not a per-source sub-retry",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T032 [US2] Implement retry-then-fallback policy execution (FR-042) — a retry",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T031"
+      ],
+      "inferred_depends_on": [
+        "T031"
+      ],
+      "wave": 15,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T033",
+      "title": "Create `BlendCombineJobPodFactory.kt` — new Fabric8 `PodBuilder` factory alongside `ReplicationPodFactory.kt`, `emptyDir sizeLimit: 30Gi`, `airbyte-workload` `nodeSelector`/toleration",
+      "title_clean": "Create BlendCombineJobPodFactory.kt — new Fabric8 PodBuilder factory alongside ReplicationPodFactory.kt, emptyDir…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendCombineJobPodFactory.kt` — new Fabric8 `PodBuilder` factory\nalongside `ReplicationPodFactory.kt`, `emptyDir sizeLimit: 30Gi`, `airbyte-workload`\n`nodeSelector`/toleration",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T033 [US2] Create `BlendCombineJobPodFactory.kt` — new Fabric8 `PodBuilder` factory",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T032"
+      ],
+      "inferred_depends_on": [
+        "T032"
+      ],
+      "wave": 16,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T034",
+      "title": "Extend the `AlertRule`/`AlertConditionEvaluator` system with a `run_degraded` condition type, dispatched through existing Slack/webhook channels",
+      "title_clean": "Extend the AlertRule/AlertConditionEvaluator system with a run_degraded condition type, dispatched through existing…",
+      "summary": "",
+      "flags": [],
+      "description": "Extend the `AlertRule`/`AlertConditionEvaluator` system with a\n`run_degraded` condition type, dispatched through existing Slack/webhook channels",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T034 [US2] [P] Extend the `AlertRule`/`AlertConditionEvaluator` system with a",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          ""
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "integration: external-integration keyword 'webhook'",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "webhook"
+          }
+        ],
+        "assignee": null,
+        "lane": "integration"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T035",
+      "title": "Unit tests for `BlendCombineJob` compute logic — Union/Join correctness, aggregation rules, missing-value handling",
+      "title_clean": "Unit tests for BlendCombineJob compute logic — Union/Join correctness, aggregation rules, missing-value handling",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `BlendCombineJob` compute logic — Union/Join\ncorrectness, aggregation rules, missing-value handling",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T035 [US2] [P] Unit tests for `BlendCombineJob` compute logic — Union/Join",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T036",
+      "title": "Unit tests for `BlendScheduler`",
+      "title_clean": "Unit tests for BlendScheduler",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `BlendScheduler`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T036 [US2] [P] Unit tests for `BlendScheduler`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T027"
+      ],
+      "inferred_depends_on": [
+        "T027"
+      ],
+      "wave": 11,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T037",
+      "title": "Integration test: end-to-end concurrent-pull → combine → outcome",
+      "title_clean": "Integration test: end-to-end concurrent-pull → combine → outcome",
+      "summary": "",
+      "flags": [],
+      "description": "Integration test: end-to-end concurrent-pull → combine → outcome",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T037 [US2] Integration test: end-to-end concurrent-pull → combine → outcome",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T036"
+      ],
+      "inferred_depends_on": [
+        "T036"
+      ],
+      "wave": 12,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T038",
+      "title": "Integration test: simulated node-loss mid-combine → full-restart-on-retry (per the resolved node-loss decision — no checkpointing, verify a clean restart) Checkpoint: A blend-backed pipeline runs end-to-end and produces correct output",
+      "title_clean": "Integration test: simulated node-loss mid-combine → full-restart-on-retry (per the resolved node-loss decision — no…",
+      "summary": "",
+      "flags": [],
+      "description": "Integration test: simulated node-loss mid-combine → full-restart-on-retry\n(per the resolved node-loss decision — no checkpointing, verify a clean restart)\n\nCheckpoint: A blend-backed pipeline runs end-to-end and produces correct output",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T038 [US2] Integration test: simulated node-loss mid-combine → full-restart-on-retry",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T037"
+      ],
+      "inferred_depends_on": [
+        "T037"
+      ],
+      "wave": 13,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T039",
+      "title": "`BlendAcceptanceTest.kt` in `airbyte-tests` — happy-path E2E (create blend, trigger a run, poll the outcome), following `SyncAcceptanceTest.kt`'s pattern",
+      "title_clean": "BlendAcceptanceTest.kt in airbyte-tests — happy-path E2E (create blend, trigger a run, poll the outcome), following…",
+      "summary": "",
+      "flags": [],
+      "description": "`BlendAcceptanceTest.kt` in `airbyte-tests` — happy-path E2E (create blend,\ntrigger a run, poll the outcome), following `SyncAcceptanceTest.kt`'s pattern",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T039 [P] `BlendAcceptanceTest.kt` in `airbyte-tests` — happy-path E2E (create blend,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T040",
+      "title": "Bump `MAX_SYNC_WORKERS`'s Helm default in `charts/v2/airbyte/values.yaml` — confirmed necessary since blend fan-out consumes N worker slots per run, not 1; exact number is the one item still open (see Open Items)",
+      "title_clean": "Bump MAX_SYNC_WORKERS's Helm default in charts/v2/airbyte/values.yaml — confirmed necessary since blend fan-out…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: Exact new MAX_SYNC_WORKERS value in T040"
+        }
+      ],
+      "description": "Bump `MAX_SYNC_WORKERS`'s Helm default in `charts/v2/airbyte/values.yaml` —\nconfirmed necessary since blend fan-out consumes N worker slots per run, not 1; exact\nnumber is the one item still open (see Open Items)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T040 [P] Bump `MAX_SYNC_WORKERS`'s Helm default in `charts/v2/airbyte/values.yaml` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "charts/v2/airbyte/values.yaml"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T041",
+      "title": "Reconcile the final hand-written DTO shapes against [contracts/api.yaml](./contracts/api.yaml), fixing any drift toward the contract",
+      "title_clean": "Reconcile the final hand-written DTO shapes against contracts/api.yaml, fixing any drift toward the contract",
+      "summary": "",
+      "flags": [],
+      "description": "Reconcile the final hand-written DTO shapes against\n[contracts/api.yaml](./contracts/api.yaml), fixing any drift toward the contract",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T041 Reconcile the final hand-written DTO shapes against",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "contracts/api.yaml",
+          "./contracts/api.yaml"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T040",
+        "T020"
+      ],
+      "inferred_depends_on": [
+        "T040",
+        "T020"
+      ],
+      "wave": 8,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T042",
+      "title": "Confirm/update relevant `CLAUDE.md` if warranted Checkpoint: Feature ready for QA usage and demo",
+      "title_clean": "Confirm/update relevant CLAUDE.md if warranted",
+      "summary": "",
+      "flags": [],
+      "description": "Confirm/update relevant `CLAUDE.md` if warranted\n\nCheckpoint: Feature ready for QA usage and demo",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T042 [P] Confirm/update relevant `CLAUDE.md` if warranted",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "CLAUDE.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T012"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T043",
+      "title": "Write Flyway migration `V1_0_0_028__AddAccountIdToBlendChildTables.kt` — denormalized `account_id` on `blend_sources`, `join_configs`, `join_key_pairs`, `union_row_identities`, `union_aggregation_rules`, `missing_value_handling`, `canonical_mappings`, backfilled from `blend_id -> blends.account_id`",
+      "title_clean": "Write Flyway migration V1_0_0_028__AddAccountIdToBlendChildTables.kt — denormalized account_id on blend_sources…",
+      "summary": "",
+      "flags": [],
+      "description": "Write Flyway migration `V1_0_0_028__AddAccountIdToBlendChildTables.kt` —\ndenormalized `account_id` on `blend_sources`, `join_configs`, `join_key_pairs`,\n`union_row_identities`, `union_aggregation_rules`, `missing_value_handling`,\n`canonical_mappings`, backfilled from `blend_id -> blends.account_id`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T043 Write Flyway migration `V1_0_0_028__AddAccountIdToBlendChildTables.kt` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T041",
+        "T039",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T041",
+        "T039",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T044",
+      "title": "Add `accountId: String` to the corresponding entity classes (`BlendSource.kt`, `JoinConfig.kt`, `JoinKeyPair.kt`, `UnionRowIdentity.kt`, `UnionAggregationRule.kt`, `MissingValueHandling.kt`, `CanonicalMapping.kt`)",
+      "title_clean": "Add accountId: String to the corresponding entity classes (BlendSource.kt, JoinConfig.kt, JoinKeyPair.kt…",
+      "summary": "",
+      "flags": [],
+      "description": "Add `accountId: String` to the corresponding entity classes\n(`BlendSource.kt`, `JoinConfig.kt`, `JoinKeyPair.kt`, `UnionRowIdentity.kt`,\n`UnionAggregationRule.kt`, `MissingValueHandling.kt`, `CanonicalMapping.kt`)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T044 [P] Add `accountId: String` to the corresponding entity classes",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T045",
+      "title": "Create `TenantOwnershipGuard.kt` — one shared ownership-check utility",
+      "title_clean": "Create TenantOwnershipGuard.kt — one shared ownership-check utility",
+      "summary": "",
+      "flags": [],
+      "description": "Create `TenantOwnershipGuard.kt` — one shared ownership-check utility",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T045 Create `TenantOwnershipGuard.kt` — one shared ownership-check utility",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T044"
+      ],
+      "inferred_depends_on": [
+        "T044"
+      ],
+      "wave": 10,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T046",
+      "title": "Replace the duplicated `if (row.accountId != accountId) throw NoSuchElementException(...)` checks in `BlendHandler.kt`, `PipelineHandler.kt`, `TransformHandler.kt`, `AlertRuleHandler.kt`, `FieldMappingHandler.kt`, `PrivacyRuleHandler.kt`, `ValidationRuleHandler.kt`, `SchemaChangeHandler.kt`, `WebhookTriggerHandler.kt`, `CustomFileSourceHandler.kt` with calls to `TenantOwnershipGuard`",
+      "title_clean": "Replace the duplicated if (row.accountId != accountId) throw NoSuchElementException(...) checks in BlendHandler.kt…",
+      "summary": "",
+      "flags": [],
+      "description": "Replace the duplicated `if (row.accountId != accountId) throw\nNoSuchElementException(...)` checks in `BlendHandler.kt`, `PipelineHandler.kt`,\n`TransformHandler.kt`, `AlertRuleHandler.kt`, `FieldMappingHandler.kt`,\n`PrivacyRuleHandler.kt`, `ValidationRuleHandler.kt`, `SchemaChangeHandler.kt`,\n`WebhookTriggerHandler.kt`, `CustomFileSourceHandler.kt` with calls to\n`TenantOwnershipGuard`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T046 [P] Replace the duplicated `if (row.accountId != accountId) throw",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "integration: external-integration keyword 'Webhook'",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Webhook"
+          }
+        ],
+        "assignee": null,
+        "lane": "integration"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T047",
+      "title": "Fix `CanonicalMappingHandler.kt`'s acknowledged no-op `accountId` check, wired into `TenantOwnershipGuard`",
+      "title_clean": "Fix CanonicalMappingHandler.kt's acknowledged no-op accountId check, wired into TenantOwnershipGuard",
+      "summary": "",
+      "flags": [],
+      "description": "Fix `CanonicalMappingHandler.kt`'s acknowledged no-op `accountId` check, wired\ninto `TenantOwnershipGuard`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T047 Fix `CanonicalMappingHandler.kt`'s acknowledged no-op `accountId` check, wired",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T046"
+      ],
+      "inferred_depends_on": [
+        "T046"
+      ],
+      "wave": 10,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T048",
+      "title": "Fix the cross-account sub-blend composition gap in `CompositionGraphValidator.validateSourceSelection` and `BlendHandler.replaceSources` — reject a `subBlendId` whose account doesn't match the parent blend's, at save time",
+      "title_clean": "Fix the cross-account sub-blend composition gap in CompositionGraphValidator.validateSourceSelection and…",
+      "summary": "",
+      "flags": [],
+      "description": "Fix the cross-account sub-blend composition gap in\n`CompositionGraphValidator.validateSourceSelection` and `BlendHandler.replaceSources` —\nreject a `subBlendId` whose account doesn't match the parent blend's, at save time",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T048 Fix the cross-account sub-blend composition gap in",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T047"
+      ],
+      "inferred_depends_on": [
+        "T047"
+      ],
+      "wave": 11,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T049",
+      "title": "`airbyte-blend-combiner` defense-in-depth — `BlendCombineSpecLoader`/ `BlendTreeExecutor` assert account equality when recursing into a sub-blend, fail the run loudly on mismatch",
+      "title_clean": "airbyte-blend-combiner defense-in-depth — BlendCombineSpecLoader/ BlendTreeExecutor assert account equality when…",
+      "summary": "",
+      "flags": [],
+      "description": "`airbyte-blend-combiner` defense-in-depth — `BlendCombineSpecLoader`/\n`BlendTreeExecutor` assert account equality when recursing into a sub-blend, fail the run\nloudly on mismatch",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T049 `airbyte-blend-combiner` defense-in-depth — `BlendCombineSpecLoader`/",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T048"
+      ],
+      "inferred_depends_on": [
+        "T048"
+      ],
+      "wave": 12,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T050",
+      "title": "Add `account_id` to `BlendCombinePodLauncher.kt`'s pod labels/log fields",
+      "title_clean": "Add account_id to BlendCombinePodLauncher.kt's pod labels/log fields",
+      "summary": "",
+      "flags": [],
+      "description": "Add `account_id` to `BlendCombinePodLauncher.kt`'s pod labels/log fields",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T050 [P] Add `account_id` to `BlendCombinePodLauncher.kt`'s pod labels/log fields",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T051",
+      "title": "Cross-tenant data-isolation test suite — all 7 newly-covered tables, the `canonical_mappings` regression, and the sub-blend leak at both the authoring-time and combine-time layers Checkpoint: No code path can read or combine another account's data given a legitimate `accountId`",
+      "title_clean": "Cross-tenant data-isolation test suite — all 7 newly-covered tables, the canonical_mappings regression, and the…",
+      "summary": "",
+      "flags": [],
+      "description": "Cross-tenant data-isolation test suite — all 7 newly-covered tables, the\n`canonical_mappings` regression, and the sub-blend leak at both the authoring-time and\ncombine-time layers\n\nCheckpoint: No code path can read or combine another account's data given a legitimate\n`accountId`. Shipped via backend PR [#138](https://github.com/Kochava/airbyte/pull/138)\nand PR [#139](https://github.com/Kochava/airbyte/pull/139) — this checklist was left\nunchecked after that merge; corrected 2026-09-29 to match `eng-plan.md`'s Phase 5 status,\nno code change involved.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T051 [P] Cross-tenant data-isolation test suite — all 7 newly-covered tables, the",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "eng-plan.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042",
+        "T026"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042",
+        "T026"
+      ],
+      "wave": 10,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T052",
+      "title": "`AccountContextFilter` + `CurrentAccountContext`/`RequestAccountContext` — gateway-header-verified, per-request account context (Parts A3/A4), rolled out to all 11 Kochava controllers/handlers; paths moved to `/api/v1/kochava/accounts/{accountId}/<resource>/<action>`",
+      "title_clean": "AccountContextFilter + CurrentAccountContext/RequestAccountContext — gateway-header-verified, per-request account…",
+      "summary": "",
+      "flags": [],
+      "description": "`AccountContextFilter` + `CurrentAccountContext`/`RequestAccountContext` —\ngateway-header-verified, per-request account context (Parts A3/A4), rolled out to all 11\nKochava controllers/handlers; paths moved to\n`/api/v1/kochava/accounts/{accountId}/<resource>/<action>`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T052 [P] `AccountContextFilter` + `CurrentAccountContext`/`RequestAccountContext` —",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          ""
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T053",
+      "title": "`account_workspaces` table (`V1_0_0_029__CreateAccountWorkspacesTable.kt`) + `AccountWorkspaceProvisioningService` — one lazily-provisioned Airbyte workspace per account (Part A5)",
+      "title_clean": "account_workspaces table (V1_0_0_029__CreateAccountWorkspacesTable.kt) + AccountWorkspaceProvisioningService — one…",
+      "summary": "",
+      "flags": [],
+      "description": "`account_workspaces` table (`V1_0_0_029__CreateAccountWorkspacesTable.kt`) +\n`AccountWorkspaceProvisioningService` — one lazily-provisioned Airbyte workspace per\naccount (Part A5)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T053 [P] `account_workspaces` table (`V1_0_0_029__CreateAccountWorkspacesTable.kt`) +",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "inferred_depends_on": [
+        "T039",
+        "T041",
+        "T042"
+      ],
+      "wave": 9,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T054",
+      "title": "`AccountConnectorsController`/`AccountConnectorsHandler` — account-scoped read-proxy onto native Sources/Destinations/Connections/Jobs (Part A6); depends on T053",
+      "title_clean": "AccountConnectorsController/AccountConnectorsHandler — account-scoped read-proxy onto native…",
+      "summary": "",
+      "flags": [],
+      "description": "`AccountConnectorsController`/`AccountConnectorsHandler` — account-scoped\nread-proxy onto native Sources/Destinations/Connections/Jobs (Part A6); depends on T053",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T054 `AccountConnectorsController`/`AccountConnectorsHandler` — account-scoped",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          ""
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T053"
+      ],
+      "inferred_depends_on": [],
+      "wave": 10,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T055",
+      "title": "Oathkeeper rule for `dc.qa.kochava.com` capturing numeric `{accountId}` from the URL path and injecting it as a header (Part C1 routing mechanics only — not the planned `remote_json` authorizer; ships with `authenticators: noop`/`authorizer: allow`, a deliberate interim decision, not this task's original scope)",
+      "title_clean": "Oathkeeper rule for dc.qa.kochava.com capturing numeric {accountId} from the URL path and injecting it as a header…",
+      "summary": "",
+      "flags": [],
+      "description": "Oathkeeper rule for `dc.qa.kochava.com` capturing numeric `{accountId}` from the\nURL path and injecting it as a header (Part C1 routing mechanics only — not the\nplanned `remote_json` authorizer; ships with `authenticators: noop`/`authorizer: allow`,\na deliberate interim decision, not this task's original scope)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T055 Oathkeeper rule for `dc.qa.kochava.com` capturing numeric `{accountId}` from the",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          ""
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T054"
+      ],
+      "inferred_depends_on": [
+        "T054"
+      ],
+      "wave": 11,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T056",
+      "title": "Frontend `dataConnectApi.ts` interceptor + 7 stores switched to `organizationStore.accountEntityId` (Parts B1/B2); Connectors/Monitoring pages rewritten onto the new proxy endpoints (Part B3), closing the original cross-tenant job-history bug report",
+      "title_clean": "Frontend dataConnectApi.ts interceptor + 7 stores switched to organizationStore.accountEntityId (Parts B1/B2)…",
+      "summary": "",
+      "flags": [],
+      "description": "Frontend `dataConnectApi.ts` interceptor + 7 stores switched to\n`organizationStore.accountEntityId` (Parts B1/B2); Connectors/Monitoring pages rewritten\nonto the new proxy endpoints (Part B3), closing the original cross-tenant job-history bug\nreport",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T056 Frontend `dataConnectApi.ts` interceptor + 7 stores switched to",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": "node-ts",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "dataConnectApi.ts"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: frontend stack node-ts",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=node-ts"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T055"
+      ],
+      "inferred_depends_on": [
+        "T055"
+      ],
+      "wave": 12,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm test"
+    },
+    {
+      "id": "T057",
+      "title": "One account manually migrated end-to-end as a live-verification exercise: numeric `account_id` re-key (13 tables, hand-run SQL, not a migration), 8 native connectors recreated in a dedicated workspace with credentials copied, 5 native Connections recreated for its active pipelines",
+      "title_clean": "One account manually migrated end-to-end as a live-verification exercise: numeric account_id re-key (13 tables…",
+      "summary": "",
+      "flags": [],
+      "description": "One account manually migrated end-to-end as a live-verification exercise:\nnumeric `account_id` re-key (13 tables, hand-run SQL, not a migration), 8 native\nconnectors recreated in a dedicated workspace with credentials copied, 5 native\nConnections recreated for its active pipelines",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [x] T057 One account manually migrated end-to-end as a live-verification exercise:",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T056"
+      ],
+      "inferred_depends_on": [
+        "T056"
+      ],
+      "wave": 13,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T058",
+      "title": "Not started",
+      "title_clean": "Not started",
+      "summary": "",
+      "flags": [],
+      "description": "Not started — Part A0 (IAM bulk account-id enumeration) + a real\n`account_id_migration_map` table and backfill migration (Parts A1/A2), generalized to\nevery account, not just the one done by hand in T057",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T058 **Not started** — Part A0 (IAM bulk account-id enumeration) + a real",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T057"
+      ],
+      "inferred_depends_on": [
+        "T057"
+      ],
+      "wave": 14,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T059",
+      "title": "Not started",
+      "title_clean": "Not started",
+      "summary": "",
+      "flags": [],
+      "description": "Not started — Part A8, reusable tooling for migrating an account's existing\nnative connectors out of the shared workspace (T057 did this by hand, once)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T059 **Not started** — Part A8, reusable tooling for migrating an account's existing",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T058"
+      ],
+      "inferred_depends_on": [
+        "T058"
+      ],
+      "wave": 15,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T060",
+      "title": "Not started, real gap",
+      "title_clean": "Not started, real gap",
+      "summary": "",
+      "flags": [],
+      "description": "Not started, real gap — Part C1's actual `remote_json` authorizer against\n`nng-sprinkler-auth`; T055 shipped only the routing/header mechanics around this",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T060 **Not started, real gap** — Part C1's actual `remote_json` authorizer against",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T059"
+      ],
+      "inferred_depends_on": [
+        "T059"
+      ],
+      "wave": 16,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T061",
+      "title": "Unconfirmed",
+      "title_clean": "Unconfirmed",
+      "summary": "",
+      "flags": [],
+      "description": "Unconfirmed — Part A7, reject a cross-account `destinationId` in\n`PipelineHandler.completeWizard`; verify against current code before assuming either way",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T061 **Unconfirmed** — Part A7, reject a cross-account `destinationId` in",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T060"
+      ],
+      "inferred_depends_on": [
+        "T060"
+      ],
+      "wave": 17,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T062",
+      "title": "Not started",
+      "title_clean": "Not started",
+      "summary": "",
+      "flags": [],
+      "description": "Not started — Part C3, remove the gateway's old catch-all fallback rule once\naccess logs confirm zero traffic on old-shape paths\n\nCheckpoint: NOT met — T060 (real gateway authentication) is the single most important\nremaining item; until it ships, `accountId` is enforced only for internal consistency\n(path vs. header), not against caller identity. See `data-model.md`'s architecture diagram.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T062 **Not started** — Part C3, remove the gateway's old catch-all fallback rule once",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "data-model.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack jvm",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=jvm"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T061"
+      ],
+      "inferred_depends_on": [
+        "T061"
+      ],
+      "wave": 18,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "T101",
+      "title": "Add Blend route entries to `router/index.ts` (`/dataconnect/blends`, `/dataconnect/blends/new`) Checkpoint: Routes resolve to placeholder views",
+      "title_clean": "Add Blend route entries to router/index.ts (/dataconnect/blends, /dataconnect/blends/new)",
+      "summary": "",
+      "flags": [],
+      "description": "Add Blend route entries to `router/index.ts` (`/dataconnect/blends`,\n`/dataconnect/blends/new`)\n\nCheckpoint: Routes resolve to placeholder views",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T101 [P] Add Blend route entries to `router/index.ts` (`/dataconnect/blends`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "router/index.ts",
+          "/dataconnect/blends",
+          "/dataconnect/blends/new"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T102",
+      "title": "Add `Blend`, `BlendType`, `BlendMembership`, `CanonicalField`, `CanonicalMapping`, `JoinDirection`, `JoinKeyPair`, `UnionRowIdentity`, `PerMetricAggregationRule`, `PartialFailurePolicy` types to `types/index.ts`",
+      "title_clean": "Add Blend, BlendType, BlendMembership, CanonicalField, CanonicalMapping, JoinDirection, JoinKeyPair, UnionRowIdentity…",
+      "summary": "",
+      "flags": [],
+      "description": "Add `Blend`, `BlendType`, `BlendMembership`, `CanonicalField`,\n`CanonicalMapping`, `JoinDirection`, `JoinKeyPair`, `UnionRowIdentity`,\n`PerMetricAggregationRule`, `PartialFailurePolicy` types to `types/index.ts`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T102 Add `Blend`, `BlendType`, `BlendMembership`, `CanonicalField`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "types/index.ts"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T103",
+      "title": "Create `services/blends.ts`, modeled on `services/pipelines.ts`",
+      "title_clean": "Create services/blends.ts, modeled on services/pipelines.ts",
+      "summary": "",
+      "flags": [],
+      "description": "Create `services/blends.ts`, modeled on `services/pipelines.ts`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T103 [P] Create `services/blends.ts`, modeled on `services/pipelines.ts`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "services/blends.ts",
+          "services/pipelines.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T104",
+      "title": "Create `services/canonicalMappings.ts`",
+      "title_clean": "Create services/canonicalMappings.ts",
+      "summary": "",
+      "flags": [],
+      "description": "Create `services/canonicalMappings.ts`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T104 [P] Create `services/canonicalMappings.ts`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "services/canonicalMappings.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T105",
+      "title": "Create `stores/blends.ts`, modeled on `stores/pipelines.ts`'s `notificationsStore.addNotification` error pattern",
+      "title_clean": "Create stores/blends.ts, modeled on stores/pipelines.ts's notificationsStore.addNotification error pattern",
+      "summary": "",
+      "flags": [],
+      "description": "Create `stores/blends.ts`, modeled on `stores/pipelines.ts`'s\n`notificationsStore.addNotification` error pattern",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T105 Create `stores/blends.ts`, modeled on `stores/pipelines.ts`'s",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "stores/blends.ts",
+          "stores/pipelines.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T104"
+      ],
+      "inferred_depends_on": [
+        "T104"
+      ],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T106",
+      "title": "Create `stores/canonicalMappings.ts` Checkpoint: Types/stores/services compile and are ready for component work",
+      "title_clean": "Create stores/canonicalMappings.ts",
+      "summary": "",
+      "flags": [],
+      "description": "Create `stores/canonicalMappings.ts`\n\nCheckpoint: Types/stores/services compile and are ready for component work",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T106 [P] Create `stores/canonicalMappings.ts`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "stores/canonicalMappings.ts"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T107",
+      "title": "Create `BlendsList.vue` (near-identical structure to `PipelinesList.vue`)",
+      "title_clean": "Create BlendsList.vue (near-identical structure to PipelinesList.vue)",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendsList.vue` (near-identical structure to `PipelinesList.vue`)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T107 [US1] Create `BlendsList.vue` (near-identical structure to `PipelinesList.vue`)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "BlendsList.vue",
+          "PipelinesList.vue"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T105",
+        "T102",
+        "T103",
+        "T106"
+      ],
+      "inferred_depends_on": [
+        "T105",
+        "T102",
+        "T103",
+        "T106"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T108",
+      "title": "Create `BlendWizard.vue` outer shell (`v-stepper`, step-gated `canProceed`, Back/Continue/Save-draft footer, mirrors `PipelineWizard.vue`'s shell)",
+      "title_clean": "Create BlendWizard.vue outer shell (v-stepper, step-gated canProceed, Back/Continue/Save-draft footer, mirrors…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `BlendWizard.vue` outer shell (`v-stepper`, step-gated `canProceed`,\nBack/Continue/Save-draft footer, mirrors `PipelineWizard.vue`'s shell)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T108 [US1] Create `BlendWizard.vue` outer shell (`v-stepper`, step-gated `canProceed`,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [
+          "BlendWizard.vue",
+          "PipelineWizard.vue"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T107"
+      ],
+      "inferred_depends_on": [
+        "T107"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T109",
+      "title": "BlendWizard step: type selection (Union/Join)",
+      "title_clean": "BlendWizard step: type selection (Union/Join)",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: type selection (Union/Join)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T109 [US1] BlendWizard step: type selection (Union/Join)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T108"
+      ],
+      "inferred_depends_on": [
+        "T108"
+      ],
+      "wave": 4,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T110",
+      "title": "BlendWizard step: source selection — connectors + saved blends, calling `validate_source_selection` per candidate pick (backend call, not a client-side graph walk — resolved in `eng-context-frontend.md` Q3)",
+      "title_clean": "BlendWizard step: source selection — connectors + saved blends, calling validate_source_selection per candidate pick…",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: source selection — connectors + saved blends, calling\n`validate_source_selection` per candidate pick (backend call, not a client-side graph\nwalk — resolved in `eng-context-frontend.md` Q3)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T110 [US1] BlendWizard step: source selection — connectors + saved blends, calling",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "eng-context-frontend.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T109"
+      ],
+      "inferred_depends_on": [
+        "T109"
+      ],
+      "wave": 5,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T111",
+      "title": "BlendWizard step: canonical field mapping — manual-only (BR-03), no auto-match UI (the mockup's auto-match UI must be removed, not adapted)",
+      "title_clean": "BlendWizard step: canonical field mapping — manual-only (BR-03), no auto-match UI (the mockup's auto-match UI must be…",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: canonical field mapping — manual-only (BR-03), no\nauto-match UI (the mockup's auto-match UI must be removed, not adapted)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T111 [US1] BlendWizard step: canonical field mapping — manual-only (BR-03), no",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T110"
+      ],
+      "inferred_depends_on": [
+        "T110"
+      ],
+      "wave": 6,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T112",
+      "title": "BlendWizard step: Join config — direction selector, composite key-pair editor with completeness chip (FR-015)",
+      "title_clean": "BlendWizard step: Join config — direction selector, composite key-pair editor with completeness chip (FR-015)",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: Join config — direction selector, composite key-pair\neditor with completeness chip (FR-015)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T112 [US1] BlendWizard step: Join config — direction selector, composite key-pair",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T111"
+      ],
+      "inferred_depends_on": [
+        "T111"
+      ],
+      "wave": 7,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T113",
+      "title": "BlendWizard step: Union config — row-identity chevron-reorder editor (no drag-and-drop, per BR-34), per-metric aggregation-rule table",
+      "title_clean": "BlendWizard step: Union config — row-identity chevron-reorder editor (no drag-and-drop, per BR-34), per-metric…",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: Union config — row-identity chevron-reorder editor\n(no drag-and-drop, per BR-34), per-metric aggregation-rule table",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T113 [US1] BlendWizard step: Union config — row-identity chevron-reorder editor",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T112"
+      ],
+      "inferred_depends_on": [
+        "T112"
+      ],
+      "wave": 8,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T114",
+      "title": "BlendWizard step: pre-commit preview — schema-only `computed()` over wizard state, rendered only at this step (resolved design, `eng-research.md` Testing Strategy)",
+      "title_clean": "BlendWizard step: pre-commit preview — schema-only computed() over wizard state, rendered only at this step (resolved…",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: pre-commit preview — schema-only `computed()` over wizard\nstate, rendered only at this step (resolved design, `eng-research.md` Testing Strategy)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T114 [US1] BlendWizard step: pre-commit preview — schema-only `computed()` over wizard",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "eng-research.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T113"
+      ],
+      "inferred_depends_on": [
+        "T113"
+      ],
+      "wave": 9,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T115",
+      "title": "BlendWizard step: name and save",
+      "title_clean": "BlendWizard step: name and save",
+      "summary": "",
+      "flags": [],
+      "description": "BlendWizard step: name and save",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T115 [US1] BlendWizard step: name and save",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T114"
+      ],
+      "inferred_depends_on": [
+        "T114"
+      ],
+      "wave": 10,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T116",
+      "title": "Blocked-action UI for BR-08 dependent conflicts — render the structured dependent list from `DependencyConflict`, not parsed prose",
+      "title_clean": "Blocked-action UI for BR-08 dependent conflicts — render the structured dependent list from DependencyConflict, not…",
+      "summary": "",
+      "flags": [],
+      "description": "Blocked-action UI for BR-08 dependent conflicts — render the structured\ndependent list from `DependencyConflict`, not parsed prose",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T116 [US1] Blocked-action UI for BR-08 dependent conflicts — render the structured",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T115"
+      ],
+      "inferred_depends_on": [
+        "T115"
+      ],
+      "wave": 11,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T117",
+      "title": "Unit tests for `BlendsList.vue` (`vi.hoisted` mock-store pattern)",
+      "title_clean": "Unit tests for BlendsList.vue (vi.hoisted mock-store pattern)",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `BlendsList.vue` (`vi.hoisted` mock-store pattern)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T117 [US1] [P] Unit tests for `BlendsList.vue` (`vi.hoisted` mock-store pattern)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "BlendsList.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T107"
+      ],
+      "inferred_depends_on": [
+        "T107"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T118",
+      "title": "Unit tests for `BlendWizard.vue` Checkpoint: Blend authoring fully functional and tested — shippable alongside backend's Phase 3 CRUD milestone",
+      "title_clean": "Unit tests for BlendWizard.vue",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for `BlendWizard.vue`\n\nCheckpoint: Blend authoring fully functional and tested — shippable alongside backend's\nPhase 3 CRUD milestone",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T118 [US1] [P] Unit tests for `BlendWizard.vue`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "BlendWizard.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T108"
+      ],
+      "inferred_depends_on": [
+        "T108"
+      ],
+      "wave": 4,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T119",
+      "title": "`PipelineWizard.vue` Step 1 — saved-blends section above the existing `connectorsStore.sources` `v-for`",
+      "title_clean": "PipelineWizard.vue Step 1 — saved-blends section above the existing connectorsStore.sources v-for",
+      "summary": "",
+      "flags": [],
+      "description": "`PipelineWizard.vue` Step 1 — saved-blends section above the existing\n`connectorsStore.sources` `v-for`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T119 [US2] `PipelineWizard.vue` Step 1 — saved-blends section above the existing",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "PipelineWizard.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T116"
+      ],
+      "inferred_depends_on": [
+        "T116"
+      ],
+      "wave": 12,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T120",
+      "title": "`PipelineWizard.vue` Step 2 — partial-source-failure policy control, reusing the `SCHEMA_POLICY_OPTIONS`/`v-radio-group` pattern",
+      "title_clean": "PipelineWizard.vue Step 2 — partial-source-failure policy control, reusing the SCHEMA_POLICY_OPTIONS/v-radio-group…",
+      "summary": "",
+      "flags": [],
+      "description": "`PipelineWizard.vue` Step 2 — partial-source-failure policy control,\nreusing the `SCHEMA_POLICY_OPTIONS`/`v-radio-group` pattern",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T120 [US2] `PipelineWizard.vue` Step 2 — partial-source-failure policy control,",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "PipelineWizard.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T119"
+      ],
+      "inferred_depends_on": [
+        "T119"
+      ],
+      "wave": 13,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T121",
+      "title": "`PipelinesList.vue` — blend indicator on blend-backed rows",
+      "title_clean": "PipelinesList.vue — blend indicator on blend-backed rows",
+      "summary": "",
+      "flags": [],
+      "description": "`PipelinesList.vue` — blend indicator on blend-backed rows",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T121 [US2] `PipelinesList.vue` — blend indicator on blend-backed rows",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "PipelinesList.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T120"
+      ],
+      "inferred_depends_on": [
+        "T120"
+      ],
+      "wave": 14,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T122",
+      "title": "`Monitoring.vue` + `PipelineStatusChip.vue` — new Degraded status in the hardcoded `COLOR_BY_STATUS`/`LABEL_BY_STATUS` maps",
+      "title_clean": "Monitoring.vue + PipelineStatusChip.vue — new Degraded status in the hardcoded COLOR_BY_STATUS/LABEL_BY_STATUS maps",
+      "summary": "",
+      "flags": [],
+      "description": "`Monitoring.vue` + `PipelineStatusChip.vue` — new Degraded status in the\nhardcoded `COLOR_BY_STATUS`/`LABEL_BY_STATUS` maps",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T122 [US2] `Monitoring.vue` + `PipelineStatusChip.vue` — new Degraded status in the",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "Monitoring.vue",
+          "PipelineStatusChip.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T121"
+      ],
+      "inferred_depends_on": [
+        "T121"
+      ],
+      "wave": 15,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T123",
+      "title": "`AlertsPage.vue`/`stores/alerts.ts` — new `run_degraded` condition-type option",
+      "title_clean": "AlertsPage.vue/stores/alerts.ts — new run_degraded condition-type option",
+      "summary": "",
+      "flags": [],
+      "description": "`AlertsPage.vue`/`stores/alerts.ts` — new `run_degraded` condition-type\noption",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T123 [US2] `AlertsPage.vue`/`stores/alerts.ts` — new `run_degraded` condition-type",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "AlertsPage.vue",
+          "stores/alerts.ts"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T122"
+      ],
+      "inferred_depends_on": [
+        "T122"
+      ],
+      "wave": 16,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T124",
+      "title": "Unit tests for the `PipelineWizard.vue` changes",
+      "title_clean": "Unit tests for the PipelineWizard.vue changes",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for the `PipelineWizard.vue` changes",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T124 [US2] [P] Unit tests for the `PipelineWizard.vue` changes",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "PipelineWizard.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T108"
+      ],
+      "inferred_depends_on": [
+        "T108"
+      ],
+      "wave": 4,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T125",
+      "title": "Unit tests for the `Monitoring.vue`/`PipelineStatusChip.vue` changes Checkpoint: Blend-backed pipelines fully integrated into the existing pipeline UX",
+      "title_clean": "Unit tests for the Monitoring.vue/PipelineStatusChip.vue changes",
+      "summary": "",
+      "flags": [],
+      "description": "Unit tests for the `Monitoring.vue`/`PipelineStatusChip.vue` changes\n\nCheckpoint: Blend-backed pipelines fully integrated into the existing pipeline UX",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T125 [US2] [P] Unit tests for the `Monitoring.vue`/`PipelineStatusChip.vue` changes",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "Monitoring.vue",
+          "PipelineStatusChip.vue"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T126",
+      "title": "Playwright spec: Blend wizard happy path (`playwright/e2e/tests/`)",
+      "title_clean": "Playwright spec: Blend wizard happy path (playwright/e2e/tests/)",
+      "summary": "",
+      "flags": [],
+      "description": "Playwright spec: Blend wizard happy path (`playwright/e2e/tests/`)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T126 [P] Playwright spec: Blend wizard happy path (`playwright/e2e/tests/`)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "playwright/e2e/tests"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T127",
+      "title": "Playwright spec: Blend list + pipeline-integration happy path",
+      "title_clean": "Playwright spec: Blend list + pipeline-integration happy path",
+      "summary": "",
+      "flags": [],
+      "description": "Playwright spec: Blend list + pipeline-integration happy path",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T127 [P] Playwright spec: Blend list + pipeline-integration happy path",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T128",
+      "title": "Confirm/update `frontend-mos`'s root `CLAUDE.md` if warranted Checkpoint: Feature ready for QA usage and demo",
+      "title_clean": "Confirm/update frontend-mos's root CLAUDE.md if warranted",
+      "summary": "",
+      "flags": [],
+      "description": "Confirm/update `frontend-mos`'s root `CLAUDE.md` if warranted\n\nCheckpoint: Feature ready for QA usage and demo",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T128 [P] Confirm/update `frontend-mos`'s root `CLAUDE.md` if warranted",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": "mos-ui",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "CLAUDE.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "frontend: kg-service kind=frontend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "frontend"
+          }
+        ],
+        "assignee": null,
+        "lane": "frontend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "inferred_depends_on": [
+        "T102",
+        "T103",
+        "T105",
+        "T106"
+      ],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "T201",
+      "title": "[SRE-owned, own issue — do not fold into an application-code task]",
+      "title_clean": "[SRE-owned, own issue — do not fold into an application-code task]",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: Exact local_ssd_ephemeral_storage_count value (N) in T201"
+        }
+      ],
+      "description": "[SRE-owned, own issue — do not fold into an application-code task] Add\n`local_ssd_ephemeral_storage_count = N` to the `s-n4-std-8-airbyte` node pool in\n`ko-infrastructure/service/qa/platformmesh/greedy_goat.tf`. Field confirmed by reading the\npinned module source directly at tag `v41.0.1`\n(`modules/beta-private-cluster/cluster.tf`) — this is the one of four similarly-named\nfields (`local_ssd_count`, `local_ssd_ephemeral_storage_count`,\n`local_ssd_ephemeral_count`, `local_nvme_ssd_count`) that actually backs `emptyDir` with\nlocal SSD; the other three would silently leave `emptyDir` on the boot disk despite\nlooking correct in the Terraform diff. Exact `N` is still open (see Open Items).",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T201 **[SRE-owned, own issue — do not fold into an application-code task]** Add",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-infrastructure",
+      "stack": "yaml-tf",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "ko-infrastructure/service/qa/platformmesh/greedy_goat.tf",
+          "modules/beta-private-cluster/cluster.tf"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "sre-agent",
+        "id": "sre-agent",
+        "reason": "infra repo routed to sre-agent",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    },
+    {
+      "id": "T202",
+      "title": "Confirm the `blend-staging/` GCS prefix convention with whoever owns the shared storage bucket's key-prefix scheme (mirrors the existing log/state/workloadOutput/activityPayload/auditLogging separation)",
+      "title_clean": "Confirm the blend-staging/ GCS prefix convention with whoever owns the shared storage bucket's key-prefix scheme…",
+      "summary": "",
+      "flags": [],
+      "description": "Confirm the `blend-staging/` GCS prefix convention with whoever owns the\nshared storage bucket's key-prefix scheme (mirrors the existing\nlog/state/workloadOutput/activityPayload/auditLogging separation)",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T202 [P] Confirm the `blend-staging/` GCS prefix convention with whoever owns the",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-infrastructure",
+      "stack": "yaml-tf",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "blend-staging"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "sre-agent",
+        "id": "sre-agent",
+        "reason": "infra repo routed to sre-agent",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    },
+    {
+      "id": "T203",
+      "title": "Add `nodeSelector`/`toleration` wiring for the combine-Job pod in `ko-k8s-apps/airbyte/app/qa/release.yaml`, if `BlendCombineJobPodFactory.kt` (T033) needs explicit chart-level config beyond what the pod spec itself sets Checkpoint: Infra ready for the combine Job to actually schedule and run correctly",
+      "title_clean": "Add nodeSelector/toleration wiring for the combine-Job pod in ko-k8s-apps/airbyte/app/qa/release.yaml, if…",
+      "summary": "",
+      "flags": [],
+      "description": "Add `nodeSelector`/`toleration` wiring for the combine-Job pod in\n`ko-k8s-apps/airbyte/app/qa/release.yaml`, if `BlendCombineJobPodFactory.kt` (T033) needs\nexplicit chart-level config beyond what the pod spec itself sets\n\nCheckpoint: Infra ready for the combine Job to actually schedule and run correctly",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T203 [P] Add `nodeSelector`/`toleration` wiring for the combine-Job pod in",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-infrastructure",
+      "stack": "yaml-tf",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "",
+          "ko-k8s-apps/airbyte/app/qa/release.yaml"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "sre-agent",
+        "id": "sre-agent",
+        "reason": "infra repo routed to sre-agent",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/airbyte-platform-2.0.0 with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/airbyte-platform-2.0.0",
+      "stack": "node-ts",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/airbyte-platform-2.0.0 before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T002",
+        "T014",
+        "T022",
+        "T023",
+        "T024",
+        "T025",
+        "T033",
+        "T034",
+        "T035",
+        "T038",
+        "T043",
+        "T045",
+        "T049",
+        "T050",
+        "T051",
+        "T052",
+        "T062"
+      ],
+      "inferred_depends_on": [],
+      "wave": 19,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "npm test"
+    },
+    {
+      "id": "TG2",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/frontend-mos with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG2",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/frontend-mos",
+      "stack": "vue",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/frontend-mos before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T101",
+        "T117",
+        "T118",
+        "T123",
+        "T124",
+        "T125",
+        "T126",
+        "T127",
+        "T128"
+      ],
+      "inferred_depends_on": [],
+      "wave": 17,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "npm run test:ci"
+    },
+    {
+      "id": "TG3",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/ko-infrastructure with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG3",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-infrastructure",
+      "stack": "yaml-tf",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/ko-infrastructure before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T201",
+        "T202",
+        "T203"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T002",
+      "T003",
+      "T004",
+      "T005",
+      "T006",
+      "T008",
+      "T009",
+      "T010",
+      "T011",
+      "T101",
+      "T102",
+      "T103",
+      "T104",
+      "T106",
+      "T201",
+      "T202",
+      "T203"
+    ],
+    [
+      "T007",
+      "T012",
+      "T105",
+      "TG3"
+    ],
+    [
+      "T013",
+      "T015",
+      "T022",
+      "T023",
+      "T024",
+      "T025",
+      "T034",
+      "T035",
+      "T039",
+      "T040",
+      "T042",
+      "T107",
+      "T125",
+      "T126",
+      "T127",
+      "T128"
+    ],
+    [
+      "T014",
+      "T016",
+      "T108",
+      "T117"
+    ],
+    [
+      "T017",
+      "T109",
+      "T118",
+      "T124"
+    ],
+    [
+      "T018",
+      "T110"
+    ],
+    [
+      "T019",
+      "T111"
+    ],
+    [
+      "T020",
+      "T112"
+    ],
+    [
+      "T021",
+      "T041",
+      "T113"
+    ],
+    [
+      "T026",
+      "T043",
+      "T044",
+      "T046",
+      "T050",
+      "T052",
+      "T053",
+      "T114"
+    ],
+    [
+      "T027",
+      "T045",
+      "T047",
+      "T051",
+      "T054",
+      "T115"
+    ],
+    [
+      "T028",
+      "T036",
+      "T048",
+      "T055",
+      "T116"
+    ],
+    [
+      "T029",
+      "T037",
+      "T049",
+      "T056",
+      "T119"
+    ],
+    [
+      "T030",
+      "T038",
+      "T057",
+      "T120"
+    ],
+    [
+      "T031",
+      "T058",
+      "T121"
+    ],
+    [
+      "T032",
+      "T059",
+      "T122"
+    ],
+    [
+      "T033",
+      "T060",
+      "T123"
+    ],
+    [
+      "T061",
+      "TG2"
+    ],
+    [
+      "T062"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 0,
+    "covered": 0,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [
+    {
+      "task_id": "T201",
+      "question": "Exact `local_ssd_ephemeral_storage_count` value (`N`) in T201",
+      "reason": "SRE, non-blocking"
+    },
+    {
+      "task_id": "T040",
+      "question": "Exact new `MAX_SYNC_WORKERS` value in T040",
+      "reason": "Whoever owns `charts/v2/airbyte` values, needs real-usage data"
+    },
+    {
+      "task_id": "T002",
+      "question": "`duckdb_jdbc` version pin in T002",
+      "reason": "Backend engineer picking up T002, should be resolvable in minutes by checking the latest stable release"
+    }
+  ],
+  "decisions": "",
+  "warnings": [
+    "Open item T201: Exact `local_ssd_ephemeral_storage_count` value (`N`) in T201",
+    "Open item T040: Exact new `MAX_SYNC_WORKERS` value in T040",
+    "Open item T002: `duckdb_jdbc` version pin in T002"
+  ],
+  "removed": []
+}
