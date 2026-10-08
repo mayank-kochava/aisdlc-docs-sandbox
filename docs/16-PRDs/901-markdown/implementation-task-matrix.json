@@ -1,0 +1,619 @@
+{
+  "matrix_id": "wi_prd901_80eef1-r1",
+  "prd": {
+    "id": "wi_prd901_80eef1",
+    "folder": "local/901-markdown",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-10-08T15:06:29.609767Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Implement in-memory `Store` with deterministic, collision-safe codes Files: - Create: `shortener/store.go` - Create: `shortener/store_test.go` Pattern: None",
+      "title_clean": "Implement in-memory Store with deterministic, collision-safe codes Files: - Create: shortener/store.go - Create…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: No eng-research.md was provided, and the sandbox repo contents are unverified"
+        }
+      ],
+      "description": "Implement in-memory `Store` with deterministic, collision-safe codes\n\nFiles:\n- Create: `shortener/store.go`\n- Create: `shortener/store_test.go`\n\nPattern: None. The sandbox repo has no existing code anchors (see Open Items).\n\nInterfaces:\n- Produces:\n- `type Store struct`\n- `func NewStore() *Store`\n- `func (s *Store) Save(url string) string`\n- `func (s *Store) Lookup(code string) (string, bool)`\n- unexported `func deriveCode(url string, attempt int) string`\n- unexported field `codeFn func(string, int) string`, defaulting to `deriveCode` so tests can force collisions\n- Consumes: nothing.\n\nSteps:\n0. Baseline: `go version` reports 1.22 or later, and `go vet ./... && go test ./...` is green (or reports \"no packages\" on an empty repo). If not, stop and report.\n1. Write `shortener/store_test.go` (package `shortener`) with these failing tests:\n- `TestDeriveCode` (table): the same URL and attempt give the same result. The result has length 6 and only `[0-9A-Za-z]`. Attempt 0 differs from attempt 1 for the same URL.\n- `TestSaveLookup`: `code := s.Save(\"https://example.com/a\")` has length 6, and `Lookup(code)` returns the URL and `true`. `Lookup(\"zzzzzz\")` returns `\"\", false`.\n- `TestSaveIdempotent`: two `Save` calls with one URL return the same code (FR-4).\n- `TestSaveCollision`: set `s.codeFn = func(u string, a int) string { if a == 0 { return \"AAAAAA\" }; return fmt.Sprintf(\"B%05d\", a) }`. Then `c1 := s.Save(\"http://a\")` and `c2 := s.Save(\"http://b\")`. Assert `c1 != c2`, that each code looks up its own URL, and that a second `Save(\"http://b\")` returns `c2`.\n- `TestSaveConcurrent`: 50 goroutines call `Save` on a mix of identical and distinct URLs. Assert no panic, and that identical URLs got identical codes.\n2. Run `go test ./shortener/...` and confirm a compile failure (undefined `NewStore`).\n3. Implement `shortener/store.go`:\n- `Store` has `mu sync.RWMutex`, `byCode map[string]string`, `byURL map[string]string` and `codeFn`.\n- `deriveCode(url, attempt)` hashes `url` when `attempt == 0`, or `url + strconv.Itoa(attempt)` otherwise, with `crypto/sha256`. It converts the digest with `new(big.Int).SetBytes(sum[:]).Text(62)` and returns the first 6 characters.\n- `Save` takes the write lock. If `byURL[url]` exists it returns that code. Otherwise it loops `attempt := 0; ; attempt++`. It computes `code := s.codeFn(url, attempt)`, and if `byCode[code]` is absent it records both maps and returns. If the code is taken (necessarily by a different URL, since the same URL was already handled), it continues.\n- `Lookup` takes the read lock.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Commit: `git add shortener/store.go shortener/store_test.go && git commit -m \"feat(shortener): add in-memory store with deterministic collision-safe codes\"`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T001 [P] Implement in-memory `Store` with deterministic, collision-safe codes",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "shortener/store.go",
+          "crypto/sha256"
+        ],
+        "test": [
+          "shortener/store_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Implement `ValidateURL` Files: - Create: `shortener/validate.go` - Create: `shortener/validate_test.go` Pattern: None (greenfield)",
+      "title_clean": "Implement ValidateURL Files: - Create: shortener/validate.go - Create: shortener/validate_test.go Pattern: None…",
+      "summary": "",
+      "flags": [],
+      "description": "Implement `ValidateURL`\n\nFiles:\n- Create: `shortener/validate.go`\n- Create: `shortener/validate_test.go`\n\nPattern: None (greenfield).\n\nInterfaces:\n- Produces: `func ValidateURL(raw string) error`. Error messages are exactly:\n- `url is required`\n- `url must be a valid http or https URL`\n- `url must be at most 2048 characters`\n- Consumes: nothing.\n\nSteps:\n1. Write `shortener/validate_test.go` (package `shortener`) with a table test `TestValidateURL`, which fails to compile before the implementation exists. Cases:\n\n| Input | Result |\n|-------|--------|\n| `http://example.com` | ok |\n| `https://example.com/a?b=c` | ok |\n| `HTTP://EXAMPLE.COM` | ok |\n| `\"\"` | `url is required` |\n| `ftp://example.com` | `url must be a valid http or https URL` |\n| `javascript:alert(1)` | same |\n| `//example.com` | same |\n| `http://` (no host) | same |\n| `not a url` | same |\n| `\"http://a.com/\"` padded with `a` to exactly 2048 runes | ok |\n| the same input padded to 2049 runes | `url must be at most 2048 characters` |\n\nAssert on `err.Error()` for the failing cases.\n2. Run `go test ./shortener/...` and confirm the failure.\n3. Implement `shortener/validate.go`:\n- Empty string returns the required error.\n- `utf8.RuneCountInString(raw) > 2048` returns the length error. The length check runs before parsing.\n- `net/url.Parse(raw)` failing, a scheme other than `http` or `https` (the parser lowercases the scheme), or an empty `Host` returns the invalid error.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Commit: `git add shortener/validate.go shortener/validate_test.go && git commit -m \"feat(shortener): add URL validation\"`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T002 [P] Implement `ValidateURL`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "shortener/validate.go",
+          "//example.com"
+        ],
+        "test": [
+          "shortener/validate_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T003",
+      "title": "Create `NewHandler` with `GET /healthz` Files: - Create: `shortener/handler.go` - Create: `shortener/handler_test.go` Pattern: None (greenfield)",
+      "title_clean": "Create NewHandler with GET /healthz Files: - Create: shortener/handler.go - Create: shortener/handler_test.go Pattern…",
+      "summary": "",
+      "flags": [],
+      "description": "Create `NewHandler` with `GET /healthz`\n\nFiles:\n- Create: `shortener/handler.go`\n- Create: `shortener/handler_test.go`\n\nPattern: None (greenfield).\n\nInterfaces:\n- Produces: `func NewHandler(s *Store) http.Handler`, backed by an unexported `type handler struct{ store *Store }` and a `(h *handler) healthz` method. It registers `\"GET /healthz\"` on an `http.ServeMux`.\n- Consumes: `*Store` (T001).\n\nSteps:\n1. Write `shortener/handler_test.go` (package `shortener`) with `TestHealthz` using `httptest.NewRecorder`:\n- `GET /healthz` returns 200 with body exactly `ok`.\n- `POST /healthz` returns 405 (provided by the 1.22 mux method pattern).\n2. Run `go test ./shortener/...` and confirm the failure (undefined `NewHandler`).\n3. Implement `handler.go`. Build the mux in `NewHandler` and register `mux.HandleFunc(\"GET /healthz\", h.healthz)`. `healthz` sets `Content-Type: text/plain; charset=utf-8` and writes `ok`.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Commit: `git add shortener/handler.go shortener/handler_test.go && git commit -m \"feat(shortener): add handler with healthz\"`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T003 [US1] Create `NewHandler` with `GET /healthz`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "shortener/handler.go",
+          "handler.go"
+        ],
+        "modify": [],
+        "test": [
+          "shortener/handler_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "inferred_depends_on": [
+        "T001",
+        "T002"
+      ],
+      "wave": 1,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T004",
+      "title": "Add `cmd/shortener/main.go` with `PORT` override and graceful shutdown Files: - Create: `cmd/shortener/main.go` - Create: `cmd/shortener/main_test.go` Pattern: None (greenfield)",
+      "title_clean": "Add cmd/shortener/main.go with PORT override and graceful shutdown Files: - Create: cmd/shortener/main.go - Create…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: No eng-research.md was provided, and the sandbox repo contents are unverified"
+        }
+      ],
+      "description": "Add `cmd/shortener/main.go` with `PORT` override and graceful shutdown\n\nFiles:\n- Create: `cmd/shortener/main.go`\n- Create: `cmd/shortener/main_test.go`\n\nPattern: None (greenfield).\n\nInterfaces:\n- Produces: unexported `func listenAddr(getenv func(string) string) string`, and `func main()`.\n- Consumes: `shortener.NewStore()` (T001) and `shortener.NewHandler(*Store)` (T003), imported from `github.com/mayank-kochava/coding-agent-sandbox/shortener`.\n\nSteps:\n1. Write `cmd/shortener/main_test.go` (package `main`) with table test `TestListenAddr`:\n- `PORT` unset or empty gives `:8081`.\n- `PORT=9090` gives `:9090`.\n- Drive it with a fake `getenv` closure.\n2. Run `go test ./cmd/...` and confirm the failure.\n3. Implement `main.go`:\n- `listenAddr` returns `\":\" + p` when `getenv(\"PORT\")` is non-empty, else `\":8081\"`.\n- `main` builds `srv := &http.Server{Addr: listenAddr(os.Getenv), Handler: shortener.NewHandler(shortener.NewStore()), ReadHeaderTimeout: 5 * time.Second}`.\n- It runs `ListenAndServe` in a goroutine.\n- It waits on `signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)`.\n- On signal it logs `shutting down`, calls `srv.Shutdown` with a 5-second timeout context, and exits 0. A `ListenAndServe` error other than `http.ErrServerClosed` is logged and exits 1.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Runtime check:\n```bash\ngo build -o /tmp/shortener ./cmd/shortener\nPORT=8099 /tmp/shortener & PID=$!\nsleep 1\ncurl -si localhost:8099/healthz      # expect HTTP/1.1 200 and body \"ok\"\nkill -TERM $PID; wait $PID; echo $?  # expect \"shutting down\" logged and exit code 0\n```\n6. Commit: `git add cmd/shortener && git commit -m \"feat(cmd): add shortener server with PORT override and graceful shutdown\"`\n\nCheckpoint: Slice US1 is runnable and healthy.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T004 [P] [US1] Add `cmd/shortener/main.go` with `PORT` override and graceful shutdown",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/shortener/main.go",
+          "main.go"
+        ],
+        "test": [
+          "cmd/shortener/main_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "inferred_depends_on": [
+        "T001",
+        "T002"
+      ],
+      "wave": 1,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T005",
+      "title": "Add `POST /shorten` Files: - Modify: `shortener/handler.go` - Modify: `shortener/handler_test.go` Pattern: Follow the `healthz` registration and handler-method style from T003",
+      "title_clean": "Add POST /shorten Files: - Modify: shortener/handler.go - Modify: shortener/handler_test.go Pattern: Follow the…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: Over-limit request body"
+        }
+      ],
+      "description": "Add `POST /shorten`\n\nFiles:\n- Modify: `shortener/handler.go`\n- Modify: `shortener/handler_test.go`\n\nPattern: Follow the `healthz` registration and handler-method style from T003.\n\nInterfaces:\n- Produces: `(h *handler) shorten`, registered as `\"POST /shorten\"` in `NewHandler`. The response shape is `{\"code\": string, \"short_url\": \"/r/<code>\"}`.\n- Consumes: `ValidateURL` (T002), `(*Store).Save` (T001), `NewHandler` (T003).\n\nSteps:\n1. Add `TestShorten` to `handler_test.go` (a table of `POST /shorten` requests):\n\n| Case | Expected |\n|------|----------|\n| `{\"url\":\"https://example.com/a\"}` | 201, `Content-Type: application/json`, `code` length 6, `short_url == \"/r/\"+code` |\n| Same body sent twice | identical `code` both times (FR-4) |\n| `{}` | 400, `{\"error\":\"url is required\"}` |\n| `{\"url\":\"\"}` | 400, `url is required` |\n| `{\"url\":\"ftp://x.com\"}` | 400, `url must be a valid http or https URL` |\n| URL of 2049 runes | 400, `url must be at most 2048 characters` |\n| `not json` | 400, `{\"error\":\"invalid request body\"}` |\n| `{\"url\":123}` | 400, `invalid request body` |\n| Body of `{\"url\":\"` + 1 MiB + 1 bytes of `a` + `\"}` | 400, `{\"error\":\"request body too large\"}` |\n| `GET /shorten` | 405 |\n\nError responses must also have `Content-Type: application/json`.\n2. Run `go test ./shortener/...` and confirm the new cases fail (404 or 405).\n3. Implement `shorten`:\n- Wrap the body with `http.MaxBytesReader(w, r.Body, 1<<20)`.\n- Decode into `struct{ URL string \\`json:\"url\"\\` }`.\n- If the decode error satisfies `errors.As(err, new(*http.MaxBytesError))`, return 400 `request body too large`. Any other decode error returns 400 `invalid request body`.\n- Call `ValidateURL`. On error, return 400 with `{\"error\": err.Error()}`.\n- Otherwise call `h.store.Save`, then return 201 with `{\"code\": code, \"short_url\": \"/r/\" + code}`.\n- Add a small `writeJSON(w, status, v)` helper.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Runtime check: build and run as in T004, then:\n```bash\ncurl -si -X POST localhost:8099/shorten -d '{\"url\":\"https://example.com\"}'\n```\nExpect 201 and a code, with the same code on a repeat call. Then send `-d '{}'` and expect 400.\n6. Commit: `git add shortener && git commit -m \"feat(shortener): add POST /shorten with validation and idempotent codes\"`\n\nCheckpoint: Slice US2 is fully functional and tested.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T005 [US2] Add `POST /shorten`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "shortener/handler.go"
+        ],
+        "test": [
+          "shortener/handler_test.go",
+          "handler_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003"
+      ],
+      "inferred_depends_on": [
+        "T003"
+      ],
+      "wave": 2,
+      "requirements": [
+        "US-2"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T006",
+      "title": "Add `GET /r/{code}` Files: - Modify: `shortener/handler.go` - Modify: `shortener/handler_test.go` Pattern: Follow the handler-method style from T003 and T005",
+      "title_clean": "Add GET /r/{code} Files: - Modify: shortener/handler.go - Modify: shortener/handler_test.go Pattern: Follow the…",
+      "summary": "",
+      "flags": [],
+      "description": "Add `GET /r/{code}`\n\nFiles:\n- Modify: `shortener/handler.go`\n- Modify: `shortener/handler_test.go`\n\nPattern: Follow the handler-method style from T003 and T005.\n\nInterfaces:\n- Produces: `(h *handler) redirect`, registered as `\"GET /r/{code}\"`.\n- Consumes: `(*Store).Lookup` (T001), `NewHandler` (T003). It reads `r.PathValue(\"code\")`.\n\nSteps:\n1. Add `TestRedirect` to `handler_test.go`. Each case builds its own store, calls `store.Save` directly to seed it, and sends the request through `NewHandler(store)`:\n- A saved URL `https://example.com/a?b=c&d=e` returns 302 with `Location` exactly equal to that URL (query string preserved).\n- `GET /r/zzzzzz` (unknown) returns 404.\n- `POST /r/anything` returns 405.\n2. Run `go test ./shortener/...` and confirm failure.\n3. Implement `redirect`. Look up `r.PathValue(\"code\")`. If it is not found, return `http.Error(w, \"not found\", http.StatusNotFound)`. Otherwise set `w.Header().Set(\"Location\", url)` and call `w.WriteHeader(http.StatusFound)`. Setting the header manually avoids any rewriting of the stored URL.\n4. Run `go vet ./... && go test -race ./...` and confirm green.\n5. Runtime check: with the binary running, shorten a URL, then `curl -si localhost:8099/r/<code>` should return 302 with the right `Location`. `curl -si localhost:8099/r/zzzzzz` should return 404.\n6. Commit: `git add shortener && git commit -m \"feat(shortener): add GET /r/{code} redirect\"`\n\nCheckpoint: Slice US3 is fully functional and tested. All FRs are met.",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T006 [US3] Add `GET /r/{code}`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "shortener/handler.go"
+        ],
+        "test": [
+          "shortener/handler_test.go",
+          "handler_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T005"
+      ],
+      "inferred_depends_on": [
+        "T005"
+      ],
+      "wave": 3,
+      "requirements": [
+        "US-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T007",
+      "title": "Document the service in `README.md` Files: - Modify: `README.md` (append the section if the file exists, otherwise create it) Pattern: None",
+      "title_clean": "Document the service in README.md Files: - Modify: README.md (append the section if the file exists, otherwise create…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Open decision in the doc: Whether README.md already exists"
+        }
+      ],
+      "description": "Document the service in `README.md`\n\nFiles:\n- Modify: `README.md` (append the section if the file exists, otherwise create it)\n\nPattern: None. Do not modify unrelated existing README content.\n\nInterfaces:\n- Produces: a `## URL Shortener` section.\n- Consumes: the behavior from T004 (port and `PORT`), T005 (`/shorten`) and T006 (`/r/{code}`).\n\nSteps:\n1. Write the `## URL Shortener` section covering:\n- how to run it (`go run ./cmd/shortener`, default `:8081`, `PORT` override);\n- the three endpoints with a `curl` example each and the status codes from FR-1 to FR-5;\n- the 2048-character URL limit;\n- a note that storage is in-memory and lost on restart;\n- the out-of-scope list: persistence, auth, metrics, custom codes, expiry.\n2. Verify:\n- `grep -n \"## URL Shortener\" README.md` finds exactly one match.\n- Run the README's example commands against the built binary and confirm they match the documented responses.\n- `go vet ./... && go test -race ./...` is still green.\n3. Commit: `git add README.md && git commit -m \"docs: document URL shortener service\"`",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "- [ ] T007 Document the service in `README.md`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "/shorten",
+          "README.md"
+        ],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T006"
+      ],
+      "inferred_depends_on": [
+        "T006"
+      ],
+      "wave": 4,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for mayank-kochava/coding-agent-sandbox with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for mayank-kochava/coding-agent-sandbox before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004",
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T002"
+    ],
+    [
+      "T003",
+      "T004"
+    ],
+    [
+      "T005"
+    ],
+    [
+      "T006"
+    ],
+    [
+      "T007"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 0,
+    "covered": 0,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [
+    {
+      "task_id": "T001",
+      "question": "No `eng-research.md` was provided, and the sandbox repo contents are unverified",
+      "reason": "Confirm the repo is greenfield for these paths, or supply research anchors"
+    },
+    {
+      "task_id": "T004",
+      "question": "No `eng-research.md` was provided, and the sandbox repo contents are unverified",
+      "reason": "Confirm the repo is greenfield for these paths, or supply research anchors"
+    },
+    {
+      "task_id": "T007",
+      "question": "Whether `README.md` already exists",
+      "reason": "None required"
+    },
+    {
+      "task_id": "T005",
+      "question": "Over-limit request body",
+      "reason": "Raise only if the product owner wants 413"
+    }
+  ],
+  "decisions": "",
+  "warnings": [
+    "Open item T001: No `eng-research.md` was provided, and the sandbox repo contents are unverified",
+    "Open item T004: No `eng-research.md` was provided, and the sandbox repo contents are unverified",
+    "Open item T007: Whether `README.md` already exists",
+    "Open item T005: Over-limit request body"
+  ],
+  "removed": []
+}
