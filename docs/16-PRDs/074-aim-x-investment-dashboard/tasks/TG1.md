@@ -1,0 +1,130 @@
+# TG1: Run tests & validate build
+
+## In short
+
+Run the full build and tests for Kochava/frontend-mos with every task above merged.
+
+🟢 Clear
+
+## Overview
+
+| Field | Value |
+|---|---|
+| Task ID | TG1 |
+| Repo | Kochava/frontend-mos |
+| Phase | Phase 16 |
+| User Story | N/A |
+| Parallel | No |
+| Status | New |
+| Owner | Test/Change Agent |
+
+## Context
+
+Run the full build and tests for Kochava/frontend-mos with every task above merged. Do not edit source.
+
+This task is part of AIM X Investment Dashboard.
+
+### `frontend-mos` (`@mos/advertiser`)
+**Technology**: Vue 3.5, Vuetify 3.12, Pinia, vue-router
+**Key Files**:
+- `packages/advertiser/src/shared/composables/useAdvertiserMenu.ts` — nav entry point
+- `packages/core/src/components/ui/SideDrawer.vue` — drawer base component
+- `packages/app/src/components/HelpContainer.vue` + `packages/core/src/components/ui/PageContainer.vue` — Help & Definitions plumbing
+- `packages/advertiser/src/shared/stores/k4aAccount.ts` — `featureRollout()` gating pattern
+**Changes**:
+| Change | Type | Complexity | Notes |
+|--------|------|------------|-------|
+| `InvestmentDashboard.vue` page + route | New | M | Lazy-loaded route under `mmm_insights` menu; must comply with existing bundle-size/lazy-load CI checks. |
+| `useAdvertiserMenu.ts` — new child menu item | Modify | L | Add under existing "AIM MMM" (`mmm_insights`) section's `children[]`. |
+| `NetworkIntelligenceDrawer.vue`, `SystemHealthDrawer.vue` | New | M each | Wrap existing `SideDrawer.vue`, `width="480"`. |
+| `AimHelp.vue` | New | L | Passed via `PageContainer`'s `help` prop — no new drawer plumbing. |
+| Onboarding tour component | New | H | **Blocked** on library-vs-custom decision (Dependency Standards). |
+| `AimProCard.vue` (upsell) | New | M | No existing reusable upsell card — new UI, needs design input. |
+| `ConfigWarningBanner.vue` | New | M | Per FR-031/032/052: no banner when confirmed; dismissible warning otherwise, persisted per-issue (browser-local). |
+| `SubscriptionTrendChart.vue` | New | M | Via `@mos/core`'s Highcharts wrapper composables only — no direct Highcharts import. |
+| `k4aAccount.ts` — `aim_x`/`aim_pro` feature-flag checks | Modify | M | Follows `featureRollout(key)` pattern; exact flag key names pending confirmation. |
+| `services/investmentDashboard.ts` — axios calls to new `mmm-portal-api` endpoints | New | M | Thin per-domain axios instance, matching `DashApi`/`AccountsApi` pattern. |
+| browser-use E2E tasks (`investment-dashboard/`) | New | M | New folder under `playwright/browser-use/tasks/{admin,basic}/`. |
+| i18n keys (`packages/app/src/locales/en.json`) | New | M | **Gap found 9 Jul 2026**: every new piece of UI copy (banner text, glossary terms, tour step content, upsell card copy, drawer labels) needs i18n keys, per `frontend-mos`'s mandatory convention — no hard-coded strings. Run `npm run i18n:generate` to auto-translate to fr/es/de/ru/ko/ja/zh once keys are added. |
+
+## Summary
+Build a new Investment Dashboard page (plus two slide-in drawers, an onboarding tour, and a Help & Definitions panel) inside `frontend-mos`'s existing `@mos/advertiser` package, nested in the existing "AIM MMM" nav section. It's backed by three new/extended endpoints on `mmm-portal-api` (C#/.NET 7) reading from a shared Metadata MongoDB, and gates `AIM X`/`AIM Pro` access via new `feature_flags[]` entries following the existing FAA-vs-paid-tier pattern. Backend API-level account-type enforcement is explicitly deferred to a subsequent release (Sprinkler-based authenticator, not built in this phase).
+**Scope correction (9 Jul 2026):** an earlier draft of this plan incorrectly scoped `mmm-attribution-api` changes into this phase for "Attribution/MMP comparison." That feature is explicitly **Out of Scope for Phase 1** per `product-spec-v3.md` Section 6 — it's AIM Pro-only and surfaced only as a static `AimProCard` upsell in this release, with no working comparison feature behind it. `mmm-attribution-api` research in `eng-research.md` remains useful groundwork for whenever that future phase is built, but **no `mmm-attribution-api` changes are part of this plan.**
+
+## Technical Context
+**Language/Version**:
+- `mmm-portal-api`: C# / ASP.NET Core, .NET 7.0
+- `mmm-attribution-api`: TypeScript / Node.js, GraphQL Yoga v5
+- `frontend-mos`: Vue 3.5 (Composition API), TypeScript
+**Primary Dependencies**:
+- Backend: Autofac (DI), AutoMapper, MongoDB.Driver 2.22, FluentValidation, Swashbuckle
+- GraphQL: GraphQL Yoga + Envelop, `mysql2`, `mongodb`, `ioredis`, Inversify (DI)
+- Frontend: Vuetify 3.12, Pinia, vue-router, Highcharts (via `@mos/core` wrapper only)
+**Storage**:
+- Metadata MongoDB (shared instance across `mmm-portal-api` and ML Services) — new `network_intelligence` collection, keyed on app ID + region + advertiser ID per FR-039
+- Aurora MySQL (Attribution store, read-only, unchanged) — existing `attribution_{appId}`/`potential_{appId}` tables
+**Testing**:
+...
+
+## Implementation Guide
+
+1. Implement: Run tests & validate build
+2. Add or update the tests listed under Files to Modify
+3. Run `npm run test:ci`
+
+## Files to Modify
+
+| File | Create/Modify/Test | Note |
+|---|---|---|
+| (none captured, check the plan) | - | - |
+
+## Acceptance Criteria
+
+- Build and existing tests still pass.
+- Existing tests pass
+- New functionality has test coverage
+- Code follows repository conventions (see CLAUDE.md)
+
+## Dependencies
+
+**Blocked by:**
+- T101 - Verify frontend-mos dev environment builds and existing tests pass (npm run test:unit, bundle-size check) before…
+- T102 - Confirm the onboarding-tour library-vs-hand-built decision is resolved (BLOCKED per eng-plan.md Dependencies &…
+- T109 - Implement the per-network pacing tile component (grid mode) inside InvestmentDashboard.vue, rendering action badge…
+- T115 - Implement Forward Month Planning Mode (3 forward periods) reusing the same tile component with period-scoped data
+- T116 - Implement the Totals & Investment Efficiency summary row
+- T118 - Implement FR-042 account-level empty-state (zero configured networks)
+- T122 - Playwright E2E test covering the FR-041/FR-042/FR-024 edge states
+- T123 - browser-use E2E task in playwright/browser-use/tasks/{admin,basic}/investment-dashboard/ covering the grid/list happy…
+- T125 - Implement SystemHealthDrawer.vue in packages/advertiser/src/views/AimInvestmentDashboard/components/SystemHealthDrawer.…
+- T129 - browser-use E2E task covering all four System Health states
+- T133 - Implement the cost-curve chart binding once ML Services confirms single-point vs. multi-point curve shape (see Open…
+- T137 - browser-use E2E task covering the empty-state and full-data drawer flows
+- T143 - Vitest unit tests for the brief widget's collapse-persistence and attribution copy
+- T146 - Wire ConfigWarningBanner.vue into InvestmentDashboard.vue's render tree — eng-plan.md flags this component as defined…
+- T151 - browser-use E2E task covering the Account Type Changes Mid-Session error/edge state (product-spec-v3.md User Flows)
+- T157 - Add i18n keys for tour/help copy to packages/app/src/locales/en.json
+- T158 - Vitest unit tests for useAimTour.ts's step-through and seen-flag logic
+- T159 - browser-use E2E task covering the full onboarding tour → Help drawer relaunch flow
+- T160 - Final bundle-size CI check confirming the new lazy-loaded route stays within the 910kB gzip main-chunk budget
+- T163 - Full Vitest + Playwright + browser-use test suite pass before merge
+
+**Blocks:**
+- none
+
+## Testing Notes
+
+```bash
+npm run test:ci
+```
+
+## Reviewer Notes
+
+Add suggestions here or as Asana comments; tell the agent in the Slack thread and it will apply them.
+
+Coding agent: one PR per repo — include all `Kochava/frontend-mos` tasks in one PR on branch `impl/prd074-frontend`.
+
+---
+
+**Parent Task:** AIM X Investment Dashboard — Kochava/frontend-mos (64 tasks · 1 PR)
+**PRD:** docs/16-PRDs/074-aim-x-investment-dashboard
