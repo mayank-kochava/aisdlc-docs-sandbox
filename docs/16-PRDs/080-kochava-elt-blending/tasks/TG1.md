@@ -120,7 +120,7 @@ npm test
 
 Add suggestions here or as Asana comments; tell the agent in the Slack thread and it will apply them.
 
-Coding agent: one PR per repo — include all `Kochava/airbyte-platform-2.0.0` tasks in one PR on branch `impl/prd08026760-backend`.
+Coding agent: one PR per repo — include all `Kochava/airbyte-platform-2.0.0` tasks in one PR on branch `impl/prd080-backend`.
 
 ---
 

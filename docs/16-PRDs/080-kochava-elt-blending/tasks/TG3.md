@@ -105,7 +105,7 @@ kustomize build {dirs} && yamllint {files}
 
 Add suggestions here or as Asana comments; tell the agent in the Slack thread and it will apply them.
 
-Coding agent: one PR per repo — include all `Kochava/ko-infrastructure` tasks in one PR on branch `impl/prd08026760-infra`.
+Coding agent: one PR per repo — include all `Kochava/ko-infrastructure` tasks in one PR on branch `impl/prd080-infra`.
 
 ---
 
