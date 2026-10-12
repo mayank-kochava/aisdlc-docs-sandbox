@@ -1,0 +1,302 @@
+{
+  "matrix_id": "wi_prd904_b2edd4-r1",
+  "prd": {
+    "id": "wi_prd904_b2edd4",
+    "folder": "local/904-markdown",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-10-12T21:43:25.471304Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Doubly linked list for recency order",
+      "title_clean": "Doubly linked list for recency order",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Doubly linked list for recency order  [P] [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "lru/list.go"
+        ],
+        "modify": [],
+        "test": [
+          "lru/list_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "none\n-",
+        "produces": "```go\n  type node struct {\n      key, value string\n      prev, next *node\n  }\n  type list struct{ head, tail *node; size int }\n  func (l *list) pushFront(n *node)\n  func (l *list) moveToFront(n *node)\n  func (l *list) removeBack() *node // nil when empty\n  ```\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1",
+        "FR-2",
+        "FR-3"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Cache with Get, Put, eviction and default capacity",
+      "title_clean": "Cache with Get, Put, eviction and default capacity",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Cache with Get, Put, eviction and default capacity  [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "lru/cache.go"
+        ],
+        "modify": [],
+        "test": [
+          "lru/cache_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`list`, `node` — from T001\n-",
+        "produces": "```go\n  type Cache struct { /* capacity, map[string]*node, list */ }\n  func New(capacity int) *Cache // capacity <= 0 uses the owner's default (FR-4: ask the owner)\n  func (c *Cache) Get(key string) (string, bool)\n  func (c *Cache) Put(key, value string)\n  func (c *Cache) Len() int\n  ```\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "US-1",
+        "FR-1",
+        "FR-2",
+        "FR-3",
+        "FR-4",
+        "FR-5"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T003",
+      "title": "Runnable example",
+      "title_clean": "Runnable example",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Runnable example  [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "lru/example_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`lru.New`, `Get`, `Put` — from T002\n-",
+        "produces": "`func Example()` with an `// Output:` block showing an eviction (capacity 2, put a, b, get a, put c, then b is gone).\n\n---\n\n## Dependencies\n\n### Cross-task\n\n| Task | Blocked by | Reason |\n| :--- | :--- | :--- |\n| T002 | T001 | Consumes `list`, `node` |\n| T003 | T002 | Consumes `lru.New` |\n\n---\n\n**Total tasks**: 3 · **Parallelizable**: 1 · **Repositories**: 1"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for mayank-kochava/coding-agent-sandbox with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for mayank-kochava/coding-agent-sandbox before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001"
+    ],
+    [
+      "T002"
+    ],
+    [
+      "T003"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 5,
+    "covered": 5,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [],
+  "removed": []
+}
