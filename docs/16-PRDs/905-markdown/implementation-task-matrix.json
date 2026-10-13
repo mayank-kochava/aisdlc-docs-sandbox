@@ -1,0 +1,502 @@
+{
+  "matrix_id": "wi_prd905_fc08a3-r2",
+  "prd": {
+    "id": "wi_prd905_fc08a3",
+    "folder": "local/905-markdown",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-10-13T07:26:19.363061Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Clock interface and fake clock",
+      "title_clean": "Clock interface and fake clock",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Clock interface and fake clock  [P] [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "ratelimit/clock.go"
+        ],
+        "modify": [],
+        "test": [
+          "ratelimit/clock_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "none\n-",
+        "produces": "```go\n  type Clock interface{ Now() time.Time }\n  func SystemClock() Clock\n  type FakeClock struct{ /* t time.Time */ }\n  func NewFakeClock(t time.Time) *FakeClock\n  func (f *FakeClock) Now() time.Time\n  func (f *FakeClock) Advance(d time.Duration)\n  ```\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "US-1",
+        "FR-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "ff60c64ee05d4662beca501e5fe02ec1fef523f5",
+        "resolved": [],
+        "missing": [
+          "ratelimit/clock.go",
+          "ratelimit/clock_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Token-bucket limiter with defaults",
+      "title_clean": "Token-bucket limiter with defaults",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Token-bucket limiter with defaults  [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "ratelimit/limiter.go"
+        ],
+        "modify": [],
+        "test": [
+          "ratelimit/limiter_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`Clock`, `FakeClock` — from T001\n-",
+        "produces": "```go\n  type Limiter struct { /* rate, burst, tokens, last, mu, clock */ }\n  func New(rate float64, burst int, clock Clock) *Limiter // rate/burst <= 0 use the owner's defaults (FR-4: ask the owner); nil clock = SystemClock()\n  func (l *Limiter) Allow() bool\n  func (l *Limiter) Tokens() float64\n  ```\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "US-1",
+        "FR-1",
+        "FR-2",
+        "FR-3",
+        "FR-4",
+        "FR-5"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "ff60c64ee05d4662beca501e5fe02ec1fef523f5",
+        "resolved": [],
+        "missing": [
+          "ratelimit/limiter.go",
+          "ratelimit/limiter_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T003",
+      "title": "Runnable example",
+      "title_clean": "Runnable example",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Runnable example  [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "ratelimit/example_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`ratelimit.New`, `Allow`, `NewFakeClock` — from T001, T002\n-",
+        "produces": "`func Example()` with an `// Output:` block: rate 1/s, burst 2, three `Allow()` calls print true true false, then advance 1s and one more prints true.\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "US-1"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "ff60c64ee05d4662beca501e5fe02ec1fef523f5",
+        "resolved": [],
+        "missing": [
+          "ratelimit/example_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T004",
+      "title": "Window boundary and idle-reset edge-case tests",
+      "title_clean": "Window boundary and idle-reset edge-case tests",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T004 — Window boundary and idle-reset edge-case tests  [P] [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "ratelimit/edge_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`ratelimit.New`, `Allow`, `Tokens`, `NewFakeClock`, `Advance` — from T001, T002\n-",
+        "produces": "table-driven tests using the fake clock (no sleeping), covering:\n  - `TestAllowAtExactRefillBoundary`: rate 1/s, burst 1; after draining the bucket, `Allow()` is false just before 1s elapses (e.g. 999ms) and true at exactly 1s.\n  - `TestFractionalCarryOver`: repeated sub-token advances (e.g. 4 × 250ms at rate 1/s) accumulate to exactly one token and allow one request.\n  - `TestBurstAfterIdle`: after a long idle period (far more than `burst/rate`), `Tokens()` is capped at `burst` and exactly `burst` consecutive `Allow()` calls succeed before the next fails.\n  - `TestNoRefillWithoutTimeAdvance`: repeated `Allow()` and `Tokens()` calls at the same clock instant do not change the token count beyond the spend.\n\n---"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "US-1",
+        "FR-2",
+        "FR-3",
+        "FR-5"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "ff60c64ee05d4662beca501e5fe02ec1fef523f5",
+        "resolved": [],
+        "missing": [
+          "ratelimit/edge_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T005",
+      "title": "Independent limiters and invalid-limit edge-case tests",
+      "title_clean": "Independent limiters and invalid-limit edge-case tests",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T005 — Independent limiters and invalid-limit edge-case tests  [P] [US1]",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "ratelimit/limits_test.go"
+        ]
+      },
+      "interfaces": {
+        "consumes": "`ratelimit.New`, `Allow`, `Tokens`, `NewFakeClock`, `Advance` — from T001, T002\n-",
+        "produces": "table-driven tests covering:\n  - `TestIndependentLimiters`: several limiters (one per key, e.g. a `map[string]*Limiter`) sharing one fake clock; draining one does not affect the others, and each refills on its own state.\n  - `TestInvalidLimits`: `rate` of 0 and negative, `burst` of 0 and negative, and both invalid, plus a `nil` clock. Each case must not panic and must produce a limiter equivalent to one built with the owner's defaults (FR-4). The default rate and burst values are not in this document; ask the owner for them and do not guess them. If they have not been provided, leave the default-value assertions out and assert only the no-panic behavior and equivalence between invalid-input cases.\n\n---\n\n## Dependencies\n\n### Cross-task\n\n| Task | Blocked by | Reason |\n| :--- | :--- | :--- |\n| T002 | T001 | Consumes `Clock`, `FakeClock` |\n| T003 | T002 | Consumes `ratelimit.New` |\n| T004 | T002 | Consumes `ratelimit.New`, `Allow`, `Tokens` |\n| T005 | T002 | Consumes `ratelimit.New`, `Allow`, `Tokens` |\n\n---\n\n**Total tasks**: 5 · **Parallelizable**: 3 · **Repositories**: 1"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "US-1",
+        "FR-1",
+        "FR-4"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "ff60c64ee05d4662beca501e5fe02ec1fef523f5",
+        "resolved": [],
+        "missing": [
+          "ratelimit/limits_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for mayank-kochava/coding-agent-sandbox with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "mayank-kochava/coding-agent-sandbox",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for mayank-kochava/coding-agent-sandbox before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001"
+    ],
+    [
+      "T002"
+    ],
+    [
+      "T003",
+      "T004",
+      "T005"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 5,
+    "covered": 5,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "T001: path not found in repo: ratelimit/clock_test.go",
+    "T002: path not found in repo: ratelimit/limiter_test.go",
+    "T003: path not found in repo: ratelimit/example_test.go",
+    "T004: path not found in repo: ratelimit/edge_test.go",
+    "T005: path not found in repo: ratelimit/limits_test.go"
+  ],
+  "removed": []
+}
