@@ -1,0 +1,99 @@
+# TG1: Run tests & validate build
+
+## In short
+
+Run the full build and tests for Kochava/frontend-mos with every task above merged.
+
+🟢 Clear
+
+## Overview
+
+| Field | Value |
+|---|---|
+| Task ID | TG1 |
+| Repo | Kochava/frontend-mos |
+| Phase | Phase 16 |
+| User Story | N/A |
+| Parallel | No |
+| Status | New |
+| Owner | Test/Change Agent |
+
+## Context
+
+Run the full build and tests for Kochava/frontend-mos with every task above merged. Do not edit source.
+
+This task is part of AIM Onboarding Decision Tool.
+
+## 2. Architecture (3 repositories)
+- **frontend-mos** (Vue 3.5 / Vuetify 3.12) — wizard + outputs as a **3rd tab** in `MmmInsightsConfiguration` (`packages/advertiser/src/views/Analytics/MmmInsightsConfiguration/`). No new route (`/advertisertools/mmmconfigurations` exists). `v-stepper` wizard (pattern: `views/MmmOptimization/ScenarioCreateView.vue`); `v-tabs`/`v-window` outputs. Pure-TS logic modules + `useAimOnboarding` composable + `onboarding` service on the shared `mmmPortalApi` axios instance (`views/Analytics/services/mmm.ts`).
+- **mmm-portal-api** (C# .NET 7, MongoDB.Driver) — persistence mirroring the **SavedView** stack (model + data layer + service + controller + DTOs); CSM-action endpoints with an embedded audit log; SES email; `onboarding_status` on `app_config`.
+- **ko-k8s-apps** — one Oathkeeper access-rule exposing `…/onboarding-sessions<.*>` (mirror `mmm-portal-advertiser-saved-views`). Role enforcement lives in portal-api, not the gateway.
+
+## 8b. Component & accessibility build notes (from deep review 2026-06-11)
+**Render real Vuetify components, not styled divs.** frontend-mos has no `createVuetify` `defaults` block — 8px radius / capitalize / tab underline / field treatment come from global SCSS keyed to `.v-btn`/`.v-field`/`.v-tabs`. A div that merely looks right inherits none of it. All colors via `rgb(var(--v-theme-*))`, never hardcoded hex.
+**Component mapping (reuse vs build-fresh):**
+- Inline banners → **`v-alert variant="tonal"`** (established precedent: Incrementality Create/List). Do NOT reuse `NotificationBanner` — it's CMS/store-bound, solid-fill.
+- Inputs → `InputText`/`InputSelect` (`v-text-field`/`v-select`, 8px, **no focus-halo** — remove the mock's `box-shadow` ring).
+- Buttons → `v-btn` (flat/outlined/tonal). Monthly-Annual + CSM tier → `v-btn-toggle`.
+- Toggle cards → **build `ToggleCard`** on `v-card`; **checkbox affordance for multi-select** (platforms, campaign types) — the mock's round radio wrongly implies single-select.
+- Sliders → **build `ShareAllocator` + `BudgetSlider`** on `v-slider` (the existing `InputSlider` is discrete index-based — can't do % allocation / currency range / total-100 validation).
+- Collapsible summary → `v-expansion-panels` (not a JS chevron). Tier chips → `v-chip` with `chips-orange` (Pro) / `chips-blue` (X) tokens.
+- **Timeline → bare `v-data-table`** (not the `List` wrapper — its viewport-height + infinite-scroll fight a static 6-row table). Status cell → `v-select` density compact.
+- Step rail → **custom** (native `v-stepper` vertical interleaves content — incompatible with the rail|content|summary layout).
+- SoW mono document (JetBrains Mono) → intentional, keep; form controls inside stay Inter.
+**Accessibility (WCAG 2.1 AA — spec §10):**
+- Adopt spec §6 semantic tokens — `--alert-green #427900`, `--alert-orange #BA4E00` — the mock's lighter `#4D840B`/`#D56428` fail AA on tint; warn banners also need a darker/denser background to clear 4.5:1.
+- Avoid `text3 #9A9B9D` on white for any text (2.78:1 fail) — use `text2`/darker, especially data-table values.
+- Color is never the sole signal: required = asterisk **+** `aria-required` + legend; rail error step gets an icon (not red only); field errors via `aria-invalid`/`aria-describedby`.
+- Roles/keyboard: tabs = `role=tablist/tab/tabpanel` + arrow nav; rail = `aria-current="step"`, focusable; multi-select cards/chips = `role=checkbox`/`aria-pressed`; summary collapse = `<button aria-expanded>`; sliders = real `role=slider` with `aria-valuemin/max/now` + arrow keys; focus moves to step heading on step change; loader honors `prefers-reduced-motion`.
+**Completeness flag:** the preview visualizes only Steps 2–3 + outputs. The other 6 step UIs (1 Team, 4 Business&Funnel, 5 Data Sources, 6 External Factors, 7 Objectives, 8 Review) are specified in `product-spec-v2.md §4.1` — plan authors build those from the spec, not the mock. All their fields already exist in §5 `wizard{}`.
+
+
+## Implementation Guide
+
+1. Implement: Run tests & validate build
+2. Add or update the tests listed under Files to Modify
+3. Run `npm run test:ci`
+
+## Files to Modify
+
+| File | Create/Modify/Test | Note |
+|---|---|---|
+| (none captured, check the plan) | - | - |
+
+## Acceptance Criteria
+
+- Build and existing tests still pass.
+- Existing tests pass
+- New functionality has test coverage
+- Code follows repository conventions (see CLAUDE.md)
+
+## Dependencies
+
+**Blocked by:**
+- T104 - AimOnboardingTab/logic/recommendTier.ts with the 8 prototype bug-fixes (budgetMonthly/Annual + annual÷12; 12mo history…
+- T105 - logic/buildProvisionPlan.ts (Data Schema rows from state)
+- T110 - Vitest tests for autosave (debounce, failure-retry, load-on-mount) with mocked service
+- T117 - Setup Summary panel (steps 2–6) + component tests for representative steps
+- T122 - CSM-mode UI: CSM Approval button, Unlock to Edit, "Book my onboarding meeting" (sent/retry per spec mermaid)
+- T123 - Component tests for output tabs (SoW render, schema rows, CSM gating)
+
+**Blocks:**
+- none
+
+## Testing Notes
+
+```bash
+npm run test:ci
+```
+
+## Reviewer Notes
+
+Add suggestions here or as Asana comments; tell the agent in the Slack thread and it will apply them.
+
+Coding agent: one PR per repo — include all `Kochava/frontend-mos` tasks in one PR on branch `impl/prd061-frontend`.
+
+---
+
+**Parent Task:** AIM Onboarding Decision Tool — Kochava/frontend-mos (24 tasks · 1 PR)
+**PRD:** docs/16-PRDs/061-aim-onboarding-decision-tool
