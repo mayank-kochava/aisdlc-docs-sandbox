@@ -1,0 +1,1710 @@
+{
+  "matrix_id": "wi_prd059_baba21-r9",
+  "prd": {
+    "id": "wi_prd059_baba21",
+    "folder": "docs/16-PRDs/059-kochava-connector-new-etl",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-10-30T06:44:37.468246Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Add GetKochavaRedshiftConfigAsync to IMetadataConfigService and MetadataConfigService",
+      "title_clean": "Add GetKochavaRedshiftConfigAsync to IMetadataConfigService and MetadataConfigService",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Add GetKochavaRedshiftConfigAsync to IMetadataConfigService and MetadataConfigService",
+        "anchors": [],
+        "pattern": "GetBigQueryConfigAsync / PrepareBigQueryConfig in Aim.DataIngestion.Core/Shared/Services/MetadataConfigService.cs:556-579; interface line 33 of IMetadataConfigService.cs."
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Aim.DataIngestion.Core/Shared/Services/MetadataConfigService.cs",
+          "Aim.DataIngestion.Core/Shared/Services/IMetadataConfigService.cs"
+        ],
+        "test": [
+          "Aim.DataIngestion.Tests/Core/Shared/Services/MetadataConfigServiceKochavaRedshiftTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftConfigModel — from T019",
+        "produces": "Task<KochavaRedshiftConfigModel> GetKochavaRedshiftConfigAsync(string configId) declared on IMetadataConfigService and implemented in MetadataConfigService"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.5,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T019"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-001"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [
+          "Aim.DataIngestion.Core/Shared/Services/MetadataConfigService.cs",
+          "Aim.DataIngestion.Core/Shared/Services/IMetadataConfigService.cs"
+        ],
+        "missing": [
+          "Aim.DataIngestion.Tests/Core/Shared/Services/MetadataConfigServiceKochavaRedshiftTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.Core/Shared/Services/FunctionPipeline.cs",
+          "Aim.DataIngestion.Core/Shared/Services/IApplicationLogger.cs",
+          "Aim.DataIngestion.Core/Shared/Services/ISecretManager.cs",
+          "Aim.DataIngestion.Core/Shared/Services/ISlackNotificationService.cs",
+          "Aim.DataIngestion.Core/Shared/Services/ISqlValidator.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T002",
+      "title": "Add campaign_type CASE WHEN to RedshiftDataAggregationSql.GetStandardAggregateTableQuery",
+      "title_clean": "Add campaign_type CASE WHEN to RedshiftDataAggregationSql.GetStandardAggregateTableQuery",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Add campaign_type CASE WHEN to RedshiftDataAggregationSql.GetStandardAggregateTableQuery",
+        "anchors": [],
+        "pattern": "Existing dimension handling in AppendDimensions, `Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/RedshiftDataAggregationSql.cs:72+` (this file exists on main)."
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/RedshiftDataAggregationSql.cs"
+        ],
+        "test": [
+          "Aim.DataIngestion.Tests/DataConsolidation/Sql/RedshiftDataAggregationSqlTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": "GetStandardAggregateTableQuery output containing a campaign_type CASE WHEN expression"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.5,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "FR-019"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/RedshiftDataAggregationSql.cs",
+          "Aim.DataIngestion.Tests/DataConsolidation/Sql/RedshiftDataAggregationSqlTests.cs",
+          "Aim.DataIngestion.Tests/DataConsolidation/Sql/RedshiftDataAggregationSqlTests.cs"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/BaseJoinQueryBuilder.cs",
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/FullOuterJoinQueryBuilder.cs",
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/LeftJoinQueryBuilder.cs",
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/RedshiftDataConsolidationSql.cs",
+          "Aim.DataIngestion.SqlBuilders/DataConsolidation/Redshift/RedshiftDataTransformationSql.cs"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T003",
+      "title": "Create KochavaRedshiftQueryBuilder and unit-test country-code CASE / GROUP BY alias",
+      "title_clean": "Create KochavaRedshiftQueryBuilder and unit-test country-code CASE / GROUP BY alias",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Create KochavaRedshiftQueryBuilder and unit-test country-code CASE / GROUP BY alias",
+        "anchors": [],
+        "pattern": "Aim.DataIngestion.DataSuppliers/BigQuery/Utils/BigQueryQueryBuilder.cs; tests follow Aim.DataIngestion.Tests/DataSuppliers/BigQuery/Utils/BigQueryQueryBuilderTests.cs"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftQueryBuilder.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftQueryBuilderTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftConfigModel from T019",
+        "produces": "public static class KochavaRedshiftQueryBuilder { public static string BuildQuery(KochavaRedshiftConfigModel config, DateTime startDate, DateTime endDate); }"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T019"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-010",
+        "FR-011",
+        "FR-012"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftQueryBuilder.cs",
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftQueryBuilderTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.DataSuppliers/S3/BaseS3Report.cs",
+          "Aim.DataIngestion.DataSuppliers/Gcs/WifGcsReport.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T004",
+      "title": "Create KochavaRedshiftReport with config validation (CohortPeriods, LookbackWeeks, duplicate KochavaId)",
+      "title_clean": "Create KochavaRedshiftReport with config validation (CohortPeriods, LookbackWeeks, duplicate KochavaId)",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T004 — Create KochavaRedshiftReport with config validation (CohortPeriods, LookbackWeeks, duplicate KochavaId)",
+        "anchors": [],
+        "pattern": "Aim.DataIngestion.DataSuppliers/BigQuery/BaseBigQueryReport.cs; tests follow Aim.DataIngestion.Tests/DataSuppliers/BigQuery/BaseBigQueryReportValidateTests.cs"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftReport.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftConfigValidatorTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftConfigModel, IKochavaRedshiftReport from T019; KochavaRedshiftQueryBuilder.BuildQuery from T003; KochavaRedshiftAppIdMapper.SwapKochavaAppIds from T005",
+        "produces": "class KochavaRedshiftReport : IKochavaRedshiftReport, IDisposable with Validate() throwing InvalidOperationException"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T005"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "FR-002c",
+        "FR-002d",
+        "FR-008"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftReport.cs",
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftConfigValidatorTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.DataSuppliers/S3/BaseS3Report.cs",
+          "Aim.DataIngestion.DataSuppliers/Gcs/WifGcsReport.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T005",
+      "title": "Create KochavaRedshiftAppIdMapper with SwapKochavaAppIds and the 100% unmatched guard",
+      "title_clean": "Create KochavaRedshiftAppIdMapper with SwapKochavaAppIds and the 100% unmatched guard",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T005 — Create KochavaRedshiftAppIdMapper with SwapKochavaAppIds and the 100% unmatched guard",
+        "anchors": [],
+        "pattern": "Aim.DataIngestion.DataSuppliers/BigQuery/Utils/BigQueryRowMapper.cs; tests follow Aim.DataIngestion.Tests/DataSuppliers/BigQuery/Utils/BigQueryRowMapperTests.cs"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftAppIdMapper.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftAppIdMapperTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftReportModel and the AppAssociations entry type (KochavaId, AppId) from T019",
+        "produces": "public static class KochavaRedshiftAppIdMapper { public static void SwapKochavaAppIds(List<KochavaRedshiftReportModel> records, IReadOnlyList<AppAssociation> associations); } (AppAssociation is the entry type defined in KochavaRedshiftConfigModel, T019)"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T019"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-013",
+        "FR-014",
+        "FR-014b"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.DataSuppliers/KochavaRedshift/KochavaRedshiftAppIdMapper.cs",
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftAppIdMapperTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.DataSuppliers/S3/BaseS3Report.cs",
+          "Aim.DataIngestion.DataSuppliers/Gcs/WifGcsReport.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T006",
+      "title": "Create KochavaRedshiftDataAggregator",
+      "title_clean": "Create KochavaRedshiftDataAggregator",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T006 — Create KochavaRedshiftDataAggregator",
+        "anchors": [],
+        "pattern": "Aim.DataIngestion.Core/DataConsolidation/Services/BigQuery/BigQueryDataAggregator.cs:9-36"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataAggregator.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataAggregatorTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftFeatureStoreTableDefinitions.GetTableDefinitions — from T019; shared RedshiftDataAggregationSql.GetStandardAggregateTableQuery with campaign_type SQL — from T002",
+        "produces": "class KochavaRedshiftDataAggregator(IDataAggregationSql aggSql, IDataService featureStoreDataService, ISchemaService schemaService) : IDataAggregator"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.5,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002",
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "FR-019"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataAggregator.cs",
+          "Aim.DataIngestion.Tests/Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataAggregatorTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/MarketShareService.cs",
+          "Aim.DataIngestion.Core/DataConsolidation/Services/S3/S3DataAggregator.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T007",
+      "title": "Create KochavaRedshiftDataConsolidator",
+      "title_clean": "Create KochavaRedshiftDataConsolidator",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T007 — Create KochavaRedshiftDataConsolidator",
+        "anchors": [],
+        "pattern": "Aim.DataIngestion.Core/DataConsolidation/Services/BigQuery/BigQueryDataConsolidator.cs:9-33"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataConsolidator.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataConsolidatorTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftFeatureStoreTableDefinitions — from T019",
+        "produces": "class KochavaRedshiftDataConsolidator(ISchemaService schemaService, IDataConsolidationSql dataConsolidationSql) : BaseDataConsolidator with Consolidate(DataSupplierRules, List<string>, string, IDataService, DataConsolidationCommonConfig)"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T006"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "FR-020"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataConsolidator.cs",
+          "Aim.DataIngestion.Tests/Core/DataConsolidation/Services/KochavaRedshift/KochavaRedshiftDataConsolidatorTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.Core/DataConsolidation/Services/MarketShareService.cs",
+          "Aim.DataIngestion.Core/DataConsolidation/Services/S3/S3DataAggregator.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T008",
+      "title": "Register KochavaRedshift aggregator and consolidator in IngestionTaskFactory",
+      "title_clean": "Register KochavaRedshift aggregator and consolidator in IngestionTaskFactory",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T008 — Register KochavaRedshift aggregator and consolidator in IngestionTaskFactory",
+        "anchors": [],
+        "pattern": "IngestionTaskFactory.cs line 11 (using), line 163 (BigQueryDataAggregator), line 173 (BigQueryDataConsolidator)"
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "Aim.DataIngestion.Command/IngestionTaskFactory.cs"
+        ],
+        "test": [
+          "Aim.DataIngestion.Tests/Command/IngestionTaskFactoryKochavaRedshiftTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "KochavaRedshiftDataAggregator from T006; KochavaRedshiftDataConsolidator from T007",
+        "produces": "Autofac registrations of both types in the dataconsolidation case"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "FR-024"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [
+          "Aim.DataIngestion.Command/IngestionTaskFactory.cs"
+        ],
+        "missing": [
+          "Aim.DataIngestion.Tests/Command/IngestionTaskFactoryKochavaRedshiftTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.Command/AppSettings.cs",
+          "Aim.DataIngestion.Command/Application.cs",
+          "Aim.DataIngestion.Command/InputModel.cs",
+          "Aim.DataIngestion.Command/Program.cs",
+          "Aim.DataIngestion.Command/ServiceContainer.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T009",
+      "title": "Create `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs` with Validate tests — `Validate_MissingServer_Throws`, `Validate_MissingDatabaseName_Throws`, `Validate_MissingSchema_Throws`, `Validate_MissingTable_Throws`, `Validate_MissingCredentials_Throws`, `Validate_EmptyCohortPeriods_Throws`, `Validate_ZeroLookbackWeeks_Throws`, `Validate_DuplicateKochavaId_Throws`, `Validate_EmptyAppAssociations_Throws` — follow `BaseBigQueryReportValidateTests` pattern; each test should set up a valid config and remove exactly one required field",
+      "title_clean": "Create Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs with Validate tests…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "red",
+          "text": "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs is created by T011, which is not in this task's depends_on"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T009 — Create `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs` with Validate tests — `Validate_MissingServer_Throws`, `Validate_MissingDatabaseName_Throws`, `Validate_MissingSchema_Throws`, `Validate_MissingTable_Throws`, `Validate_MissingCredentials_Throws`, `Validate_EmptyCohortPeriods_Throws`, `Validate_ZeroLookbackWeeks_Throws`, `Validate_DuplicateKochavaId_Throws`, `Validate_EmptyAppAssociations_Throws` — follow `BaseBigQueryReportValidateTests` pattern; each test should set up a valid config and remove exactly one required field",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [
+          "BaseBigQueryReportValidateTests"
+        ],
+        "missing_symbols": [
+          "Validate_MissingServer_Throws",
+          "Validate_MissingDatabaseName_Throws",
+          "Validate_MissingSchema_Throws",
+          "Validate_MissingTable_Throws",
+          "Validate_MissingCredentials_Throws",
+          "Validate_EmptyCohortPeriods_Throws",
+          "Validate_ZeroLookbackWeeks_Throws",
+          "Validate_DuplicateKochavaId_Throws",
+          "Validate_EmptyAppAssociations_Throws"
+        ],
+        "exemplars": [],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T010",
+      "title": "Create `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportBuildQueryTests.cs` with two tests: `BuildQuery_SingleCountryCode_ContainsRegexAndCasePattern` (assert generated SQL contains `~*`, `(^|`, `countrycode`, and `HAVING`) and `BuildQuery_MultipleCohortPeriods_GeneratesAllColumnAliases` (assert SQL contains `revenue7d`, `revenue30d`, `revenue90d` etc. when `CohortPeriods = [\"1\",\"7\",\"30\",\"90\"]` and `CohortMetricEventMappings` includes `revenue`)",
+      "title_clean": "Create Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportBuildQueryTests.cs with two tests…",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T010 — Create `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportBuildQueryTests.cs` with two tests: `BuildQuery_SingleCountryCode_ContainsRegexAndCasePattern` (assert generated SQL contains `~*`, `(^|`, `countrycode`, and `HAVING`) and `BuildQuery_MultipleCohortPeriods_GeneratesAllColumnAliases` (assert SQL contains `revenue7d`, `revenue30d`, `revenue90d` etc. when `CohortPeriods = [\"1\",\"7\",\"30\",\"90\"]` and `CohortMetricEventMappings` includes `revenue`)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportBuildQueryTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportBuildQueryTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [
+          "BuildQuery_SingleCountryCode_ContainsRegexAndCasePattern",
+          "HAVING",
+          "BuildQuery_MultipleCohortPeriods_GeneratesAllColumnAliases",
+          "CohortPeriods",
+          "CohortMetricEventMappings"
+        ],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T011",
+      "title": "Add `SwapKochavaAppIds` and `Dispose` tests to `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs` — `SwapKochavaAppIds_MatchFound_ReplacesKochavaIdWithAppId`, `SwapKochavaAppIds_NoMatchForOneRecord_LeavesOriginalAppId`, `SwapKochavaAppIds_AllRecordsUnmatched_ThrowsInvalidOperationException` (verifies FR-014b guard), `Dispose_CalledTwice_DoesNotThrow`",
+      "title_clean": "Add SwapKochavaAppIds and Dispose tests to Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportT…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "test task now depends on T004, which creates the code under test"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T011 — Add `SwapKochavaAppIds` and `Dispose` tests to `Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs` — `SwapKochavaAppIds_MatchFound_ReplacesKochavaIdWithAppId`, `SwapKochavaAppIds_NoMatchForOneRecord_LeavesOriginalAppId`, `SwapKochavaAppIds_AllRecordsUnmatched_ThrowsInvalidOperationException` (verifies FR-014b guard), `Dispose_CalledTwice_DoesNotThrow`",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007",
+        "T009",
+        "T004"
+      ],
+      "inferred_depends_on": [
+        "T004"
+      ],
+      "wave": 5,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Tests/DataSuppliers/KochavaRedshift/KochavaRedshiftReportTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [
+          "SwapKochavaAppIds",
+          "Dispose",
+          "SwapKochavaAppIds_MatchFound_ReplacesKochavaIdWithAppId",
+          "SwapKochavaAppIds_NoMatchForOneRecord_LeavesOriginalAppId",
+          "SwapKochavaAppIds_AllRecordsUnmatched_ThrowsInvalidOperationException",
+          "Dispose_CalledTwice_DoesNotThrow"
+        ],
+        "exemplars": [],
+        "status": "new",
+        "notes": [
+          "repair: test task now depends on T004, which creates the code under test"
+        ]
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T012",
+      "title": "Create `Aim.DataIngestion.Tests/Core/DataImport/Services/KochavaRedshift/KochavaRedshiftDataImportServiceTests.cs` with five tests: `DownloadReportAsync_ConfigNotFound_LogsFatalAndThrows`, `DownloadReportAsync_CredentialResolutionFails_LogsFatalAndThrows`, `DownloadReportAsync_ZeroRowsForWindow_SkipsBulkCopyAndContinues`, `DownloadReportAsync_HappyPath_CallsMergeStepsInCorrectOrder` (verify RemoveDuplicates → MergeTables → ReplaceDataAndMergeTables sequence), `DownloadReportAsync_QueryThrows_LogsFailureAndRethrows` — follow `BigQueryDataImportServiceTests.cs` pattern for mock setup Checkpoint: `dotnet test` passes with 0 failures for all new test files",
+      "title_clean": "Create Aim.DataIngestion.Tests/Core/DataImport/Services/KochavaRedshift/KochavaRedshiftDataImportServiceTests.cs with…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "File path corrected: BigQueryDataImportServiceTests.cs → Aim.DataIngestion.Tests/Core/DataImport/Services/BigQuery/BigQueryDataImportServiceTests.cs"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T012 — Create `Aim.DataIngestion.Tests/Core/DataImport/Services/KochavaRedshift/KochavaRedshiftDataImportServiceTests.cs` with five tests: `DownloadReportAsync_ConfigNotFound_LogsFatalAndThrows`, `DownloadReportAsync_CredentialResolutionFails_LogsFatalAndThrows`, `DownloadReportAsync_ZeroRowsForWindow_SkipsBulkCopyAndContinues`, `DownloadReportAsync_HappyPath_CallsMergeStepsInCorrectOrder` (verify RemoveDuplicates → MergeTables → ReplaceDataAndMergeTables sequence), `DownloadReportAsync_QueryThrows_LogsFailureAndRethrows` — follow `BigQueryDataImportServiceTests.cs` pattern for mock setup Checkpoint: `dotnet test` passes with 0 failures for all new test files",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/Core/DataImport/Services/KochavaRedshift/KochavaRedshiftDataImportServiceTests.cs",
+          "Aim.DataIngestion.Tests/Core/DataImport/Services/BigQuery/BigQueryDataImportServiceTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T007"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Tests/Core/DataImport/Services/KochavaRedshift/KochavaRedshiftDataImportServiceTests.cs"
+        ],
+        "fixed": {
+          "BigQueryDataImportServiceTests.cs": "Aim.DataIngestion.Tests/Core/DataImport/Services/BigQuery/BigQueryDataImportServiceTests.cs"
+        },
+        "existing_symbols": [],
+        "missing_symbols": [
+          "DownloadReportAsync_ConfigNotFound_LogsFatalAndThrows",
+          "DownloadReportAsync_CredentialResolutionFails_LogsFatalAndThrows",
+          "DownloadReportAsync_ZeroRowsForWindow_SkipsBulkCopyAndContinues",
+          "DownloadReportAsync_HappyPath_CallsMergeStepsInCorrectOrder",
+          "DownloadReportAsync_QueryThrows_LogsFailureAndRethrows"
+        ],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "T013",
+      "title": "Run a job to deploy the Sharawmer DataSupplierConfig document into MongoDB data_supplier_configs",
+      "title_clean": "Run a job to deploy the Sharawmer DataSupplierConfig document into MongoDB data_supplier_configs",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T013 — Run a job to deploy the Sharawmer DataSupplierConfig document into MongoDB data_supplier_configs",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "FR-001"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T014",
+      "title": "Ops: create AWS Secrets Manager secret {env}/AIMETLService/Sharawmer",
+      "title_clean": "Ops: create AWS Secrets Manager secret {env}/AIMETLService/Sharawmer",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T014 — Ops: create AWS Secrets Manager secret {env}/AIMETLService/Sharawmer",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Secrets Manager')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Secrets Manager"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "FR-003"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T015",
+      "title": "Ops: confirm network path from dev ETL pods to Kochava Redshift",
+      "title_clean": "Ops: confirm network path from dev ETL pods to Kochava Redshift",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T015 — Ops: confirm network path from dev ETL pods to Kochava Redshift",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('network path')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "network path"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T014"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "FR-005"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T016",
+      "title": "Deploy check: run the dataimport.kochavaredshift job for Sharawmer on dev and verify row counts",
+      "title_clean": "Deploy check: run the dataimport.kochavaredshift job for Sharawmer on dev and verify row counts",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T016 — Deploy check: run the dataimport.kochavaredshift job for Sharawmer on dev and verify row counts",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T013",
+        "T015"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "FR-016"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T017",
+      "title": "Deploy check: run the dataconsolidation job for Sharawmer on dev and verify the aggregate table",
+      "title_clean": "Deploy check: run the dataconsolidation job for Sharawmer on dev and verify the aggregate table",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T017 — Deploy check: run the dataconsolidation job for Sharawmer on dev and verify the aggregate table",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T008",
+        "T016"
+      ],
+      "inferred_depends_on": [],
+      "wave": 6,
+      "requirements": [
+        "FR-019"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T018",
+      "title": "Deploy check: run the featurecreation and featurecreation.postprocessor jobs for Sharawmer on dev",
+      "title_clean": "Deploy check: run the featurecreation and featurecreation.postprocessor jobs for Sharawmer on dev",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T018 — Deploy check: run the featurecreation and featurecreation.postprocessor jobs for Sharawmer on dev",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T017"
+      ],
+      "inferred_depends_on": [],
+      "wave": 7,
+      "requirements": [
+        "FR-019"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T019",
+      "title": "Create KochavaRedshift foundation types (config model, table definitions, report model, IKochavaRedshiftReport)",
+      "title_clean": "Create KochavaRedshift foundation types (config model, table definitions, report model, IKochavaRedshiftReport)",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T019 — Create KochavaRedshift foundation types (config model, table definitions, report model, IKochavaRedshiftReport)",
+        "anchors": [],
+        "pattern": "Follow BigQueryConfigModel.cs and BigQueryFeatureStoreTableDefinitions.cs under Aim.DataIngestion.Core/DataImport/Models/Configuration/BigQuery/."
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/KochavaRedshift/KochavaRedshiftConfigModel.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/KochavaRedshift/KochavaRedshiftFeatureStoreTableDefinitions.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Report/KochavaRedshift/KochavaRedshiftReportModel.cs",
+          "Aim.DataIngestion.Core/DataImport/DataSuppliers/IKochavaRedshiftReport.cs"
+        ],
+        "modify": [],
+        "test": [
+          "Aim.DataIngestion.Tests/Core/DataImport/Models/KochavaRedshift/KochavaRedshiftFeatureStoreTableDefinitionsTests.cs"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "Pattern types from Aim.DataIngestion.Core/DataImport/Models/Configuration/BigQuery/BigQueryConfigModel.cs and BigQueryFeatureStoreTableDefinitions.cs (exist in repo).",
+        "produces": "KochavaRedshiftConfigModel (ConnectorType, AdvertiserConfig{Server, Port, DatabaseName, Schema, Table, CountryCodes, LookbackWeeks, WeeklyGrouping, CohortPeriods, CohortMetricEventMappings, AppAssociations{KochavaId, AppId}}, ConnectorCredential{UsernameSecretKey, PasswordSecretKey}); static KochavaRedshiftFeatureStoreTableDefinitions.GetTableDefinitions(string schema, ISchemaService schemaService, DatasetType datasetType, string dataSupplierConfigId) returning MainTable/LoadTable/TempTable/AggregateTable; KochavaRedshiftReportModel (campaign_id, daus, clicks, impressions nullable); IKochavaRedshiftReport."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack csharp",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=csharp"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-009",
+        "FR-012b"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "d105b11ff9d5207e27826896d7cee5d841258ab1",
+        "resolved": [],
+        "missing": [
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/KochavaRedshift/KochavaRedshiftConfigModel.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/KochavaRedshift/KochavaRedshiftFeatureStoreTableDefinitions.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Report/KochavaRedshift/KochavaRedshiftReportModel.cs",
+          "Aim.DataIngestion.Core/DataImport/DataSuppliers/IKochavaRedshiftReport.cs",
+          "Aim.DataIngestion.Tests/Core/DataImport/Models/KochavaRedshift/KochavaRedshiftFeatureStoreTableDefinitionsTests.cs"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/Common.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Configuration/EventMapping.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Report/S3/S3ReportModel.cs",
+          "Aim.DataIngestion.Core/DataImport/Models/Report/S3/S3RatingsReportModel.cs",
+          "Aim.DataIngestion.Core/DataImport/DataSuppliers/IS3Report.cs"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "dotnet test"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/aim-data-ingestion with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/aim-data-ingestion",
+      "stack": "csharp",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/aim-data-ingestion before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T010",
+        "T011",
+        "T012",
+        "T018"
+      ],
+      "inferred_depends_on": [],
+      "wave": 8,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "dotnet test"
+    }
+  ],
+  "waves": [
+    [
+      "T019"
+    ],
+    [
+      "T001",
+      "T003",
+      "T005"
+    ],
+    [
+      "T002",
+      "T004"
+    ],
+    [
+      "T006",
+      "T009",
+      "T010",
+      "T013",
+      "T014"
+    ],
+    [
+      "T007",
+      "T015"
+    ],
+    [
+      "T008",
+      "T011",
+      "T012",
+      "T016"
+    ],
+    [
+      "T017"
+    ],
+    [
+      "T018"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 19,
+    "covered": 18,
+    "uncovered": [
+      "PRD-059"
+    ]
+  },
+  "conflicts": [],
+  "open_questions": [
+    {
+      "task_id": "T001",
+      "question": "Is `GetKochavaRedshiftConfigAsync` implemented in `MetadataConfigService.cs` or only declared in the interface?",
+      "reason": "Resolved: does not exist in either `IMetadataConfigService` or `MetadataConfigService`; T001 adds it to both as new code"
+    },
+    {
+      "task_id": "T002",
+      "question": "Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?",
+      "reason": "Resolved: not present today; T002 adds campaign_type CASE WHEN to `GetStandardAggregateTableQuery` in `RedshiftDataAggregationSql.cs`"
+    },
+    {
+      "task_id": "T006",
+      "question": "Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?",
+      "reason": "Resolved: not present today; T002 adds campaign_type CASE WHEN to `GetStandardAggregateTableQuery` in `RedshiftDataAggregationSql.cs`"
+    },
+    {
+      "task_id": "T006",
+      "question": "Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?",
+      "reason": "Resolved: not present today; T002 adds campaign_type CASE WHEN to `GetStandardAggregateTableQuery` in `RedshiftDataAggregationSql.cs`"
+    },
+    {
+      "task_id": "T002",
+      "question": "Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?",
+      "reason": "Resolved: not present today; T002 adds campaign_type CASE WHEN to `GetStandardAggregateTableQuery` in `RedshiftDataAggregationSql.cs`"
+    }
+  ],
+  "decisions": "",
+  "warnings": [
+    "T012: `BigQueryDataImportServiceTests.cs` has no folder in the repo; check where it belongs",
+    "grounding pinned to d105b11f; knowledge graph skipped for Kochava/aim-data-ingestion",
+    "Open item T001: Is `GetKochavaRedshiftConfigAsync` implemented in `MetadataConfigService.cs` or only declared in the interface?",
+    "Open item T002: Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?",
+    "Open item T006: Does `RedshiftDataAggregationSql.GetStandardAggregateTableQuery` include campaign_type CASE WHEN for KochavaRedshift, or does the aggregator need custom SQL?"
+  ],
+  "removed": []
+}
