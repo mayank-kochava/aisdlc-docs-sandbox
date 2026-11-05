@@ -1,0 +1,2934 @@
+{
+  "matrix_id": "wi_95477170d7e160488811-r1",
+  "prd": {
+    "id": "wi_95477170d7e160488811",
+    "folder": "089-amazon-ads-eventgraineligibility-row-level-redacti",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-05T13:45:17.000139Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Parse eventGrainEligibility and set row_level_restricted behind AMAZON_ADS_EGE_ENFORCE_FROM",
+      "title_clean": "Parse eventGrainEligibility and set row_level_restricted behind AMAZON_ADS_EGE_ENFORCE_FROM",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Parse eventGrainEligibility and set row_level_restricted behind AMAZON_ADS_EGE_ENFORCE_FROM",
+        "anchors": [],
+        "pattern": "Follow the dynamic-field stamping already in buildMatchObj (reconcile.go:456-469, SetDynamicField for partner_request_id / vendor_device_id) and the cli flag style in cmd/build/amazonadssan_config.go:17-50 (use cli.Int64Flag with Destination)."
+      },
+      "repo": "Kochava/watson",
+      "stack": "go",
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/watson/amazonadssan/request.go",
+          "cmd/watson/amazonadssan/reconcile.go",
+          "cmd/build/amazonadssan_config.go",
+          "CLAUDE.md"
+        ],
+        "test": [
+          "cmd/watson/amazonadssan/reconcile_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (build.AmazonAdsSANConfig, Reconciler, response and waterfall.ClaimInterface.SetDynamicField already exist in the repo: cmd/build/amazonadssan_config.go:9, cmd/watson/amazonadssan/reconcile.go:83, request.go:3)",
+        "produces": "```go\n// cmd/build/amazonadssan_config.go\ntype AmazonAdsSANConfig struct {\n    // ...existing fields...\n    EGEEnforceFrom int64 // unix seconds; 0 = enforcement off. flag amazonadssan-ege-enforce-from, env AMAZON_ADS_EGE_ENFORCE_FROM\n}\n// cmd/watson/amazonadssan/request.go\ntype response struct {\n    // ...existing fields...\n    EventGrainEligibility json.RawMessage `json:\"eventGrainEligibility,omitempty\"`\n}\n// cmd/watson/amazonadssan/reconcile.go\nconst (\n    dynFieldRowLevelRestricted    = \"row_level_restricted\"      // bool, only ever true\n    dynFieldEventGrainEligibility = \"event_grain_eligibility\"   // string, audit only\n)\ntype Reconciler struct {\n    // ...existing fields...\n    Now func() time.Time // nil => time.Now\n}\nfunc parseEligibility(raw json.RawMessage) (value string, unrestricted bool)\nfunc (reconciler *Reconciler) enforcementActive() bool\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-4",
+        "BR-5",
+        "BR-6",
+        "BR-10",
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "NFR-001",
+        "NFR-009",
+        "NFR-011",
+        "NFR-013"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "499374a67bfddca0378452650598e2edae2dc35e",
+        "resolved": [
+          "cmd/watson/amazonadssan/request.go",
+          "cmd/watson/amazonadssan/reconcile.go",
+          "cmd/build/amazonadssan_config.go",
+          "CLAUDE.md",
+          "cmd/watson/amazonadssan/reconcile_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/watson/amazonadssan/credentials.go",
+          "cmd/watson/amazonadssan/credentials_interface.go",
+          "cmd/watson/amazonadssan/process_request.go",
+          "cmd/build/aaas_config.go",
+          "cmd/build/adsmeasurement.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Add amazonads_event_grain_eligibility mock field for the QA matrix",
+      "title_clean": "Add amazonads_event_grain_eligibility mock field for the QA matrix",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Add amazonads_event_grain_eligibility mock field for the QA matrix",
+        "anchors": [],
+        "pattern": "Follow the other mockFields lookups in mockResponse (reconcile.go:163-223) and the extension point TestMockResponse_AllFields (reconcile_test.go:3036)."
+      },
+      "repo": "Kochava/watson",
+      "stack": "go",
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/watson/amazonadssan/reconcile.go"
+        ],
+        "test": [
+          "cmd/watson/amazonadssan/reconcile_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`response.EventGrainEligibility json.RawMessage` — from T001",
+        "produces": "mockResponse (cmd/watson/amazonadssan/reconcile.go:160) honours MockFields[\"amazonads_event_grain_eligibility\"]: absent key => field left nil (missing); value \"null\" => RawMessage `null`; \"true\"/\"false\" => raw JSON boolean; anything else => JSON string of the value"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "BR-12",
+        "FR-007",
+        "FR-061"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "499374a67bfddca0378452650598e2edae2dc35e",
+        "resolved": [
+          "cmd/watson/amazonadssan/reconcile.go",
+          "cmd/watson/amazonadssan/reconcile_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/watson/amazonadssan/credentials.go",
+          "cmd/watson/amazonadssan/credentials_interface.go",
+          "cmd/watson/amazonadssan/process_request.go",
+          "cmd/watson/amazonadssan/request.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T010",
+      "title": "Deploy to QA and run a job sending mock 13954 claims on all claim paths; freeze the canonical Amazon column list",
+      "title_clean": "Deploy to QA and run a job sending mock 13954 claims on all claim paths; freeze the canonical Amazon column list",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T010 — Deploy to QA and run a job sending mock 13954 claims on all claim paths; freeze the canonical Amazon column list",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/watson",
+      "stack": null,
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "BR-12",
+        "FR-007",
+        "FR-025",
+        "FR-060",
+        "FR-062"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "499374a67bfddca0378452650598e2edae2dc35e",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T011",
+      "title": "Deploy QA configuration and run a job for the end-to-end verification of every output with enforcement on",
+      "title_clean": "Deploy QA configuration and run a job for the end-to-end verification of every output with enforcement on",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T011 — Deploy QA configuration and run a job for the end-to-end verification of every output with enforcement on",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/watson",
+      "stack": null,
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T111",
+        "T1101",
+        "T112",
+        "T301",
+        "T951",
+        "T901"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [
+        "BR-1",
+        "BR-2",
+        "BR-3",
+        "BR-7",
+        "BR-8",
+        "BR-9",
+        "BR-10",
+        "BR-11",
+        "FR-007",
+        "FR-061",
+        "FR-025",
+        "FR-031",
+        "FR-050",
+        "NFR-006",
+        "NFR-007",
+        "NFR-012",
+        "NFR-014"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "499374a67bfddca0378452650598e2edae2dc35e",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T012",
+      "title": "Set AMAZON_ADS_EGE_ENFORCE_FROM on prod watson and deploy (final activation step)",
+      "title_clean": "Set AMAZON_ADS_EGE_ENFORCE_FROM on prod watson and deploy (final activation step)",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T012 — Set AMAZON_ADS_EGE_ENFORCE_FROM on prod watson and deploy (final activation step)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/watson",
+      "stack": null,
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T011"
+      ],
+      "inferred_depends_on": [],
+      "wave": 6,
+      "requirements": [
+        "BR-6",
+        "BR-10",
+        "BR-12",
+        "NFR-011",
+        "FR-061",
+        "NFR-012"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "499374a67bfddca0378452650598e2edae2dc35e",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T101",
+      "title": "Add nullable require_restriction_flag to configuration storage and config API",
+      "title_clean": "Add nullable require_restriction_flag to configuration storage and config API",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Large task — consider splitting"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T101 — Add nullable require_restriction_flag to configuration storage and config API",
+        "anchors": [],
+        "pattern": "Follow how send_unredacted flows through every layer: structs.go:14,46; queries.go:18,41,65,88 (selects + GROUP BY), insertNetworkConfigQuery :136-196, updateNetworkConfigurationQuery :315-358; network_adapters.go:56; create.go:120; update.go:148; getactiveconfig.go:58,103; getconfig.go:70; list.go:77."
+      },
+      "repo": "Kochava/sanitization-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/dao/bqnetworksanitization/structs.go",
+          "internal/dao/bqnetworksanitization/queries.go",
+          "pkg/nwsanitizationconfig/nwSanitizationConfig.go",
+          "internal/adapters/network_adapters.go",
+          "internal/handlers/networkSanitizationHandler/structs.go",
+          "internal/handlers/networkSanitizationHandler/create.go",
+          "internal/handlers/networkSanitizationHandler/update.go",
+          "internal/handlers/networkSanitizationHandler/getactiveconfig.go",
+          "internal/handlers/networkSanitizationHandler/getconfig.go",
+          "internal/handlers/networkSanitizationHandler/list.go",
+          "README.md"
+        ],
+        "test": [
+          "internal/dao/bqnetworksanitization/queries_test.go",
+          "internal/handlers/networkSanitizationHandler/require_restriction_flag_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (existing NetworkSanitizationConfiguration, NetworkSanitizationConfigWithKeypaths, nwsanitizationconfig.NetworkSanitizationConfig / NetworkSanitizationConfigResponse, handler NetworkSanitizationConfigRequest / Response)",
+        "produces": "```go\n// internal/dao/bqnetworksanitization/structs.go (both NetworkSanitizationConfiguration and NetworkSanitizationConfigWithKeypaths)\nRequireRestrictionFlag bigquery.NullBool `bigquery:\"require_restriction_flag\"`\n// pkg/nwsanitizationconfig/nwSanitizationConfig.go (both NetworkSanitizationConfig and NetworkSanitizationConfigResponse)\nRequireRestrictionFlag bool `json:\"require_restriction_flag\"`\n// internal/handlers/networkSanitizationHandler/structs.go\n//   NetworkSanitizationConfigResponse.RequireRestrictionFlag bool  `json:\"require_restriction_flag\"`\n//   NetworkSanitizationConfigRequest.RequireRestrictionFlag  *bool `json:\"require_restriction_flag\"`\n// internal/dao/bqnetworksanitization/queries.go\nfunc nullBoolSQL(b bigquery.NullBool) string // \"NULL\" when !b.Valid, else \"true\"/\"false\"\n```\nGET active-config / get-config / list responses expose `require_restriction_flag` (false when NULL)."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-2",
+        "NFR-013",
+        "FR-010",
+        "FR-011"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "22138ac34a36ee5979686c63234341b8f6c853ef",
+        "resolved": [
+          "internal/dao/bqnetworksanitization/structs.go",
+          "internal/dao/bqnetworksanitization/queries.go",
+          "pkg/nwsanitizationconfig/nwSanitizationConfig.go",
+          "internal/adapters/network_adapters.go",
+          "internal/handlers/networkSanitizationHandler/structs.go",
+          "internal/handlers/networkSanitizationHandler/create.go",
+          "internal/handlers/networkSanitizationHandler/update.go",
+          "internal/handlers/networkSanitizationHandler/getactiveconfig.go",
+          "internal/handlers/networkSanitizationHandler/getconfig.go",
+          "internal/handlers/networkSanitizationHandler/list.go",
+          "README.md"
+        ],
+        "missing": [
+          "internal/dao/bqnetworksanitization/queries_test.go",
+          "internal/handlers/networkSanitizationHandler/require_restriction_flag_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "internal/dao/bqnetworksanitization/bq.go",
+          "internal/dao/bqnetworksanitization/bqclient.go",
+          "internal/dao/bqnetworksanitization/bqclient_mock.go",
+          "internal/handlers/networkSanitizationHandler/delete.go",
+          "internal/handlers/networkSanitizationHandler/deleteall.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T102",
+      "title": "Expose require_restriction_flag on the keypaths endpoint for Control",
+      "title_clean": "Expose require_restriction_flag on the keypaths endpoint for Control",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T102 — Expose require_restriction_flag on the keypaths endpoint for Control",
+        "anchors": [],
+        "pattern": "Same file: the ShowDateGranularity lookup from `h.configGetter.Get` at getkeypaths.go:59-70; extend the anonymous `response` struct at :72-86."
+      },
+      "repo": "Kochava/sanitization-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/handlers/networkSanitizationHandler/getkeypaths.go"
+        ],
+        "test": [
+          "internal/handlers/networkSanitizationHandler/getkeypaths_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`nwsanitizationconfig.NetworkSanitizationConfig.RequireRestrictionFlag bool` — from T101 (already read in this handler as `config` at getkeypaths.go:60)",
+        "produces": "GET /network/{network_id}/sanitize/keypaths/recipient/{r}/traffic_type/{t}/postback_type/{p} response gains `\"require_restriction_flag\": true` (key omitted when false). Go: anonymous response struct field `RequireRestrictionFlag bool `json:\"require_restriction_flag,omitempty\"``"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T101"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "NFR-013",
+        "FR-040",
+        "FR-041"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "22138ac34a36ee5979686c63234341b8f6c853ef",
+        "resolved": [
+          "internal/handlers/networkSanitizationHandler/getkeypaths.go",
+          "internal/handlers/networkSanitizationHandler/getkeypaths_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "internal/handlers/networkSanitizationHandler/create.go",
+          "internal/handlers/networkSanitizationHandler/delete.go",
+          "internal/handlers/networkSanitizationHandler/deleteall.go",
+          "internal/handlers/networkSanitizationHandler/getactiveconfig.go",
+          "internal/handlers/networkSanitizationHandler/getconfig.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T110",
+      "title": "Run a job to deploy the BigQuery DDL adding nullable BOOL column require_restriction_flag to network_sanitization.configuration (QA then prod)",
+      "title_clean": "Run a job to deploy the BigQuery DDL adding nullable BOOL column require_restriction_flag to…",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T110 — Run a job to deploy the BigQuery DDL adding nullable BOOL column require_restriction_flag to network_sanitization.configuration (QA then prod)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/sanitization-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "NFR-013"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "22138ac34a36ee5979686c63234341b8f6c853ef",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T111",
+      "title": "Deploy the network 13954 configuration and keypath rows by running sanitization-api calls (QA then prod)",
+      "title_clean": "Deploy the network 13954 configuration and keypath rows by running sanitization-api calls (QA then prod)",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T111 — Deploy the network 13954 configuration and keypath rows by running sanitization-api calls (QA then prod)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/sanitization-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T010",
+        "T201",
+        "T1002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "BR-12",
+        "FR-061",
+        "FR-060",
+        "FR-010",
+        "FR-040"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "22138ac34a36ee5979686c63234341b8f6c853ef",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T112",
+      "title": "Deploy readers to QA and run a job for the parity dry-run of aggregate readers with no 13954 configuration row",
+      "title_clean": "Deploy readers to QA and run a job for the parity dry-run of aggregate readers with no 13954 configuration row",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T112 — Deploy readers to QA and run a job for the parity dry-run of aggregate readers with no 13954 configuration row",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/rollup-worker-cloud",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('Deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T410",
+        "T502",
+        "T601",
+        "T701",
+        "T801"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "BR-7",
+        "NFR-013",
+        "FR-031",
+        "NFR-003"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "2df5d0b77b30ff4f8cf5f431c60304f37d8629ac",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T501",
+      "title": "Rollup SUMMARY: read 13954 installs/events/san_claims from unredacted_app_N via config CTE + UNION ALL",
+      "title_clean": "Rollup SUMMARY: read 13954 installs/events/san_claims from unredacted_app_N via config CTE + UNION ALL",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T501 — Rollup SUMMARY: read 13954 installs/events/san_claims from unredacted_app_N via config CTE + UNION ALL",
+        "anchors": [],
+        "pattern": "Aggregated Insights config-CTE + UNION ALL (apache-superset-dashboards aggregated_insights_events.yaml:8-13,60-70: INNER JOIN tmp_configuration for the unredacted half inside the date window, LEFT JOIN ... IS NULL for the redacted half). Do NOT overload schemaRead: `%s_restricted` joins (buildquery.go:56,78,163,316,318) expand from it."
+      },
+      "repo": "Kochava/rollup-worker-cloud",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/rollup-worker-cloud/buildquery.go"
+        ],
+        "test": [
+          "cmd/rollup-worker-cloud/buildquery_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`Config.ReadProjectID string` (flags.go:25) and `jobStruct.AppID int64` (main.go:33-43); unredacted_app_N tables created by bqgolden — from T401/T410",
+        "produces": "```go\n// buildquery.go\nfunc (c *Config) rawNetworksCTE() string // `tmp_configuration AS (SELECT ... FROM <ReadProjectID>.network_sanitization.configuration WHERE timeframe = 'day' AND active = true AND network_id = '13954')`\nfunc (c *Config) src(j jobStruct, table, dateCol string) string // parenthesised UNION ALL subquery usable wherever `%s.<table>` was used\n```\nbuildQuerySUMMARY(schemaRead string, j jobStruct, dF string, dT string) keeps its signature."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T401"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "BR-1",
+        "BR-7",
+        "NFR-013",
+        "FR-031",
+        "NFR-003",
+        "FR-030",
+        "NFR-005"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "2df5d0b77b30ff4f8cf5f431c60304f37d8629ac",
+        "resolved": [
+          "cmd/rollup-worker-cloud/buildquery.go"
+        ],
+        "missing": [
+          "cmd/rollup-worker-cloud/buildquery_test.go",
+          "cmd/rollup-worker-cloud/buildquery_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/rollup-worker-cloud/bq.go",
+          "cmd/rollup-worker-cloud/flags.go",
+          "cmd/rollup-worker-cloud/main.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T502",
+      "title": "Rollup DETAIL: same unredacted routing for installs/events/san_claims",
+      "title_clean": "Rollup DETAIL: same unredacted routing for installs/events/san_claims",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T502 — Rollup DETAIL: same unredacted routing for installs/events/san_claims",
+        "anchors": [],
+        "pattern": "Same edit as T501 applied to buildQueryDETAIL (buildquery.go:494): FROMs at :826 (installs_primary), :864 (san_claims), :935 and :979 (events_primary); CTE prepended to the DETAIL WITH list near :496-564."
+      },
+      "repo": "Kochava/rollup-worker-cloud",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/rollup-worker-cloud/buildquery.go"
+        ],
+        "test": [
+          "cmd/rollup-worker-cloud/buildquery_detail_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`(c *Config) rawNetworksCTE() string` and `(c *Config) src(j jobStruct, table, dateCol string) string` — from T501; test helpers `testCfg`, `mustContain`, `mustNotContain` defined in T501's cmd/rollup-worker-cloud/buildquery_test.go (same package main)",
+        "produces": "buildQueryDETAIL(schemaRead string, j jobStruct, dF string, dT string) keeps its signature; its installs/events/san_claims FROMs come from c.src"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T501"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "BR-7",
+        "FR-031",
+        "NFR-003",
+        "FR-030"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "2df5d0b77b30ff4f8cf5f431c60304f37d8629ac",
+        "resolved": [
+          "cmd/rollup-worker-cloud/buildquery.go"
+        ],
+        "missing": [
+          "cmd/rollup-worker-cloud/buildquery_detail_test.go",
+          "cmd/rollup-worker-cloud/buildquery_detail_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/rollup-worker-cloud/bq.go",
+          "cmd/rollup-worker-cloud/flags.go",
+          "cmd/rollup-worker-cloud/main.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T201",
+      "title": "Conditional write-time sanitization: only flagged postbacks reach the redacted copy sanitized",
+      "title_clean": "Conditional write-time sanitization: only flagged postbacks reach the redacted copy sanitized",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T201 — Conditional write-time sanitization: only flagged postbacks reach the redacted copy sanitized",
+        "anchors": [],
+        "pattern": "Follow Handler.Handle at cmd/soccer-v2/main.go:248-302 (needsSanitization branch sends original to UnredactedTopic and `sanitizedData` to Topic) and the test scaffolding in cmd/soccer-v2/handler_test.go:205-256 (MockProducerTest, MockSanitizationClientTest, MockConnection)."
+      },
+      "repo": "Kochava/soccer-v2",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "cmd/soccer-v2/restriction.go"
+        ],
+        "modify": [
+          "internal/httpclients/sanitization/models/sanitization.go",
+          "cmd/soccer-v2/main.go"
+        ],
+        "test": [
+          "cmd/soccer-v2/handler_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`models.ConfigurationResponse.RequireRestrictionFlag` JSON key `require_restriction_flag` — served by sanitization-api active-config (T101)",
+        "produces": "```go\n// internal/httpclients/sanitization/models/sanitization.go\ntype ConfigurationResponse struct {\n    // ...existing...\n    RequireRestrictionFlag bool `json:\"require_restriction_flag\"`\n}\n// cmd/soccer-v2/restriction.go\nfunc isRowLevelRestricted(p *control.Postback) bool\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T101"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "BR-1",
+        "BR-3",
+        "BR-6",
+        "NFR-013",
+        "FR-010",
+        "FR-011",
+        "FR-012",
+        "FR-013",
+        "NFR-002"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "6442e8bd931217f2ea41788cb3c2c68402a501e1",
+        "resolved": [
+          "internal/httpclients/sanitization/models/sanitization.go",
+          "cmd/soccer-v2/main.go",
+          "cmd/soccer-v2/handler_test.go"
+        ],
+        "missing": [
+          "cmd/soccer-v2/restriction.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/soccer-v2/logger.go",
+          "cmd/soccer-v2/mock_producer.go",
+          "cmd/soccer-v2/sarama.go",
+          "cmd/soccer-v2/shutdown.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T301",
+      "title": "Blacklist unredacted_* datasets in the query API",
+      "title_clean": "Blacklist unredacted_* datasets in the query API",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T301 — Blacklist unredacted_* datasets in the query API",
+        "anchors": [],
+        "pattern": "Follow TestBlacklist_RestrictedDatasetBlocked (cmd/query/blacklist_test.go:15-68), which simulates the blacklist check from validateQuery."
+      },
+      "repo": "Kochava/koch-query-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/query/blacklist.go"
+        ],
+        "test": [
+          "cmd/query/blacklist_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (blacklistedDatasets []string at cmd/query/blacklist.go:3; matching in helpers.go:205-216 is strings.Contains over lower-cased table names)",
+        "produces": "blacklistedDatasets contains the entry \"unredacted\" (matches unredacted_app_N and account_N_unredacted)"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-050",
+        "NFR-006",
+        "NFR-007",
+        "FR-051"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "e2e6c4cdc98470b37022600d19f769126ba4b95a",
+        "resolved": [
+          "cmd/query/blacklist.go",
+          "cmd/query/blacklist_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/query/amm_audit.go",
+          "cmd/query/api.go",
+          "cmd/query/bq.go",
+          "cmd/query/db.go",
+          "cmd/query/dml.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T401",
+      "title": "Add unredacted_app_%d golden image",
+      "title_clean": "Add unredacted_app_%d golden image",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T401 — Add unredacted_app_%d golden image",
+        "anchors": [],
+        "pattern": "Follow CoreRestrictedGoldenImage (app_golden_image.go:63-72), the flag list in cmd/bqgoldenutil/config/app_golden_image.go:11-30 and AppGoldenImages in cmd/bqgoldenutil/subcmd/app_golden_images.go:10-32."
+      },
+      "repo": "Kochava/bqgolden",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "app_golden_image.go",
+          "cmd/bqgoldenutil/config/app_golden_image.go",
+          "cmd/bqgoldenutil/subcmd/app_golden_images.go"
+        ],
+        "test": [
+          "cmd/bqgoldenutil/config/app_golden_image_test.go",
+          "cmd/bqgoldenutil/subcmd/app_golden_images_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (CoreGoldenImage / CoreRestrictedGoldenImage at app_golden_image.go:52-72 as the shape to copy)",
+        "produces": "```go\n// app_golden_image.go\nfunc CoreUnredactedGoldenImage(bigqueryClient *bigquery.Client, apiClient *rowaccesspolicy.Client) AppGoldenImage // Name \"coreunredacted\", Source golden_image_core, DestDatasetFormat \"unredacted_app_%d\"\n// cmd/bqgoldenutil/config/app_golden_image.go\ntype AppGoldenImage struct { Core, CoreRestricted, AllAppTables bool; CoreUnredacted bool }\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-7",
+        "FR-032"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "c80500465473fca570d80dbbd3aafb0d50479d70",
+        "resolved": [
+          "app_golden_image.go",
+          "cmd/bqgoldenutil/config/app_golden_image.go",
+          "cmd/bqgoldenutil/subcmd/app_golden_images.go",
+          "cmd/bqgoldenutil/config/app_golden_image_test.go",
+          "cmd/bqgoldenutil/subcmd/app_golden_images_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "aaas_golden_image.go",
+          "account_golden_image.go",
+          "copy_dataset.go",
+          "copy_golden_image_for_aaas.go",
+          "copy_golden_image_for_account.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T410",
+      "title": "OPS: sync the unredacted_app_N golden image for all apps (QA then prod) before readers deploy",
+      "title_clean": "OPS: sync the unredacted_app_N golden image for all apps (QA then prod) before readers deploy",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "File path corrected: sync_cmd.go → cmd/bqgoldenutil/subcmd/sync_cmd.go"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T410 — OPS: sync the unredacted_app_N golden image for all apps (QA then prod) before readers deploy",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/bqgolden",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/bqgoldenutil/subcmd/sync_cmd.go"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T401"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-032"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "c80500465473fca570d80dbbd3aafb0d50479d70",
+        "resolved": [],
+        "missing": [],
+        "fixed": {
+          "sync_cmd.go": "cmd/bqgoldenutil/subcmd/sync_cmd.go"
+        },
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/bqgoldenutil/subcmd/aaas_golden_images.go",
+          "cmd/bqgoldenutil/subcmd/account_golden_images.go",
+          "cmd/bqgoldenutil/subcmd/add_row_level_security.go",
+          "cmd/bqgoldenutil/subcmd/app_golden_images.go",
+          "cmd/bqgoldenutil/subcmd/create_account_tables_cmd.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T601",
+      "title": "analytics-query: route network 13954 rows of account_N.analytics to account_N_unredacted",
+      "title_clean": "analytics-query: route network 13954 rows of account_N.analytics to account_N_unredacted",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T601 — analytics-query: route network 13954 rows of account_N.analytics to account_N_unredacted",
+        "anchors": [],
+        "pattern": "FromAccountIDToUnionQuery (namerproduction.go:48-116, standardTable at :52 and FROM at :92), FromAccountIDToUnionQueryWithColumns (:121-, standardTable :128, standard_filtered CTE args :413), ConditionalNamer.FromAccountIDToUnionQueryWithColumns plain-table branch (namerconditional.go:40-43). The 10263 branches (hash-join to account_N_restricted) and FromAccountIDToFullTableName (used by writers) stay unchanged."
+      },
+      "repo": "Kochava/analytics-query",
+      "stack": "go",
+      "domain_manifest": "query-module",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "pkg/analyticstechspecs/namerproduction.go",
+          "pkg/analyticstechspecs/namerconditional.go"
+        ],
+        "test": [
+          "pkg/analyticstechspecs/namerproduction_test.go",
+          "pkg/analyticstechspecs/namerconditional_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`account_N_unredacted.analytics` (already provisioned per account; bqgolden account golden image reused unchanged) and `network_sanitization.configuration` rows from ops T111",
+        "produces": "```go\n// pkg/analyticstechspecs/namerproduction.go\nfunc (an *productionAnalyticsNamer) StandardSource(accountID int64) string\n// returns a parenthesised subquery: WITH tmp_configuration AS (<network_id='13954', timeframe='day', active=true>) \n//   SELECT a.* FROM `P.account_N.analytics` a LEFT JOIN tmp_configuration c ON a.network_id=c.network_id AND a._date>=c.start_date AND a._date<COALESCE(c.end_date, TIMESTAMP '2099-12-31') WHERE c.network_id IS NULL\n//   UNION ALL SELECT a.* FROM `P.account_N_unredacted.analytics` a INNER JOIN tmp_configuration c ON <same window>\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-7",
+        "NFR-013",
+        "FR-031",
+        "NFR-003",
+        "FR-030",
+        "NFR-005"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "7c8e68b42f6d23e6894c5c831346f970f2011a2a",
+        "resolved": [
+          "pkg/analyticstechspecs/namerproduction.go",
+          "pkg/analyticstechspecs/namerconditional.go",
+          "pkg/analyticstechspecs/namerproduction_test.go",
+          "pkg/analyticstechspecs/namerconditional_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "pkg/analyticstechspecs/converter.go",
+          "pkg/analyticstechspecs/namer.go",
+          "pkg/analyticstechspecs/schema.go"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T701",
+      "title": "Superset datasets: read network 13954 rows from account_N_unredacted via config CTE + UNION ALL",
+      "title_clean": "Superset datasets: read network 13954 rows from account_N_unredacted via config CTE + UNION ALL",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T701 — Superset datasets: read network 13954 rows from account_N_unredacted via config CTE + UNION ALL",
+        "anchors": [],
+        "pattern": "aggregated_insights_events.yaml:8-13 (tmp_configuration) and :60-70 (unredacted INNER JOIN inside the window), :134-162 (redacted LEFT JOIN ... IS NULL half). Scope the CTE with `AND network_id = '13954'` (design D4) — do not copy the unscoped Aggregated Insights CTE."
+      },
+      "repo": "Kochava/apache-superset-dashboards",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/analytics.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/cost_measurement.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/aggregated_insights_app_campaign_filter.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/aggregated_insights_match_to_type_filter.yaml"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`kochava-query-1370.network_sanitization.configuration` and `account_N_unredacted.analytics` (existing)",
+        "produces": "Each listed dataset's `sql:` replaces its `account_{{ cache_key_wrapper(get_kochava_account_id()) }}.analytics` source (analytics.yaml:12; cost_measurement.yaml:31-32 and :50-51; aggregated_insights_match_to_type_filter.yaml:9; aggregated_insights_app_campaign_filter.yaml:8-12) with an inline subquery: `(WITH tmp_configuration AS (SELECT SAFE_CAST(network_id AS INT) AS network_id, SAFE_CAST(start_date AS TIMESTAMP) AS start_date, SAFE_CAST(end_date AS TIMESTAMP) AS end_date FROM `kochava-query-1370.network_sanitization.configuration` WHERE timeframe = 'day' AND active = true AND network_id = '13954') SELECT a.* FROM <account_N.analytics> a LEFT JOIN tmp_configuration c ON a.network_id = c.network_id AND a._date >= c.start_date AND a._date < COALESCE(c.end_date, '2099-12-31') WHERE c.network_id IS NULL UNION ALL SELECT a.* FROM <account_N_unredacted.analytics> a INNER JOIN tmp_configuration c ON a.network_id = c.network_id AND a._date >= c.start_date AND a._date < COALESCE(c.end_date, '2099-12-31'))` keeping each dataset's existing alias (`a` / `analytics`)."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack python",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "stack=python"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-7",
+        "NFR-013",
+        "FR-031",
+        "FR-030"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "563b987ff1d988a49c8016c8641734a46eb16dfc",
+        "resolved": [
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/analytics.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/cost_measurement.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/aggregated_insights_app_campaign_filter.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/aggregated_insights_match_to_type_filter.yaml"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/Fraud_-_Anonymized_Activity_Dataset_BQ.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/Fraud_-_Device_Attribute_Outliers_BQ.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/Fraud_-_Invalid_Device_ID_Dataset_BQ.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/Fraud_-_Jailbroken_Installs_Dataset_BQ.yaml",
+          "prod/datasets/Google_BigQuery_Kochava_Query_1370/Fraud_-_MTTI_Dataset_BQ.yaml"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T801",
+      "title": "app-match-api: add account_N_unredacted analytics step between analytics and restricted",
+      "title_clean": "app-match-api: add account_N_unredacted analytics step between analytics and restricted",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T801 — app-match-api: add account_N_unredacted analytics step between analytics and restricted",
+        "anchors": [],
+        "pattern": "Existing fallback chain in getterImpl.Get (getter.go:37-72) and getFromRestrictedAnalyticsTable (:133-159) which differs from getFromAnalyticsTable only by the table constant."
+      },
+      "repo": "Kochava/app-match-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "pkg/directmatch/getter.go"
+        ],
+        "test": [
+          "pkg/directmatch/getter_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`bqGetter.getAppIDFromAnalytics(ctx, campaignName, campaignID string, accountID int64, table string, allowNull bool) (int64, error)` and `getAppIDFromSKAD(ctx, campaignName, campaignID string, accountID int64, allowNull bool) (int64, error)` (pkg/directmatch/bigquery.go:47,96)",
+        "produces": "```go\nconst (\n    unredactedSource = \"unredacted\"\n    unredactedTable  = \"`%s.account_%d_unredacted.analytics`\"\n)\ntype appIDLookup interface {\n    getAppIDFromAnalytics(ctx context.Context, campaignName, campaignID string, accountID int64, table string, allowNull bool) (int64, error)\n    getAppIDFromSKAD(ctx context.Context, campaignName, campaignID string, accountID int64, allowNull bool) (int64, error)\n}\nfunc resolveAppID(ctx context.Context, request MatchRequest, bq appIDLookup) (appID int64, source string, err error)\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-7",
+        "NFR-013",
+        "FR-030"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "13de7c0db948df533666e1295fcf172f820ea249",
+        "resolved": [
+          "pkg/directmatch/getter.go"
+        ],
+        "missing": [
+          "pkg/directmatch/getter_test.go",
+          "pkg/directmatch/getter_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "pkg/directmatch/bigquery.go",
+          "pkg/directmatch/directmatch.go",
+          "pkg/directmatch/sql.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T901",
+      "title": "v13 detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+      "title_clean": "v13 detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T901 — v13 detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+        "anchors": [],
+        "pattern": "Per-row blob check template: the FB/IG branch in sanitizeNetworkDataCSV_2 (main.go:4615-) and _2event (:4277-); both first-pass blocks create sanitizeRulesCSV at :4295 and :4647; partner switches contain `case \\\"facebook\\\", \\\"instagram\\\", ...` at :4364 and :4715. The new path must NOT be routed through checkAmazonMatch (:5586)."
+      },
+      "repo": "Kochava/krepdetailworkerv13",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "src/krepdetailworkerv13/rowlevel.go"
+        ],
+        "modify": [
+          "src/krepdetailworkerv13/main.go"
+        ],
+        "test": [
+          "src/krepdetailworkerv13/rowlevel_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "report_filtering row for partner amazonadssan and cpi_networks mapping — from ops T1101; existing globals sanitizeRulesCSV (main.go:223), posOfFirstInstallinEvent (:231), originalRequestCols, dbR, logP",
+        "produces": "```go\n// src/krepdetailworkerv13/rowlevel.go\nconst rowLevelRestrictedKey = \"row_level_restricted\"\nvar restrictedRulesCSV map[string][]int // network id -> output column positions to mask when the row is restricted\nfunc rowHasRestrictionFlag(cells ...string) bool\nfunc applyRowLevelRestriction(rowArr []string, cols []int, requestCells ...string) bool // masks cols with \"---\" when any cell is flagged; returns whether it masked; ignores out-of-range/negative indexes\nfunc originalRequestCellsInRange(rowArr []string, reqCols []int, from, to int) []string\nfunc loadRowLevelRules(mySQLPartner string, colPos2Sanitize []int) (errMsg string)\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-2",
+        "BR-3",
+        "BR-8",
+        "BR-9",
+        "FR-025",
+        "FR-020",
+        "FR-021",
+        "FR-022",
+        "FR-023",
+        "FR-024",
+        "FR-026",
+        "NFR-004",
+        "NFR-008"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "902c46096fe7f07d46bf953de248ca62157a004f",
+        "resolved": [
+          "src/krepdetailworkerv13/main.go"
+        ],
+        "missing": [
+          "src/krepdetailworkerv13/rowlevel.go",
+          "src/krepdetailworkerv13/rowlevel_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "src/krepdetailworkerv13/bq.go",
+          "src/krepdetailworkerv13/agency.go",
+          "src/krepdetailworkerv13/email.go",
+          "src/krepdetailworkerv13/event_queries.go",
+          "src/krepdetailworkerv13/find_sanitization_indices.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T951",
+      "title": "v14 mysql detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+      "title_clean": "v14 mysql detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T951 — v14 mysql detail worker: amazonadssan per-row masking keyed on row_level_restricted",
+        "anchors": [],
+        "pattern": "Per-row blob check template: the FB/IG branch in sanitizeNetworkDataCSV_2 (main.go:6028-6088) and _2event (:5652-5698, :5739-5802); rules loading in loadSanitizeRules (:6096-6150); partner switch (:5895-5961 and :5530-5592). The new path must NOT be routed through checkAmazonMatch (:6843) — amazonadssan is never added to amazonNetworks, and the new block runs independently of the sanitizeRulesCSV block."
+      },
+      "repo": "Kochava/krepdetailworkerv14",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "cmd/krepdetailworkerv14/rowlevel.go"
+        ],
+        "modify": [
+          "cmd/krepdetailworkerv14/main.go"
+        ],
+        "test": [
+          "cmd/krepdetailworkerv14/rowlevel_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "report_filtering row for partner amazonadssan and cpi_networks mapping — from ops T1101; existing globals originalRequestCols, posOfFirstInstallinEvent (main.go:309-317), dbR, logP, sanitizeRulesCSV",
+        "produces": "```go\n// cmd/krepdetailworkerv14/rowlevel.go\nconst rowLevelRestrictedKey = \"row_level_restricted\"\nvar restrictedRulesCSV map[string][]int // network id -> output column positions to mask when the row is restricted\nfunc rowHasRestrictionFlag(cells ...string) bool\nfunc applyRowLevelRestriction(rowArr []string, cols []int, requestCells ...string) bool // masks cols with \"---\" when any cell is flagged; returns whether it masked; ignores out-of-range/negative indexes\nfunc originalRequestCellsInRange(rowArr []string, reqCols []int, from, to int) []string\nfunc loadRowLevelRules(mySQLPartner string, colPos2Sanitize []int) (errMsg string)\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-2",
+        "BR-3",
+        "BR-8",
+        "BR-9",
+        "FR-025",
+        "FR-020",
+        "FR-021",
+        "FR-022",
+        "FR-023",
+        "FR-024",
+        "FR-026",
+        "NFR-004",
+        "NFR-008"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "mysql",
+        "resolved": [
+          "cmd/krepdetailworkerv14/main.go"
+        ],
+        "missing": [
+          "cmd/krepdetailworkerv14/rowlevel.go",
+          "cmd/krepdetailworkerv14/rowlevel_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/krepdetailworkerv14/bq.go",
+          "cmd/krepdetailworkerv14/advanced_restated_cost.go",
+          "cmd/krepdetailworkerv14/agency.go",
+          "cmd/krepdetailworkerv14/email.go",
+          "cmd/krepdetailworkerv14/event_queries.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T1101",
+      "title": "Deploy the ko-sql-ops change that inserts the amazonadssan kochava_reports.report_filtering row (QA then prod)",
+      "title_clean": "Deploy the ko-sql-ops change that inserts the amazonadssan kochava_reports.report_filtering row (QA then prod)",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T1101 — Deploy the ko-sql-ops change that inserts the amazonadssan kochava_reports.report_filtering row (QA then prod)",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/krepdetailworkerv14",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "cmd/krepdetailworkerv14/main.go"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T010"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "BR-12",
+        "FR-060",
+        "FR-020",
+        "FR-022"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "mysql",
+        "resolved": [
+          "cmd/krepdetailworkerv14/main.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "cmd/krepdetailworkerv14/advanced_restated_cost.go",
+          "cmd/krepdetailworkerv14/agency.go",
+          "cmd/krepdetailworkerv14/bq.go",
+          "cmd/krepdetailworkerv14/email.go",
+          "cmd/krepdetailworkerv14/event_queries.go"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T1001",
+      "title": "SanitizationApiClient: read and cache require_restriction_flag from the keypaths response",
+      "title_clean": "SanitizationApiClient: read and cache require_restriction_flag from the keypaths response",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T1001 — SanitizationApiClient: read and cache require_restriction_flag from the keypaths response",
+        "anchors": [],
+        "pattern": "Existing client: constructor params at SanitizationApiClient.php:10, cache read :93-102, API parse :149-155, cache write :158-164; test scaffolding TestSanitizationApiClient/ testRetrieveKeyPathsReturnsResponseFromApi at tests/lib/KochavaControl/Api/SanitizationApiClientTest.php:12-76."
+      },
+      "repo": "Kochava/control",
+      "stack": "php",
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "source/var/www/lib/KochavaControl/Api/SanitizationApiClient.php"
+        ],
+        "test": [
+          "tests/lib/KochavaControl/Api/SanitizationApiClientTest.php"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "keypaths JSON key `require_restriction_flag` (bool, omitted when false) — from T102",
+        "produces": "```php\nclass GetKeypathsResponse\n{\n    public function __construct(public $recipient = '', public $traffic_type = '', public $postback_type = '', public $matched_to_type = '', public $key_paths = [], public $require_restriction_flag = false)\n}\n```\n`retrieveKeyPaths(...)` returns it populated from the API (`(bool)($data['require_restriction_flag'] ?? false)`), from the cache, and as false on every error path; the 15-minute cache payload gains `require_restriction_flag`."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "NFR-013",
+        "FR-040",
+        "FR-041"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "27754ac12d263d30041fda445f9f6065ec1e7d42",
+        "resolved": [
+          "source/var/www/lib/KochavaControl/Api/SanitizationApiClient.php",
+          "tests/lib/KochavaControl/Api/SanitizationApiClientTest.php"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "source/var/www/lib/KochavaControl/Api/CampaignManagerIFace.php",
+          "source/var/www/lib/KochavaControl/Api/Champaign.php",
+          "source/var/www/lib/KochavaControl/Api/ChampaignMock.php",
+          "source/var/www/lib/KochavaControl/Api/Currencies.php",
+          "source/var/www/lib/KochavaControl/Api/EncryptedParams.php"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "vendor/bin/phpunit"
+    },
+    {
+      "id": "T1002",
+      "title": "Postback send-time redaction only for flagged conversions on conditional configs",
+      "title_clean": "Postback send-time redaction only for flagged conversions on conditional configs",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T1002 — Postback send-time redaction only for flagged conversions on conditional configs",
+        "anchors": [],
+        "pattern": "The keypath path in the send loop: Postback.php:630-647 (`$templateIsForNetworkID ... getPrivacySanitizationKeyPaths ... SanitizePrivacy`) and the array-vs-object handling in getPrivacySanitizationKeyPaths :1607-1629."
+      },
+      "repo": "Kochava/control",
+      "stack": "php",
+      "domain_manifest": "attribution-core",
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "source/var/www/lib/KochavaControl/Event/Postback.php"
+        ],
+        "test": [
+          "tests/lib/KochavaControl/Event/Postback_test.php"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`GetKeypathsResponse->require_restriction_flag` (bool) and `->key_paths` — from T1001",
+        "produces": "```php\n// Postback.php\npublic static function postbackIsRowLevelRestricted(array $postback): bool\npublic static function filterKeypathsForRestriction($keypaths, array $postback)\n// returns null when $keypaths is null; returns null when $keypaths->require_restriction_flag is true and the postback is not flagged; otherwise returns $keypaths unchanged\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T1001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "BR-8",
+        "BR-11",
+        "NFR-013",
+        "FR-040",
+        "FR-041",
+        "NFR-008",
+        "FR-042"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "27754ac12d263d30041fda445f9f6065ec1e7d42",
+        "resolved": [
+          "source/var/www/lib/KochavaControl/Event/Postback.php",
+          "tests/lib/KochavaControl/Event/Postback_test.php"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "source/var/www/lib/KochavaControl/Event/AttributionAssociation.php",
+          "source/var/www/lib/KochavaControl/Event/Helper.php",
+          "source/var/www/lib/KochavaControl/Event/Manager.php",
+          "source/var/www/lib/KochavaControl/Event/Process.php",
+          "source/var/www/lib/KochavaControl/Event/Register.php"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "vendor/bin/phpunit"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/analytics-query with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/analytics-query",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/analytics-query before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T601"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG2",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/apache-superset-dashboards with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG2",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/apache-superset-dashboards",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/apache-superset-dashboards before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T701"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": ""
+    },
+    {
+      "id": "TG3",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/app-match-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG3",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/app-match-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/app-match-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T801"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG4",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/bqgolden with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG4",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/bqgolden",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/bqgolden before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T410"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG5",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/control with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG5",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/control",
+      "stack": "php",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/control before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T1002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "vendor/bin/phpunit"
+    },
+    {
+      "id": "TG6",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/koch-query-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG6",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/koch-query-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/koch-query-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T301"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG7",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/krepdetailworkerv13 with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG7",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/krepdetailworkerv13",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/krepdetailworkerv13 before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T901"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG8",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/krepdetailworkerv14 with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG8",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/krepdetailworkerv14",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/krepdetailworkerv14 before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T951",
+        "T1101"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG9",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/rollup-worker-cloud with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG9",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/rollup-worker-cloud",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/rollup-worker-cloud before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T112"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG10",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/sanitization-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG10",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/sanitization-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/sanitization-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T102",
+        "T110",
+        "T111"
+      ],
+      "inferred_depends_on": [],
+      "wave": 5,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG11",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/soccer-v2 with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG11",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/soccer-v2",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/soccer-v2 before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T201"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG12",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/watson with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG12",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/watson",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/watson before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T010",
+        "T012"
+      ],
+      "inferred_depends_on": [],
+      "wave": 7,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T101",
+      "T110",
+      "T301",
+      "T401",
+      "T601",
+      "T701",
+      "T801",
+      "T901",
+      "T951"
+    ],
+    [
+      "T002",
+      "T102",
+      "T201",
+      "T410",
+      "T501",
+      "TG1",
+      "TG2",
+      "TG3",
+      "TG6",
+      "TG7"
+    ],
+    [
+      "T010",
+      "T1001",
+      "T502",
+      "TG11",
+      "TG4"
+    ],
+    [
+      "T1002",
+      "T1101",
+      "T112"
+    ],
+    [
+      "T111",
+      "TG5",
+      "TG8",
+      "TG9"
+    ],
+    [
+      "T011",
+      "TG10"
+    ],
+    [
+      "T012"
+    ],
+    [
+      "TG12"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 54,
+    "covered": 54,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "T410: `sync_cmd.go` has no folder in the repo; check where it belongs",
+    "grounding pinned to mysql; knowledge graph skipped for Kochava/krepdetailworkerv14",
+    "T101: task too large (13 files (max 5)); consider splitting"
+  ],
+  "removed": []
+}
