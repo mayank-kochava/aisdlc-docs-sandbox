@@ -1,0 +1,355 @@
+{
+  "matrix_id": "wi_379f44c2fdf4e54066f2-r1",
+  "prd": {
+    "id": "wi_379f44c2fdf4e54066f2",
+    "folder": "089-product-k4a-title-show-the-service-version-in-the-",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-12T14:34:34.995425Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Append service version to /healthcheck body and wire both call sites",
+      "title_clean": "Append service version to /healthcheck body and wire both call sites",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Append service version to /healthcheck body and wire both call sites",
+        "anchors": [],
+        "pattern": "Existing handler at internal/healthcheck/healthcheck.go:11-21; version already passed to kotel via cliCtx.App.Version at internal/commands/server/server.go:103 and internal/commands/reader/reader.go:89"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/healthcheck/healthcheck.go",
+          "internal/commands/server/server.go",
+          "internal/commands/reader/reader.go"
+        ],
+        "test": [
+          "internal/healthcheck/healthcheck_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "cliCtx.App.Version (string; set from gopkgver.Version at cmd/household-id-adornment-api/main.go:20). cliCtx is in scope at internal/commands/server/server.go:103 and internal/commands/reader/reader.go:89, in the same function as the HealthHandler call sites at server.go:166 and reader.go:154 (the call sites are inside goroutine closures, so cliCtx is captured).",
+        "produces": "func HealthHandler(version string) http.Handler  // package healthcheck (internal/healthcheck/healthcheck.go); replaces HealthHandler(); the existing function already returns http.Handler via http.HandlerFunc"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-001",
+        "FR-003",
+        "FR-006",
+        "FR-007",
+        "NFR-001",
+        "NFR-005",
+        "NFR-006"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "internal/healthcheck/healthcheck.go",
+          "internal/commands/server/server.go",
+          "internal/commands/reader/reader.go"
+        ],
+        "missing": [
+          "internal/healthcheck/healthcheck_test.go",
+          "internal/healthcheck/healthcheck_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Fix Dockerfile ldflags so injected VERSION reaches gopkgver.Version",
+      "title_clean": "Fix Dockerfile ldflags so injected VERSION reaches gopkgver.Version",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Fix Dockerfile ldflags so injected VERSION reaches gopkgver.Version",
+        "anchors": [],
+        "pattern": "Dockerfile:3-4 already declares ARG VERSION=dev and ARG PKG_VER_PATH=github.com/Kochava/gopkgver.Version (unused); Dockerfile:10 currently targets nonexistent main.Version. Both ARGs are declared in the same build stage (stage1) as the go build line, so no ARG re-declaration is needed."
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "infra",
+      "files": {
+        "create": [],
+        "modify": [
+          "Dockerfile"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "gopkgver.Version var in github.com/Kochava/gopkgver (A4); build arg VERSION from CI",
+        "produces": "Image whose binary reports the injected VERSION through app.Version (cmd/household-id-adornment-api/main.go:20)"
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "infra (SRE, manual): IaC/CI files",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Dockerfile"
+          }
+        ],
+        "assignee": null,
+        "lane": "infra"
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-002",
+        "FR-004",
+        "FR-005",
+        "NFR-007"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "Dockerfile"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T003",
+      "title": "Run a job: deploy built images locally and check connectivity with curl to /healthcheck, record DEC-003 sign-off in PR",
+      "title_clean": "Run a job: deploy built images locally and check connectivity with curl to /healthcheck, record DEC-003 sign-off in PR",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Run a job: deploy built images locally and check connectivity with curl to /healthcheck, record DEC-003 sign-off in PR",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "HealthHandler(version string) from T001; Dockerfile fix from T002 (images hid:test built with VERSION=1.2.3 and hid:nover built without)",
+        "produces": "Verification evidence in the PR description and the DEC-003 approval link"
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('deploy')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "deploy"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-007",
+        "NFR-007",
+        "FR-008",
+        "NFR-002",
+        "NFR-003"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/household-id-adornment-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/household-id-adornment-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T002"
+    ],
+    [
+      "T003"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 14,
+    "covered": 13,
+    "uncovered": [
+      "PRD-089-product-k4a-title-show-the-service-version-in-the-"
+    ]
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "T003: `adornment/household-id` is a folder, not a file; dropped from the task's files"
+  ],
+  "removed": []
+}
