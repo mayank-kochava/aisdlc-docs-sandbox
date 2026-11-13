@@ -1,0 +1,401 @@
+{
+  "matrix_id": "wi_05d89b13853e9945e838-r1",
+  "prd": {
+    "id": "wi_05d89b13853e9945e838",
+    "folder": "089-show-the-service-version-in-the-household-id-adorn",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-13T11:42:51.888232Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Fix Dockerfile ldflags so release tag reaches gopkgver.Version",
+      "title_clean": "Fix Dockerfile ldflags so release tag reaches gopkgver.Version",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Fix Dockerfile ldflags so release tag reaches gopkgver.Version",
+        "anchors": [],
+        "pattern": "Kochava/geoip-adornment-api/dockerfile:18 (-ldflags \"-X ${PKG_VER_PATH}=${VERSION}\"); this task keeps single quotes around the -X argument as in the current Dockerfile:10"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "infra",
+      "files": {
+        "create": [],
+        "modify": [
+          "Dockerfile"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (Dockerfile:4 already declares ARG PKG_VER_PATH=github.com/Kochava/gopkgver.Version; cmd/household-id-adornment-api/main.go:20 reads gopkgver.Version)",
+        "produces": "Built binary whose gopkgver.Version equals the VERSION build-arg (observable via `household-id-adornment-api --version`)"
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "infra (SRE, manual): IaC/CI files",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "Dockerfile"
+          }
+        ],
+        "assignee": null,
+        "lane": "infra"
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-002",
+        "FR-003",
+        "FR-006",
+        "NFR-008"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "Dockerfile"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "T002",
+      "title": "Health handler appends version with \"unknown\" fallback; update both call sites",
+      "title_clean": "Health handler appends version with \"unknown\" fallback; update both call sites",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Health handler appends version with \"unknown\" fallback; update both call sites",
+        "anchors": [],
+        "pattern": "Existing handler at internal/healthcheck/healthcheck.go:11-21 (host=\"unknown\" fallback idiom); HealthHandler call sites internal/commands/server/server.go:166 and internal/commands/reader/reader.go:154"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/healthcheck/healthcheck.go",
+          "internal/commands/server/server.go",
+          "internal/commands/reader/reader.go"
+        ],
+        "test": [
+          "internal/healthcheck/healthcheck_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "cliCtx.App.Version (= gopkgver.Version, set at cmd/household-id-adornment-api/main.go:20); stdlib log/slog default logger. No symbol from T001 is consumed: T001 touches only the Dockerfile and the two tasks are independent (T001 is needed only for end-to-end accuracy of the reported value).",
+        "produces": "func HealthHandler(version string) http.Handler  // package healthcheck (internal/healthcheck/healthcheck.go); body \"OK - <host> - <version>\""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-002",
+        "FR-001",
+        "FR-004",
+        "FR-005",
+        "FR-007",
+        "FR-008",
+        "NFR-001",
+        "NFR-002",
+        "NFR-005",
+        "NFR-006"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "internal/healthcheck/healthcheck.go",
+          "internal/commands/server/server.go",
+          "internal/commands/reader/reader.go"
+        ],
+        "missing": [
+          "internal/healthcheck/healthcheck_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T003",
+      "title": "Pre-deploy gate: verify probes are status-only; document post-deploy version smoke check",
+      "title_clean": "Pre-deploy gate: verify probes are status-only; document post-deploy version smoke check",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Modifies Kochava, which isn't in the repo and no task creates it"
+        },
+        {
+          "level": "yellow",
+          "text": "Modifies Kochava/ko-k8s-apps/adornment/household-id/api/prod/api.yaml, which isn't in the repo and no task creates it"
+        },
+        {
+          "level": "yellow",
+          "text": "Modifies Kochava/ko-k8s-apps/adornment/household-id/api/base/api.yaml, which isn't in the repo and no task creates it"
+        },
+        {
+          "level": "yellow",
+          "text": "Modifies values.yaml, which isn't in the repo and no task creates it"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Pre-deploy gate: verify probes are status-only; document post-deploy version smoke check",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-k8s-apps",
+      "stack": "yaml-tf",
+      "domain_manifest": "infra",
+      "governance": "infra",
+      "files": {
+        "create": [],
+        "modify": [
+          "Kochava",
+          "Kochava/ko-k8s-apps/adornment/household-id/api/prod/api.yaml",
+          "adornment/household-id/api/base/api.yaml",
+          "Kochava/ko-k8s-apps/adornment/household-id/api/base/api.yaml",
+          "values.yaml"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "The /healthcheck body 'OK - <host> - <version>' defined by T002 (observed over HTTP, no code symbol).",
+        "produces": "A PR comment on the T002 PR recording the probe verification outcome, and a post-deploy smoke result. No code symbols."
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "infra (SRE, manual): infra repo, SRE is manual",
+        "confidence": 0.36,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": "infra"
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "NFR-008",
+        "FR-005",
+        "NFR-007",
+        "NFR-011"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1d67cf704a86cbca2c3d7d2a76d5af7506680aab",
+        "resolved": [
+          "adornment/household-id/api/base/api.yaml"
+        ],
+        "missing": [
+          "Kochava",
+          "Kochava/ko-k8s-apps/adornment/household-id/api/prod/api.yaml",
+          "Kochava/ko-k8s-apps/adornment/household-id/api/base/api.yaml",
+          "values.yaml"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "adornment/household-id/api/base/api_hpa.yaml",
+          "adornment/household-id/api/base/kustomization.yaml",
+          "adornment/household-id/api/base/service.yaml",
+          ".sops.yaml",
+          ".yamlfmt.yaml"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/household-id-adornment-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/household-id-adornment-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T002",
+      "T003"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 15,
+    "covered": 14,
+    "uncovered": [
+      "PRD-089-show-the-service-version-in-the-household-id-adorn"
+    ]
+  },
+  "conflicts": [],
+  "open_questions": [
+    {
+      "task_id": "T003",
+      "question": "Owner allocation for T003 has low confidence (0.36); confirm manual-developer manually before dispatch.",
+      "reason": "infra (SRE, manual): infra repo, SRE is manual"
+    }
+  ],
+  "decisions": "",
+  "warnings": [
+    "T003: `Kochava` has no folder in the repo; check where it belongs",
+    "T003: `Kochava/ko-k8s-apps/adornment/household-id/api/prod/api.yaml` has no folder in the repo; check where it belongs",
+    "T003: `Kochava/ko-k8s-apps/adornment/household-id/api/base/api.yaml` has no folder in the repo; check where it belongs",
+    "T003: `values.yaml` has no folder in the repo; check where it belongs",
+    "T003: path not found in repo: Kochava",
+    "T003: path not found in repo: Kochava/ko-k8s-apps/adornment/household-id/api/prod/api.yaml",
+    "T003: path not found in repo: Kochava/ko-k8s-apps/adornment/household-id/api/base/api.yaml",
+    "T003: path not found in repo: values.yaml"
+  ],
+  "removed": []
+}
