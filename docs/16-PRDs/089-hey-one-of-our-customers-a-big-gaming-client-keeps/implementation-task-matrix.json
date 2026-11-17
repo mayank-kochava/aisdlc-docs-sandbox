@@ -1,0 +1,455 @@
+{
+  "matrix_id": "wi_e225ebbd1d55b1bc06c4-r2",
+  "prd": {
+    "id": "wi_e225ebbd1d55b1bc06c4",
+    "folder": "089-hey-one-of-our-customers-a-big-gaming-client-keeps",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-17T16:12:38.893973Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Pure ISO 8601 date normalizer helper",
+      "title_clean": "Pure ISO 8601 date normalizer helper",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Pure ISO 8601 date normalizer helper",
+        "anchors": [],
+        "pattern": "Mirror stdlib datetime/strftime style of convert_date_with_time in tools/k4a_api_tools.py (~895-941); logger as in tools/campaign_tools.py:15-17. Tests: plain pytest in unit-tests/ per pytest.ini (testpaths=unit-tests, asyncio_mode=auto)."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "utils/date_format.py"
+        ],
+        "modify": [],
+        "test": [
+          "unit-tests/test_date_format.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (stdlib datetime/re only; logger via fastmcp.utilities.logging.get_logger as in tools/campaign_tools.py:15-17)",
+        "produces": "```python\nlogger  # module-level, get_logger(\"date-format\")\nDATE_EPOCH_KEYS: frozenset[str]  # per A2\ndef normalize_dates(obj: Any, *, tool: str = \"unknown\") -> Any\n```\nReturns a deep copy of dict/list/scalar data with US MM/DD/YYYY strings rendered YYYY-MM-DD, and epoch ints under DATE_EPOCH_KEYS rendered YYYY-MM-DD (UTC). Never raises."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-001",
+        "FR-002",
+        "FR-005",
+        "FR-007",
+        "NFR-003",
+        "NFR-005",
+        "NFR-006"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [],
+        "missing": [
+          "utils/date_format.py",
+          "unit-tests/test_date_format.py"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "utils/authentication.py",
+          "utils/mmm_tool_proxy.py",
+          "utils/kochava_agency_client.py",
+          "utils/mmp_entitlement.py",
+          "utils/netwrkcost_backfill_client.py"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "T002",
+      "title": "Normalize campaign tool results before json.dumps",
+      "title_clean": "Normalize campaign tool results before json.dumps",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Normalize campaign tool results before json.dumps",
+        "anchors": [],
+        "pattern": "tools/campaign_tools.py:42-48 (client = KochavaAgencyClient(api_key=...); result = await client.list_campaigns(...); json.dumps(result, indent=2)); mocking: patch.object the get_auth_key and KochavaAgencyClient names imported in tools/campaign_tools.py (lines 13-14) with AsyncMock client methods list_campaigns (:42), get_campaign (:93), create_campaign (:181), update_campaign (:271)."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "tools/campaign_tools.py"
+        ],
+        "test": [
+          "unit-tests/test_campaign_tools_dates.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "normalize_dates(obj, *, tool=...) from utils.date_format — T001",
+        "produces": "No new symbols; the success returns of kochava_list_campaigns (tools/campaign_tools.py:48), kochava_get_campaign (:96), kochava_create_campaign (:199) and kochava_update_campaign (:283) become json.dumps(normalize_dates(result, tool=\"<tool name>\"), indent=2)."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "PRD-089-hey-one-of-our-customers-a-big-gaming-client-keeps",
+        "FR-001",
+        "FR-004",
+        "FR-008",
+        "NFR-002"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [
+          "tools/campaign_tools.py"
+        ],
+        "missing": [
+          "unit-tests/test_campaign_tools_dates.py"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "tools/app_management_tools.py",
+          "tools/cost_backfill_tools.py",
+          "tools/cost_configuration_tools.py",
+          "tools/event_tools.py",
+          "tools/faa_create_acc.py"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "T003",
+      "title": "Normalize dates in mcp_wrapper before TOON encode",
+      "title_clean": "Normalize dates in mcp_wrapper before TOON encode",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Normalize dates in mcp_wrapper before TOON encode",
+        "anchors": [],
+        "pattern": "tools/k4a_api_tools.py:186-194 (existing mcp_wrapper isinstance(result,(dict,list)) branch); decorator usage in unit-tests/test_event_tools.py."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "tools/k4a_api_tools.py"
+        ],
+        "test": [
+          "unit-tests/test_mcp_wrapper_dates.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "normalize_dates from utils.date_format — T001; encode from toon_format (already imported in tools/k4a_api_tools.py)",
+        "produces": "No new symbols; mcp_wrapper inside mcp_tool_with_internal_access (tools/k4a_api_tools.py:186-194) returns encode(normalize_dates(result, tool=func.__name__)); func is the decorated function in scope at :191. `._internal` still returns raw, unnormalized data."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001",
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "NFR-005",
+        "FR-008",
+        "FR-003"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [
+          "tools/k4a_api_tools.py"
+        ],
+        "missing": [
+          "unit-tests/test_mcp_wrapper_dates.py"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "tools/app_management_tools.py",
+          "tools/campaign_tools.py",
+          "tools/cost_backfill_tools.py",
+          "tools/cost_configuration_tools.py",
+          "tools/event_tools.py"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "T004",
+      "title": "Run a job against the hosted MCP remote to capture a live campaign-stats response, verify connectivity and the deploy backing it, then confirm rollback",
+      "title_clean": "Run a job against the hosted MCP remote to capture a live campaign-stats response, verify connectivity and the deploy…",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T004 — Run a job against the hosted MCP remote to capture a live campaign-stats response, verify connectivity and the deploy backing it, then confirm rollback",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "decisions.md"
+        ],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none",
+        "produces": "decisions.md in the PRD folder recording: confirmed US-format producer, in-scope field set (BR-3), BR-2 rule, BR-5 consumer finding, rollback path."
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "ops/deploy step, not code ('connectivity')",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "task",
+            "ref": "connectivity"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-006",
+        "FR-009",
+        "NFR-007",
+        "NFR-008"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [],
+        "missing": [
+          "decisions.md"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "README.md"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/k4a-mcp-server with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/k4a-mcp-server before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002",
+        "T003"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "pytest"
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T004"
+    ],
+    [
+      "T002",
+      "T003"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 16,
+    "covered": 16,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "T004: `decisions.md` has no folder in the repo; check where it belongs",
+    "grounding pinned to 87831c34; knowledge graph skipped for Kochava/k4a-mcp-server"
+  ],
+  "removed": []
+}
