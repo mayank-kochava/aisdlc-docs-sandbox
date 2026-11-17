@@ -1,0 +1,396 @@
+{
+  "matrix_id": "wi_5a283f9a7aabddad956c-r1",
+  "prd": {
+    "id": "wi_5a283f9a7aabddad956c",
+    "folder": "089-k4a-mcp-equal-priority-override-removal",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-17T08:14:52.774099Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Pre-request validation for equal_priority_window and reconciliation_appstore_search_exception",
+      "title_clean": "Pre-request validation for equal_priority_window and reconciliation_appstore_search_exception",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Pre-request validation for equal_priority_window and reconciliation_appstore_search_exception",
+        "anchors": [],
+        "pattern": "Follow the existing `_validate_settings` style in tools/reconciliation_tools.py (return an 'Error: ...' string, never raise). Mirror the semantics of dash-api's `ValidateEqualPriorityWindowValue` (Kochava/dash-api internal/utils/helpers/equal_priority.go): trim whitespace, exact decimal comparison for -1/0/24, float comparison for the 1/60 lower bound. See A3."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "tools/reconciliation_tools.py"
+        ],
+        "test": [
+          "unit-tests/test_reconciliation_tools.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "Existing `_validate_settings(settings: dict[str, str]) -> str | None` in tools/reconciliation_tools.py (returns an 'Error: ...' string or None). Today any key outside `_ENUM_SETTING_VALID_TOKENS` falls into the numeric lookback branch, which rejects negatives, so equal_priority_window='-1' is wrongly rejected and reconciliation_appstore_search_exception is only checked as a non-negative number. Also consumes the existing `kochava_set_attribution_windows` tool body, whose generic all-strings check (`not all(isinstance(k, str) and isinstance(v, str) ...)`) precedes `_validate_settings`. Anchors: see A3.",
+        "produces": "```python\n_EQUAL_PRIORITY_WINDOW_KEY = \"equal_priority_window\"\n_APPSTORE_SEARCH_EXCEPTION_KEY = \"reconciliation_appstore_search_exception\"\ndef _validate_equal_priority_window(value: object) -> str | None  # error string naming valid values, or None\ndef _validate_appstore_search_exception(value: object) -> str | None\n```"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "BR-1",
+        "BR-2",
+        "BR-3",
+        "BR-4",
+        "BR-5",
+        "BR-6",
+        "BR-8",
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-011"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [
+          "tools/reconciliation_tools.py",
+          "unit-tests/test_reconciliation_tools.py"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "tools/app_management_tools.py",
+          "tools/campaign_tools.py",
+          "tools/cost_backfill_tools.py",
+          "tools/cost_configuration_tools.py",
+          "tools/event_tools.py"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "T002",
+      "title": "Surface dash-api warnings as success_with_warnings from kochava_set_attribution_windows",
+      "title_clean": "Surface dash-api warnings as success_with_warnings from kochava_set_attribution_windows",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Surface dash-api warnings as success_with_warnings from kochava_set_attribution_windows",
+        "anchors": [],
+        "pattern": "Follow the in-repo convention `status: \"success_with_warnings\"` + `warnings` list in tools/faa_create_acc.py (symbol: the `\"status\": \"success_with_warnings\" if has_warnings else \"success\"` result dict). Do not invent a new status vocabulary. See A3, A4."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "tools/reconciliation_tools.py"
+        ],
+        "test": [
+          "unit-tests/test_reconciliation_tools.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "`_validate_settings` behaviour from T001 (unchanged signature). Existing `_set_reconciliation_settings(app_id: str, network_id: str, settings: dict[str, str]) -> dict[str, Any] | str` in tools/reconciliation_tools.py; it reads `result.get('data')` from the dash-api body and discards `result['warnings']` (dash-api BaseResponse.Warnings, json 'warnings,omitempty', a list of strings such as 'equal_priority_window dropped: network does not support CTV impressions'; emitted in Kochava/dash-api internal/handlers/partners/configure-reconciliation.go). Existing `_get_reconciliation_settings(app_id, network_id) -> dict | str`.",
+        "produces": "```python\nasync def _set_reconciliation_settings(\n    app_id: str, network_id: str, settings: dict[str, str]\n) -> tuple[dict[str, Any], list[str]] | str  # (data, warnings); error string unchanged"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "BR-7",
+        "BR-8",
+        "FR-011",
+        "FR-009",
+        "FR-010"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [
+          "tools/reconciliation_tools.py",
+          "unit-tests/test_reconciliation_tools.py"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "tools/app_management_tools.py",
+          "tools/campaign_tools.py",
+          "tools/cost_backfill_tools.py",
+          "tools/cost_configuration_tools.py",
+          "tools/event_tools.py"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "T003",
+      "title": "Document equal_priority_window, equal_priority_enabled, appstore search exception and warning status in tool docstring",
+      "title_clean": "Document equal_priority_window, equal_priority_enabled, appstore search exception and warning status in tool docstring",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Document equal_priority_window, equal_priority_enabled, appstore search exception and warning status in tool docstring",
+        "anchors": [],
+        "pattern": "Follow the existing 'Settable keys' sections of the same docstring in tools/reconciliation_tools.py (the `Numeric lookback-window keys` and `Enum tier/override/privacy keys` blocks). The current docstring does not mention any of the three keys. See A3."
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "tools/reconciliation_tools.py"
+        ],
+        "test": [
+          "unit-tests/test_reconciliation_tools.py"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "Validation rules from T001 (error wording per A1) and the success_with_warnings return shapes from T002 (A4, A6).",
+        "produces": "Updated docstring of `kochava_set_attribution_windows` in tools/reconciliation_tools.py. No new symbols."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "BR-7",
+        "BR-9",
+        "FR-012"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "87831c34c60e4a7a10a7cd2568e20d535b657fbf",
+        "resolved": [
+          "tools/reconciliation_tools.py",
+          "unit-tests/test_reconciliation_tools.py"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "tools/app_management_tools.py",
+          "tools/campaign_tools.py",
+          "tools/cost_backfill_tools.py",
+          "tools/cost_configuration_tools.py",
+          "tools/event_tools.py"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "pytest"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/k4a-mcp-server with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/k4a-mcp-server",
+      "stack": "python",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/k4a-mcp-server before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "pytest"
+    }
+  ],
+  "waves": [
+    [
+      "T001"
+    ],
+    [
+      "T002"
+    ],
+    [
+      "T003"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 21,
+    "covered": 21,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "grounding pinned to 87831c34; knowledge graph skipped for Kochava/k4a-mcp-server"
+  ],
+  "removed": []
+}
