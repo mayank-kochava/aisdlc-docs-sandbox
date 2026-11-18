@@ -3,13 +3,13 @@
 - **Work item:** wi_df56eceacd302b79e165
 - **Requester:** Mayank Ukey
 - **Product/channel:** K4A
-- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Business rules conflict (EU vs. New York); timezone scope (single/configurable/per-region) and export coverage (main only vs. all types) remain unspecified. Backend logic needed but approach undefined.))
+- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Business rules conflict: summary says EU customers, Q&A says Acme Media in New York. Timezone scope (single vs. configurable, EU-only vs. global) and export coverage remain unresolved.))
   - Requirement clarity: unclear
   - UX/design need: minor
   - Technical design clarity: unclear
   - Identified services: 1 (Type A trigger if >2)
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
-- **Risk tier:** MEDIUM (Hard month-end deadline with unclear scope creates rework risk; single backend service limits blast radius but timezone/data handling requires careful design upfront.)
+- **Risk tier:** MEDIUM (Single backend service limits blast radius, but timezone/localization logic often affects data handling, compliance, and reporting accuracy. Conflicting geographic scope raises execution risk.)
 - **Constraints/Deadline:** end of next month would be fine
 - **Gate outcome:** pending review
 - **Next-round owner:** (unassigned)
@@ -28,6 +28,7 @@ Modify the K4A export CSV to display times in the local timezone for EU customer
 - Apply to the main/primary export CSV functionality
 - Unclear whether other CSV exports or export formats should also be updated
 - Timezone requirement applies to EU customers only; scope for other regions unclear
+- Timezone library selection to be decided by engineering during design
 
 ## Success Criteria
 
@@ -82,10 +83,10 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 ### Affected Services (agent-derived from the codebase KG)
 
-- k4a-mcp-server (backend): K4A export CSV generation and format
+- k4a-mcp-server (backend): K4A export CSV generation and time formatting
 
 ### Technical Analysis
 
 Technical analysis (agent-derived from the codebase KG):
 
-- k4a-mcp-server — role: K4A export CSV generation and format; kind: backend; confidence: high
+- k4a-mcp-server — role: K4A export CSV generation and time formatting; kind: backend; confidence: high
