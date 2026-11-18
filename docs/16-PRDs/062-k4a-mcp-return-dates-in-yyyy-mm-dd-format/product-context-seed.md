@@ -11,8 +11,8 @@
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
 - **Risk tier:** MEDIUM (Spans 2 services (backend + frontend) with unknown scope; no deadline mitigates risk but cross-layer blast radius elevates it.)
 - **Constraints/Deadline:** not urgent, no deadline
-- **Gate outcome:** pending review
-- **Next-round owner:** (unassigned)
+- **Gate outcome:** approved
+- **Next-round owner:** Mayank Ukey (mukey@kochava.com)
 
 ## Requirement Summary
 
