@@ -3,13 +3,13 @@
 - **Work item:** wi_df56eceacd302b79e165
 - **Requester:** Mayank Ukey
 - **Product/channel:** K4A
-- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Scope of which CSV exports need timezone conversion is ambiguous ('main export' undefined); backend timezone logic is straightforward but discovery needed first.))
+- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Business rules conflict (EU vs. New York); timezone scope (single/configurable/per-region) and export coverage (main only vs. all types) remain unspecified. Backend logic needed but approach undefined.))
   - Requirement clarity: unclear
   - UX/design need: minor
   - Technical design clarity: unclear
   - Identified services: 1 (Type A trigger if >2)
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
-- **Risk tier:** MEDIUM (Single backend service, clear deadline, but export scope ambiguity and no confirmation of configurability (per-user vs. hardcoded) create rework risk.)
+- **Risk tier:** MEDIUM (Hard month-end deadline with unclear scope creates rework risk; single backend service limits blast radius but timezone/data handling requires careful design upfront.)
 - **Constraints/Deadline:** end of next month would be fine
 - **Gate outcome:** pending review
 - **Next-round owner:** (unassigned)
@@ -20,18 +20,19 @@
 
 ## Objective
 
-Modify the K4A export CSV to display times in Acme Media's local timezone (New York) instead of UTC. The requester believes this applies to the main export CSV, though the exact scope of which exports need this change has not been confirmed.
+Modify the K4A export CSV to display times in the local timezone for EU customers instead of UTC. The requester initially mentioned New York timezone but has now clarified this applies to EU customers only.
 
 ## Behavior & Rules
 
-- Times currently exported in UTC should be converted to Eastern Time (ET)
+- Times currently exported in UTC should be converted to local timezone for EU customers
 - Apply to the main/primary export CSV functionality
 - Unclear whether other CSV exports or export formats should also be updated
+- Timezone requirement applies to EU customers only; scope for other regions unclear
 
 ## Success Criteria
 
-- Exported CSV times display in New York local timezone (ET)
-- Acme Media confirms the timezone conversion is correct
+- Exported CSV times display in correct local timezone for EU customers
+- EU customers confirm the timezone conversion is correct
 
 ## Constraints & Deadline
 
@@ -43,14 +44,16 @@ Modify the K4A export CSV to display times in Acme Media's local timezone (New Y
 ## Scope
 
 - **Product:** K4A
+- **Geography:** EU customers
 - **UI/Frontend change needed:** Unclear — export functionality may involve UI changes, but this was not confirmed with the requester
 
 ---
 
 **Note:** Before proceeding, please confirm:
 
-1. Does "main export CSV" cover all export types, or are there other exports that should remain in UTC?
-2. Should the timezone be configurable per user/organization, or hardcoded to ET for Acme Media?
+1. Which timezone(s) should EU customers see — a single timezone (e.g., UTC+1 or UTC+2), or should it be configurable by customer location?
+2. Does "main export CSV" cover all export types, or are there other exports that should remain in UTC?
+3. What should non-EU customers see — UTC or their own local timezone?
 
 ## Related / Existing PRDs
 
@@ -79,10 +82,10 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 ### Affected Services (agent-derived from the codebase KG)
 
-- k4a-mcp-server (backend): K4A export CSV generation and timezone formatting
+- k4a-mcp-server (backend): K4A export CSV generation and format
 
 ### Technical Analysis
 
 Technical analysis (agent-derived from the codebase KG):
 
-- k4a-mcp-server — role: K4A export CSV generation and timezone formatting; kind: backend; confidence: high
+- k4a-mcp-server — role: K4A export CSV generation and format; kind: backend; confidence: high
