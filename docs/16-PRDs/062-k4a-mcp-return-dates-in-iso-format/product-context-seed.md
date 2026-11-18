@@ -11,8 +11,8 @@
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
 - **Risk tier:** MEDIUM (Affects 2 services (backend + frontend); no deadline urgency mitigates; but scope and implementation approach remain undefined.)
 - **Constraints/Deadline:** no rush, whenever. customer just keeps asking
-- **Gate outcome:** pending review
-- **Next-round owner:** (unassigned)
+- **Gate outcome:** approved
+- **Next-round owner:** Lovepreet Singh (lsingh@kochava.com)
 
 ## Requirement Summary
 
