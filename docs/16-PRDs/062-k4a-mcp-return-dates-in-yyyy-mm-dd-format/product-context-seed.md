@@ -3,18 +3,20 @@
 - **Work item:** wi_66ee0b70943f5d5cda72
 - **Requester:** Mayank Ukey
 - **Product/channel:** K4A
-- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Current date field locations and formats are unknown; engineering discovery required before implementation can begin.))
+- **Classification:** Type A (confidence 0.7 — Type A trigger(s): requirements unclear, needs discovery. (Date format change is specified, but current format and location in K4A MCP response are unknown; affects backend and frontend services.))
   - Requirement clarity: unclear
-  - UX/design need: none
+  - UX/design need: minor
   - Technical design clarity: unclear
-  - Identified services: 1 (Type A trigger if >2)
+  - Identified services: 2 (Type A trigger if >2)
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
-- **Risk tier:** LOW (Single backend service, no sensitive data, no deadline, low customer impact—safe to explore.)
+- **Risk tier:** MEDIUM (Spans 2 services (backend + frontend) with unknown scope; no deadline mitigates risk but cross-layer blast radius elevates it.)
 - **Constraints/Deadline:** not urgent, no deadline
 - **Gate outcome:** pending review
 - **Next-round owner:** (unassigned)
 
 ## Requirement Summary
+
+---
 
 ## Requirement Summary
 
@@ -77,10 +79,12 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 ### Affected Services (agent-derived from the codebase KG)
 
-- kochava-k4a-mcp-server (backend): K4A MCP server implementation, owns date format in API responses
+- kochava-k4a-mcp-server (backend): K4A MCP server: owns date format in API responses
+- frontend-mos (frontend): MOS Console: displays K4A MCP dates to gaming customers
 
 ### Technical Analysis
 
 Technical analysis (agent-derived from the codebase KG):
 
-- kochava-k4a-mcp-server — role: K4A MCP server implementation, owns date format in API responses; kind: backend; confidence: high
+- kochava-k4a-mcp-server — role: K4A MCP server: owns date format in API responses; kind: backend; confidence: high
+- frontend-mos — role: MOS Console: displays K4A MCP dates to gaming customers; kind: frontend; confidence: medium
