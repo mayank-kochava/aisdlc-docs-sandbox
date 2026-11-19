@@ -25,7 +25,7 @@ The requester (Mayank Ukey) grounded the scope through intake Q&A as follows, an
 
 > **Scope population — resolved.** The reviewer confirmed the scope is **Lumen Retail's main account only** for now — a single-account flag, not a full EU-customer contract-currency capability. Other EU customers come later; only Lumen Retail needs to be live before their renewal. This spec therefore treats Lumen Retail's main account as the sole in-scope account for Phase 1, with the broader EU-customer population deferred to a later phase.
 
-> **On-screen vs. download-only surface — needs a human call.** Intake classified this as having **no** UI/frontend impact, but the Q&A reply ("yes, but only for EU customers") and the available engineering evidence both suggest a frontend display component may be involved. This spec scopes the **downloaded report** as the confirmed surface and treats on-screen display as a separate decision. Whether the on-screen K4A conversion report must also show contract currency is a business decision. [DECISION REQUIRED]
+> **On-screen vs. download-only surface — needs a human call.** Intake classified this as having **no** UI/frontend impact, but the Q&A reply ("yes, but only for EU customers") and the available engineering evidence both suggest a frontend display component may be involved. This spec scopes the **downloaded report** as the confirmed surface and treats on-screen display as a separate decision. Whether the on-screen K4A conversion report must also show contract currency is a business decision. [DECISION REQUIRED: DEC-001]
 
 ### Business Rules
 
@@ -34,8 +34,8 @@ The requester (Mayank Ukey) grounded the scope through intake Q&A as follows, an
 - **BR-3 — Lumen Retail is the first in-scope account:** Lumen Retail's main account (Munich) is an eligible EU customer and must display revenue in its contract currency (EUR).
 - **BR-4 — Source of contract currency is authoritative, not inferred ad hoc:** The customer's contract currency is read from the stored currency field on the customer's account (in the billing settings), which is the authoritative source of truth. It must not be guessed or inferred per report.
 - **BR-5 — Conversion must be traceable:** When a revenue figure is converted from its original currency to the contract currency, the conversion must be reproducible and reviewable, given this touches billing/revenue data under a HIGH risk tier.
-- **BR-6 — Treatment of the original (USD) amount:** Whether the original USD amount is hidden, shown alongside the contract-currency amount, or configurable is a business decision. [DECISION REQUIRED]
-- **BR-7 — Multi-account / multi-contract currency resolution:** How currency is resolved when an EU customer has multiple accounts or contracts in different currencies (per-account currency vs. a primary currency) is a business decision. [DECISION REQUIRED]
+- **BR-6 — Treatment of the original (USD) amount:** For an eligible EU customer, the original USD amount is shown alongside the contract-currency (EUR) amount, in a second column, so finance can still reconcile. The original amount is neither hidden nor collapsed into the contract-currency figure.
+- **BR-7 — Multi-account / multi-contract currency resolution:** How currency is resolved when an EU customer has multiple accounts or contracts in different currencies (per-account currency vs. a primary currency) is a business decision. [DECISION REQUIRED: DEC-002]
 
 ### Service-ownership note (engineering reference)
 
@@ -77,7 +77,7 @@ flowchart TD
 
 ## 3. Functional Requirements
 
-> All FRs below are scoped to the **downloaded K4A conversion report** as the confirmed surface (see Section 1). If on-screen display is confirmed in scope ([DECISION REQUIRED], Section 1), an equivalent display-surface FR set must be added in revision.
+> All FRs below are scoped to the **downloaded K4A conversion report** as the confirmed surface (see Section 1). If on-screen display is confirmed in scope ([DECISION REQUIRED: DEC-003], Section 1), an equivalent display-surface FR set must be added in revision.
 
 ### Feature Area: EU Customer Eligibility
 
@@ -143,7 +143,7 @@ And those accounts/contracts are denominated in more than one currency
 When a K4A conversion report is generated
 Then the system resolves which currency applies per the defined multi-currency resolution rule
 ```
-> Whether resolution is per-account or via a single primary currency is [DECISION REQUIRED] per Section 1 / BR-7. Until decided, engineering may build against per-account resolution (each account displays its own contract currency).
+> Whether resolution is per-account or via a single primary currency is [DECISION REQUIRED: DEC-004] per Section 1 / BR-7. Until decided, engineering may build against per-account resolution (each account displays its own contract currency).
 
 ### Feature Area: Revenue Currency Conversion
 
@@ -155,7 +155,7 @@ When revenue figures are prepared for the report
 Then each revenue figure is converted from its original currency to the contract currency using the defined exchange rate
 And the conversion produces a reproducible result for the same inputs
 ```
-> Whether a conversion mechanism / exchange-rate source already exists or must be built, and the rate source and refresh frequency, is a business/discovery decision. [DECISION REQUIRED]
+> Whether a conversion mechanism / exchange-rate source already exists or must be built, and the rate source and refresh frequency, is a business/discovery decision. [DECISION REQUIRED: DEC-005]
 
 **FR-009 — Revenue already in contract currency is not re-converted**
 ```gherkin
@@ -196,9 +196,9 @@ And the currency is formatted according to the contract currency's locale conven
 ```gherkin
 Given an eligible EU customer whose report revenue was converted to the contract currency
 When the downloaded report is produced
-Then the report presents the original amount, the converted amount, and/or conversion metadata according to the defined report-content rule
+Then the report presents the converted contract-currency (EUR) amount and the original USD amount side by side, with the original USD amount in a second column so finance can reconcile
 ```
-> Whether the download includes both original and converted amounts, conversion metadata, or only the contract-currency amount is a business decision. [DECISION REQUIRED] This is the same underlying trade-off as BR-6 (treatment of the original USD amount) applied to the downloaded file.
+> Resolved: the downloaded report shows the original USD amount next to the contract-currency (EUR) amount, in a second column, so finance can still reconcile. This is the same underlying rule as BR-6 (treatment of the original USD amount) applied to the downloaded file.
 
 **FR-014 — Report regeneration for the same inputs is consistent**
 ```gherkin
@@ -206,7 +206,7 @@ Given a K4A conversion report previously generated for an eligible EU customer
 When the same report is regenerated for the same reporting period and inputs
 Then the presented contract-currency figures are consistent with the prior generation for that period
 ```
-> Reporting consistency for multi-currency organizations (parent companies with EU subsidiary accounts) depends on the multi-account resolution decision (FR-007 / BR-7) and is governed by that same [DECISION REQUIRED].
+> Reporting consistency for multi-currency organizations (parent companies with EU subsidiary accounts) depends on the multi-account resolution decision (FR-007 / BR-7) and is governed by that same [DECISION REQUIRED: DEC-006].
 
 Now reporting the decisions I flagged in Sections 0–3.
 
@@ -219,7 +219,7 @@ The system must track the following business information to support the FRs in S
 - **Revenue figure original currency** — the currency each revenue figure is natively expressed in before any conversion (currently USD). Source: System-Derived (from the revenue/reporting data). Matters because it determines whether conversion is required (FR-008, FR-009).
 - **Exchange rate (per currency pair)** — the rate used to convert a revenue figure from its original currency to the contract currency, with enough identifying context (pair, effective timing) to reproduce it. Source: System-Derived or External [DECISION REQUIRED — whether a rate mechanism exists or must be built, and the rate source and refresh frequency; same decision as FR-008]. Matters because conversion accuracy and reproducibility depend on it (FR-008, FR-011).
 - **Conversion trace** — for each converted revenue figure: original amount, original currency, resolved contract currency, and the rate applied. Source: System-Derived. Matters because the HIGH risk tier (billing/revenue data) requires every conversion to be reproducible and reviewable (FR-011, BR-5).
-- **Report content configuration (original-amount treatment)** — the rule governing whether a downloaded report shows the original amount, the converted amount, and/or conversion metadata. Source: System-Derived (configuration) [DECISION REQUIRED — same decision as BR-6/FR-013]. Matters because it controls what the eligible customer actually sees in the file (FR-013).
+- **Report content configuration (original-amount treatment)** — the rule governing how a downloaded report presents amounts: the downloaded report shows the original USD amount alongside the contract-currency (EUR) amount, in a second column, so finance can reconcile (per BR-6/FR-013). Source: System-Derived (configuration). Matters because it controls what the eligible customer actually sees in the file (FR-013).
 - **Multi-currency resolution rule** — the rule determining which currency applies when a customer has multiple accounts/contracts in different currencies (per-account vs. primary). Source: System-Derived (configuration/policy) [DECISION REQUIRED — same decision as BR-7/FR-007]. Matters because it governs correctness for parent/subsidiary organizations (FR-007, FR-014).
 - **Failure condition (named error states)** — the distinct outcomes "contract-currency-unresolved" and "exchange-rate-unavailable" produced during report generation. Source: System-Derived. Matters because each must be handled and recorded separately rather than collapsed into a generic error (FR-006, FR-010).
 
@@ -230,7 +230,7 @@ The system must track the following business information to support the FRs in S
 ### Performance & Capacity
 
 **NFR-001 — Report generation latency is not materially degraded**
-Adding contract-currency resolution and conversion must not materially degrade K4A conversion-report generation latency relative to current behavior. Target: p95 report-generation time stays within the current baseline plus an agreed margin, measured under representative report-generation load. The current baseline and acceptable margin are not supplied by the input. [DECISION REQUIRED]
+Adding contract-currency resolution and conversion must not materially degrade K4A conversion-report generation latency relative to current behavior. Target: p95 report-generation time stays within the current baseline plus an agreed margin, measured under representative report-generation load. The current baseline and acceptable margin are not supplied by the input. [DECISION REQUIRED: DEC-007]
 
 **NFR-002 — Currency-resolution and rate lookups are protected against added load**
 Contract-currency resolution and exchange-rate lookups add new read paths against the authoritative currency source and the rate source. Where these share capacity with existing traffic, apply an explicit rate cap protecting the shared resource. Monitoring convention: alert when the error rate on currency-resolution or rate-lookup calls exceeds 1% for 5 minutes, sustained.
@@ -244,12 +244,12 @@ EU-customer eligibility and contract-currency resolution must be enforced server
 Revenue figures and conversion details must not be written to logs in a form that exposes a customer's billing/revenue data beyond what operational diagnostics require. Error states (FR-006, FR-010) must not emit raw revenue amounts into general-purpose logs.
 
 **NFR-005 — Secure delivery of downloaded reports**
-Because the confirmed surface is a downloaded report containing billing/revenue data, the report must be delivered to the customer through the existing secure, access-controlled delivery path for K4A reports; it must not be made retrievable by an unauthorized party. Whether existing K4A report delivery already satisfies a time-limited secure-link standard is not stated in the input. [DECISION REQUIRED]
+Because the confirmed surface is a downloaded report containing billing/revenue data, the report must be delivered to the customer through the existing secure, access-controlled delivery path for K4A reports; it must not be made retrievable by an unauthorized party. Whether existing K4A report delivery already satisfies a time-limited secure-link standard is not stated in the input. [DECISION REQUIRED: DEC-008]
 
 ### Correctness & Auditability
 
 **NFR-006 — Conversions are reproducible and auditable**
-Every currency conversion applied to report revenue must be reproducible from its recorded inputs (original amount, original currency, resolved contract currency, rate applied) per FR-011. Given the HIGH risk tier and billing/revenue data, the conversion trace must be append-only (not editable or deletable through any application code path) so that a figure a customer was shown can always be reconstructed. Minimum retention for the conversion trace is not supplied by the input; Kochava's typical range is 12–24 months. [DECISION REQUIRED]
+Every currency conversion applied to report revenue must be reproducible from its recorded inputs (original amount, original currency, resolved contract currency, rate applied) per FR-011. Given the HIGH risk tier and billing/revenue data, the conversion trace must be append-only (not editable or deletable through any application code path) so that a figure a customer was shown can always be reconstructed. Minimum retention for the conversion trace is not supplied by the input; Kochava's typical range is 12–24 months. [DECISION REQUIRED: DEC-009]
 
 **NFR-007 — Named failure conditions are handled distinctly**
 The two failure conditions — contract-currency-unresolved (FR-006) and exchange-rate-unavailable (FR-010) — must each have their own recorded status and must not be collapsed into a single generic error. The failure posture for both is graceful degradation to the prior USD behavior with the fallback flagged on the report (not fail-closed/withhold), applied consistently to both conditions.
@@ -268,7 +268,7 @@ The renewal deadline is mitigated only if the scope-population decision (single 
 Mitigated when: conversions are reproducible and auditable (NFR-006); revenue already in the contract currency is never double-converted (FR-009); and no unconverted USD figure is ever presented labeled as contract currency (FR-010). No customer may be shown a revenue figure in an unverified currency (FR-006).
 
 **NFR-011 — Multi-service / high blast radius (6+ services, backend + frontend)**
-Mitigated by a config-based kill-switch that disables contract-currency behavior and reverts eligible customers to the prior USD behavior without a code deploy. An on-call engineer must be able to disable it during an incident without separate approval. New requests pick up the flip within an established propagation window (5 minutes is the Kochava precedent); state explicitly whether reports already in-flight at flip time complete under the prior behavior. [DECISION REQUIRED]
+Mitigated by a config-based kill-switch that disables contract-currency behavior and reverts eligible customers to the prior USD behavior without a code deploy. An on-call engineer must be able to disable it during an incident without separate approval. New requests pick up the flip within an established propagation window (5 minutes is the Kochava precedent); state explicitly whether reports already in-flight at flip time complete under the prior behavior. [DECISION REQUIRED: DEC-010]
 
 **NFR-012 — Backward compatibility for existing report consumers**
 Because this modifies an existing report that non-EU customers already receive, non-EU customer reports must remain byte-for-byte unchanged in behavior (FR-003), and any downstream consumer of the existing revenue/report output that assumes USD must not silently receive a different currency without the eligibility gate applying. Existing (non-EU) behavior is the compatibility contract that must remain unchanged.
@@ -285,7 +285,7 @@ Because this modifies an existing report that non-EU customers already receive, 
 
 ## 6. Out of Scope & Phasing
 
-The Context Seed did not define an explicit MVP/out-of-scope list; the following phasing is derived from the confirmed scope (Section 1) and the open discovery questions, to prevent scope creep against the renewal deadline. The population and surface boundaries themselves remain [DECISION REQUIRED] items in Section 1.
+The Context Seed did not define an explicit MVP/out-of-scope list; the following phasing is derived from the confirmed scope (Section 1) and the open discovery questions, to prevent scope creep against the renewal deadline. The population and surface boundaries themselves remain [DECISION REQUIRED: DEC-011] items in Section 1.
 
 | Item | Status | Rationale |
 |------|--------|-----------|
@@ -330,13 +330,9 @@ Now reporting the decisions I flagged in Sections 4–6.
 
 _Applied reviewer's request._
 
-- Resolved BR-4: contract currency comes from the stored currency field on the customer's account billing settings (DEC-003 resolved).
-- Resolved FR-005 source note to the stored account billing-settings currency field, with USD-fallback-and-flag on missing.
-- Resolved the contract-currency Information Requirement source to the stored account billing-settings currency field.
-- Resolved DEC-004 at FR-006: fall back to USD and flag on report instead of blocking.
-- Resolved DEC-004 at FR-010: fall back to USD and flag on report instead of blocking.
-- Updated flowchart failure-posture nodes to reflect USD fallback with flag.
-- Resolved DEC-004 at NFR-007: posture is USD fallback with flag for both conditions.
+- Resolved BR-6: original USD amount shown alongside EUR in a second column for reconciliation (DEC-005).
+- Resolved FR-013: downloaded report shows original USD amount in a second column next to the EUR amount (DEC-005).
+- Updated Information Requirements original-amount-treatment bullet to reflect the resolved two-column display rule (DEC-005).
 
 
 ---
@@ -350,16 +346,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | PM states DEC-002 should remain open, correcting the erroneous resolved status. | Product owner (Mayank Ukey) | Scope the downloaded report as the only confirmed surface for Phase 1; defer on-screen display to a fast follow. If a quick check with the requester confirms on-screen is expected, add the mirrored display-surface FR set before build. |
-| **DEC-005** | Treatment of the original (USD) amount for eligible EU customers — hidden entirely, shown alongside the contract-currency amount, or configurable by user/admin? Applies both to the general display rule (BR-6) and to the downloaded report content (FR-013). | Product owner (Mayank Ukey) | Show the contract-currency amount as the primary revenue figure; omit the original USD amount from the customer-facing report body. Retain the original amount, currency, and rate internally for reproducibility/audit (FR-011) rather than exposing them to the customer by default. |
 | **DEC-006** | Multi-account / multi-contract currency resolution: when an EU customer has multiple accounts or contracts in different currencies, should each account display its own contract currency or should a single primary currency apply? This also governs reporting consistency for parent companies with EU subsidiary accounts (FR-007, FR-014). | Product owner (Mayank Ukey) | Resolve contract currency per-account (each account displays its own contract currency). This matches the account-scoped behavior and the single-account starting point for Lumen Retail; revisit a parent-level primary-currency rollup only if a multi-subsidiary customer requires it. |
 | **DEC-010** | Minimum retention period for the conversion trace (original amount, original currency, resolved contract currency, rate applied) required for billing/revenue auditability (NFR-006). | Compliance/Security + Product owner | Retain conversion trace for 24 months (upper end of Kochava's typical 12-24 month range, given billing/revenue sensitivity and an annual renewal cycle). |
 
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: scope is Lumen Retail's main account only for Phase 1 (single-account flag), with the broader EU-customer contract-currency population deferred to a later phase; only Lumen Retail needs to be live before their renewal.
+- **DEC-002**: Already decided: Engineering decides
 - **DEC-003**: DEC-003 resolved: contract currency is determined from a stored currency field on the customer's account (in the billing settings), used as the source of truth; if missing, fall back to USD and flag it on the report.
 - **DEC-004**: DEC-004 resolved: when an eligible EU customer's contract currency (FR-006) or the required exchange rate (FR-010) cannot be resolved, the system falls back to the prior USD behavior and flags it on the report rather than blocking/withholding the report.
+- **DEC-005**: DEC-005 resolved: the original USD amount is shown next to the contract-currency (EUR) amount in a second column so finance can reconcile — applied to both the general display rule (BR-6) and the downloaded report content (FR-013).
 - **DEC-007**: Engineering decides: Assume an existing exchange-rate mechanism must be confirmed first; if none exists, build against a single authoritative daily-refreshed rate source applied at report-generation time, with the rate used recorded per figure (FR-011). Confirm the rate source and refresh cadence with Finance before finalizing.
 - **DEC-008**: Engineering decides: p95 report-generation time stays within current baseline + 15%, measured under representative report-generation load; establish the current baseline from existing K4A conversion-report telemetry before coding.
 - **DEC-009**: Engineering decides: Reuse the existing authenticated, access-controlled K4A report delivery path; if it is a raw attachment, upgrade to a time-limited secure link before GA.
