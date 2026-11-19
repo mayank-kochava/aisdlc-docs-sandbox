@@ -11,8 +11,8 @@
   - UI/frontend impact (PM-confirmed): unclear (Type A trigger if yes)
 - **Risk tier:** MEDIUM (Hard end-of-month deadline, affects 4 services, and root cause of date miscalculation is unknown—could be client-side, API, or analytics-query layer.)
 - **Constraints/Deadline:** end of this month would be fine
-- **Gate outcome:** pending review
-- **Next-round owner:** (unassigned)
+- **Gate outcome:** approved with deviation — deviation: actually please change it so the fix is only for Acme Media's EU users, not everyone (owner: Mayank Ukey)
+- **Next-round owner:** <@U09N9QMKE31> (mukey@kochava.com)
 
 ## Requirement Summary
 
