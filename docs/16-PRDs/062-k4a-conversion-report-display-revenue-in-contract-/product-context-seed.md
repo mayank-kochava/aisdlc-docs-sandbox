@@ -3,46 +3,20 @@
 - **Work item:** wi_e817485fe6d2622be1bb
 - **Requester:** Mayank Ukey
 - **Product/channel:** K4A
-- **Classification:** Type A (confidence 0.85 — Type A trigger(s): requirements unclear, needs discovery; more than 2 identified services (5). (Account scope and currency logic are ambiguous (one account vs. all EU accounts); multi-service backend changes (5 services) require clear data-flow and schema design before dev.))
+- **Classification:** Type A (confidence 0.85 — Type A trigger(s): requirements unclear, needs discovery; more than 2 identified services (6). (Currency scope (which accounts/customers/regions) remains ambiguous despite Q&A; multi-service blast radius (6 services, backend+frontend) demands architectural clarity.))
   - Requirement clarity: unclear
-  - UX/design need: none
+  - UX/design need: minor
   - Technical design clarity: unclear
-  - Identified services: 5 (Type A trigger if >2)
+  - Identified services: 6 (Type A trigger if >2)
   - UI/frontend impact (PM-confirmed): no (Type A trigger if yes)
-- **Risk tier:** HIGH (Hard external deadline (end of month renewal), affects billing/revenue data across 5 services, and customer visibility into financial figures.)
+- **Risk tier:** HIGH (Hard external deadline (renewal end-of-month), affects billing/revenue data, spans 6 services including frontend and data processing.)
 - **Constraints/Deadline:** end of next month, they renew then
 - **Gate outcome:** pending review
 - **Next-round owner:** (unassigned)
 
 ## Requirement Summary
 
-## Requirement Summary
-
-## Objective
-
-Show revenue in the contract currency (EUR) instead of USD on the K4A conversion report for Lumen Retail's main account in Munich. The change applies to EU customers only.
-
-## Behavior & Rules
-
-- Identify Lumen Retail's account(s) in the EU region
-- Retrieve the contract currency for each account (EUR for Lumen Retail)
-- Display revenue amounts in the contract currency on the conversion report instead of defaulting to USD
-- Apply this logic to all EU customers, not just Lumen Retail
-
-## Success Criteria
-
-- Lumen Retail sees revenue displayed in EUR on their K4A conversion report
-- EU customers see revenue in their respective contract currencies
-- The change is reflected in downloaded reports/files
-
-## Constraints & Deadline
-
-- Must be complete by end of next month (customer renewal date)
-
-## Scope
-
-- **Product:** K4A
-- **UI/Frontend change:** No
+I'm ready to refine this requirement with you, but I don't see a question or requested edit in your message. What would you like to adjust, clarify, or confirm about the summary?
 
 ## Related / Existing PRDs
 
@@ -76,17 +50,19 @@ _The sections below are derived automatically from the codebase knowledge graph,
 ### Affected Services (agent-derived from the codebase KG)
 
 - reporting-api (backend): K4A conversion report generation and currency handling
-- cost-v2 (backend): Revenue calculation and currency conversion logic
-- cost-revenue-workers (backend): Revenue data aggregation and currency transformation
-- accounts-api (backend): Account contract currency metadata and customer region configuration
-- frontend-mos (frontend): K4A UI currency display and report download
+- cost-revenue-workers (backend): Revenue calculation and currency conversion for reports
+- analytics-query (backend): Query layer for report data retrieval and formatting
+- frontend-mos (frontend): K4A UI: conversion report display and currency localization
+- accounts-api (backend): Account currency settings and customer contract details
+- reporting-dispatcher (backend): Report generation workflow and delivery to customers
 
 ### Technical Analysis
 
 Technical analysis (agent-derived from the codebase KG):
 
 - reporting-api — role: K4A conversion report generation and currency handling; kind: backend; confidence: high
-- cost-v2 — role: Revenue calculation and currency conversion logic; kind: backend; confidence: high
-- cost-revenue-workers — role: Revenue data aggregation and currency transformation; kind: backend; confidence: medium
-- accounts-api — role: Account contract currency metadata and customer region configuration; kind: backend; confidence: medium
-- frontend-mos — role: K4A UI currency display and report download; kind: frontend; confidence: low
+- cost-revenue-workers — role: Revenue calculation and currency conversion for reports; kind: backend; confidence: high
+- analytics-query — role: Query layer for report data retrieval and formatting; kind: backend; confidence: medium; endpoints: DELETE /analytics/accounts/{accountID}/filter-sets/{filterID}, POST /analytics/accounts/{accountID}/filter-sets, PUT /analytics/accounts/{accountID}/apps/{appID}/filter-sets/{filterID}, PUT /analytics/accounts/{accountID}/filter-sets
+- frontend-mos — role: K4A UI: conversion report display and currency localization; kind: frontend; confidence: medium
+- accounts-api — role: Account currency settings and customer contract details; kind: backend; confidence: medium
+- reporting-dispatcher — role: Report generation workflow and delivery to customers; kind: backend; confidence: medium
