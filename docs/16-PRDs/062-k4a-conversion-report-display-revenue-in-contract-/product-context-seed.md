@@ -11,7 +11,7 @@
   - UI/frontend impact (PM-confirmed): no (Type A trigger if yes)
 - **Risk tier:** HIGH (Hard external deadline (renewal end-of-month), affects billing/revenue data, spans 6 services including frontend and data processing.)
 - **Constraints/Deadline:** end of next month, they renew then
-- **Gate outcome:** pending review
+- **Gate outcome:** approved
 - **Next-round owner:** (unassigned)
 
 ## Requirement Summary
