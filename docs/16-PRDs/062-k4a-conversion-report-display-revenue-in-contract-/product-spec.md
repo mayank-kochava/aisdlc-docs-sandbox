@@ -32,7 +32,7 @@ The requester (Mayank Ukey) grounded the scope through intake Q&A as follows, an
 - **BR-1 — Eligibility by EU status:** Contract-currency display applies only to EU customers. Non-EU customers continue to see revenue in the current (USD) behavior.
 - **BR-2 — Contract currency is the display currency for eligible customers:** For an eligible EU customer, the conversion report's revenue figures are presented in that customer's contract currency rather than USD.
 - **BR-3 — Lumen Retail is the first in-scope account:** Lumen Retail's main account (Munich) is an eligible EU customer and must display revenue in its contract currency (EUR).
-- **BR-4 — Source of contract currency is authoritative, not inferred ad hoc:** The customer's contract currency must come from a defined, authoritative source rather than being guessed per report. How contract currency is determined (stored field, derived from billing region, or external contract system) is a business/discovery decision. [DECISION REQUIRED]
+- **BR-4 — Source of contract currency is authoritative, not inferred ad hoc:** The customer's contract currency is read from the stored currency field on the customer's account (in the billing settings), which is the authoritative source of truth. It must not be guessed or inferred per report.
 - **BR-5 — Conversion must be traceable:** When a revenue figure is converted from its original currency to the contract currency, the conversion must be reproducible and reviewable, given this touches billing/revenue data under a HIGH risk tier.
 - **BR-6 — Treatment of the original (USD) amount:** Whether the original USD amount is hidden, shown alongside the contract-currency amount, or configurable is a business decision. [DECISION REQUIRED]
 - **BR-7 — Multi-account / multi-contract currency resolution:** How currency is resolved when an EU customer has multiple accounts or contracts in different currencies (per-account currency vs. a primary currency) is a business decision. [DECISION REQUIRED]
@@ -57,8 +57,8 @@ flowchart TD
     ResolveCurrency --> CurrencyFound{Contract currency resolved successfully?}
 
     CurrencyFound -- No --> CurrencyError[Error state: contract currency unavailable]
-    CurrencyError --> FailPosture[Apply defined failure posture for unresolved currency]
-    FailPosture --> DeliverError([Report delivered per failure posture / customer-safe fallback])
+    CurrencyError --> FailPosture[Fall back to prior USD behavior and flag the fallback on the report]
+    FailPosture --> DeliverError([Report delivered in USD with fallback flagged])
 
     CurrencyFound -- Yes --> NeedsConversion{Revenue already in contract currency?}
 
@@ -120,21 +120,21 @@ And a client-supplied eligibility value is not trusted to grant contract-currenc
 ```gherkin
 Given an eligible EU customer
 When a K4A conversion report is generated for that customer
-Then the system resolves the customer's contract currency from the defined authoritative source
+Then the system resolves the customer's contract currency from the stored currency field on the customer's account (billing settings)
 And the resolved contract currency is used as the report's display currency
 ```
-> The identity of the authoritative source (stored account field vs. billing-region derivation vs. external contract system) is [DECISION REQUIRED] per Section 1 / BR-4.
+> The authoritative source is the stored currency field on the customer's account in the billing settings (per Section 1 / BR-4). If that field is missing, the report falls back to USD and flags the missing contract currency on the report (see FR-006).
 
 **FR-006 — Contract currency cannot be resolved (error state)**
 ```gherkin
 Given an eligible EU customer
 And the customer's contract currency cannot be resolved from the authoritative source
 When a K4A conversion report is generated for that customer
-Then the report generation applies the defined failure posture for an unresolved contract currency
+Then the report generation falls back to the prior USD behavior and flags the unresolved contract currency on the report
 And the failure is recorded as a distinct, named error condition (currency-unresolved), separate from other failure conditions
 And the customer is not silently presented a revenue figure in an unverified currency
 ```
-> The failure posture (block/withhold the report vs. fall back to the prior USD behavior) is a business decision given this is billing/revenue data. [DECISION REQUIRED]
+> Failure posture resolved: when the contract currency cannot be resolved, the report falls back to the prior USD behavior and flags the fallback on the report rather than blocking/withholding it. This is consistent with the FR-005 note (missing currency field → fall back to USD and flag).
 
 **FR-007 — Multi-account / multi-contract currency resolution**
 ```gherkin
@@ -169,7 +169,7 @@ Then the figures are presented in the contract currency without applying a conve
 Given an eligible EU customer whose revenue requires conversion to the contract currency
 And no exchange rate is available for the required currency pair
 When revenue figures are prepared for the report
-Then report generation applies the defined failure posture for an unavailable exchange rate
+Then report generation falls back to the prior USD behavior and flags the unavailable exchange rate on the report
 And the failure is recorded as a distinct, named error condition (rate-unavailable), separate from the currency-unresolved condition
 And the customer is not presented an unconverted USD figure labeled as contract currency
 ```
@@ -215,7 +215,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 The system must track the following business information to support the FRs in Section 3. These describe *what* information is needed and *why*; data types, field names, and storage models belong to eng-plan.
 
 - **EU-customer eligibility status** — whether a given customer/account qualifies as an EU customer. Source: System-Derived or External (from the authoritative account/customer source). Matters because it is the gate for all contract-currency behavior (FR-001, FR-003, FR-004).
-- **Contract currency (per eligible customer/account)** — the currency a customer's commercial contract is denominated in (e.g. EUR for Lumen Retail). Source: authoritative source [DECISION REQUIRED — the identity of this source: stored account field, billing-region derivation, or external contract system; same decision as BR-4]. Matters because it is the display/target currency for the report (FR-005, FR-002).
+- **Contract currency (per eligible customer/account)** — the currency a customer's commercial contract is denominated in (e.g. EUR for Lumen Retail). Source: the stored currency field on the customer's account (billing settings), which is the authoritative source of truth (per BR-4). Matters because it is the display/target currency for the report (FR-005, FR-002).
 - **Revenue figure original currency** — the currency each revenue figure is natively expressed in before any conversion (currently USD). Source: System-Derived (from the revenue/reporting data). Matters because it determines whether conversion is required (FR-008, FR-009).
 - **Exchange rate (per currency pair)** — the rate used to convert a revenue figure from its original currency to the contract currency, with enough identifying context (pair, effective timing) to reproduce it. Source: System-Derived or External [DECISION REQUIRED — whether a rate mechanism exists or must be built, and the rate source and refresh frequency; same decision as FR-008]. Matters because conversion accuracy and reproducibility depend on it (FR-008, FR-011).
 - **Conversion trace** — for each converted revenue figure: original amount, original currency, resolved contract currency, and the rate applied. Source: System-Derived. Matters because the HIGH risk tier (billing/revenue data) requires every conversion to be reproducible and reviewable (FR-011, BR-5).
@@ -252,7 +252,7 @@ Because the confirmed surface is a downloaded report containing billing/revenue 
 Every currency conversion applied to report revenue must be reproducible from its recorded inputs (original amount, original currency, resolved contract currency, rate applied) per FR-011. Given the HIGH risk tier and billing/revenue data, the conversion trace must be append-only (not editable or deletable through any application code path) so that a figure a customer was shown can always be reconstructed. Minimum retention for the conversion trace is not supplied by the input; Kochava's typical range is 12–24 months. [DECISION REQUIRED]
 
 **NFR-007 — Named failure conditions are handled distinctly**
-The two failure conditions — contract-currency-unresolved (FR-006) and exchange-rate-unavailable (FR-010) — must each have their own recorded status and must not be collapsed into a single generic error. The failure posture (fail-closed/withhold vs. graceful degradation to prior USD behavior) must be applied consistently to both; which posture applies is the billing-safety decision flagged at FR-006.
+The two failure conditions — contract-currency-unresolved (FR-006) and exchange-rate-unavailable (FR-010) — must each have their own recorded status and must not be collapsed into a single generic error. The failure posture for both is graceful degradation to the prior USD behavior with the fallback flagged on the report (not fail-closed/withhold), applied consistently to both conditions.
 
 ### Resilience of External/Downstream Dependencies
 
@@ -330,7 +330,13 @@ Now reporting the decisions I flagged in Sections 4–6.
 
 _Applied reviewer's request._
 
-- Resolved DEC-001: scope is Lumen Retail's main account only for Phase 1, EU population deferred.
+- Resolved BR-4: contract currency comes from the stored currency field on the customer's account billing settings (DEC-003 resolved).
+- Resolved FR-005 source note to the stored account billing-settings currency field, with USD-fallback-and-flag on missing.
+- Resolved the contract-currency Information Requirement source to the stored account billing-settings currency field.
+- Resolved DEC-004 at FR-006: fall back to USD and flag on report instead of blocking.
+- Resolved DEC-004 at FR-010: fall back to USD and flag on report instead of blocking.
+- Updated flowchart failure-posture nodes to reflect USD fallback with flag.
+- Resolved DEC-004 at NFR-007: posture is USD fallback with flag for both conditions.
 
 
 ---
@@ -345,8 +351,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-002** | On-screen vs. download-only surface: must the on-screen K4A conversion report also show contract currency, or is the downloaded file the only surface? Intake classified UI/frontend impact as 'no', but the Q&A reply and engineering evidence both suggest a frontend display component may be involved. This determines whether a whole frontend FR set and frontend service work are in scope before the deadline. | Product owner (Mayank Ukey) | Scope the downloaded report as the only confirmed surface for Phase 1; defer on-screen display to a fast follow. If a quick check with the requester confirms on-screen is expected, add the mirrored display-surface FR set before build. |
-| **DEC-003** | How is a customer's contract currency determined — a stored currency field on the account, derived from billing-address region, or pulled from an external contract-management system? This is unresolved from discovery and changes which service owns the source of truth and whether new data surface area must be created and populated. | Product owner + Engineering (discovery) | Use an explicit stored contract-currency attribute on the account as the authoritative source, populated for in-scope EU accounts (EUR for Lumen Retail). Do not derive currency from billing-address region, to avoid coupling display currency to address data that may not reflect the contract. |
-| **DEC-004** | Failure posture when an eligible EU customer's contract currency (FR-006) or the required exchange rate (FR-010) cannot be resolved: block/withhold the report, or fall back to the prior USD behavior? This is billing/revenue data under a HIGH risk tier, so a wrong-currency figure and a withheld report carry different business costs. | Product owner + Compliance/Finance | Fail closed: do not deliver a revenue figure in an unverified or unconverted currency. Withhold the eligible-customer report and raise an operational alert rather than silently presenting a USD figure labeled as contract currency. |
 | **DEC-005** | Treatment of the original (USD) amount for eligible EU customers — hidden entirely, shown alongside the contract-currency amount, or configurable by user/admin? Applies both to the general display rule (BR-6) and to the downloaded report content (FR-013). | Product owner (Mayank Ukey) | Show the contract-currency amount as the primary revenue figure; omit the original USD amount from the customer-facing report body. Retain the original amount, currency, and rate internally for reproducibility/audit (FR-011) rather than exposing them to the customer by default. |
 | **DEC-006** | Multi-account / multi-contract currency resolution: when an EU customer has multiple accounts or contracts in different currencies, should each account display its own contract currency or should a single primary currency apply? This also governs reporting consistency for parent companies with EU subsidiary accounts (FR-007, FR-014). | Product owner (Mayank Ukey) | Resolve contract currency per-account (each account displays its own contract currency). This matches the account-scoped behavior and the single-account starting point for Lumen Retail; revisit a parent-level primary-currency rollup only if a multi-subsidiary customer requires it. |
 | **DEC-010** | Minimum retention period for the conversion trace (original amount, original currency, resolved contract currency, rate applied) required for billing/revenue auditability (NFR-006). | Compliance/Security + Product owner | Retain conversion trace for 24 months (upper end of Kochava's typical 12-24 month range, given billing/revenue sensitivity and an annual renewal cycle). |
@@ -354,6 +358,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: scope is Lumen Retail's main account only for Phase 1 (single-account flag), with the broader EU-customer contract-currency population deferred to a later phase; only Lumen Retail needs to be live before their renewal.
+- **DEC-003**: DEC-003 resolved: contract currency is determined from a stored currency field on the customer's account (in the billing settings), used as the source of truth; if missing, fall back to USD and flag it on the report.
+- **DEC-004**: DEC-004 resolved: when an eligible EU customer's contract currency (FR-006) or the required exchange rate (FR-010) cannot be resolved, the system falls back to the prior USD behavior and flags it on the report rather than blocking/withholding the report.
 - **DEC-007**: Engineering decides: Assume an existing exchange-rate mechanism must be confirmed first; if none exists, build against a single authoritative daily-refreshed rate source applied at report-generation time, with the rate used recorded per figure (FR-011). Confirm the rate source and refresh cadence with Finance before finalizing.
 - **DEC-008**: Engineering decides: p95 report-generation time stays within current baseline + 15%, measured under representative report-generation load; establish the current baseline from existing K4A conversion-report telemetry before coding.
 - **DEC-009**: Engineering decides: Reuse the existing authenticated, access-controlled K4A report delivery path; if it is a raw attachment, upgrade to a time-limited secure link before GA.
