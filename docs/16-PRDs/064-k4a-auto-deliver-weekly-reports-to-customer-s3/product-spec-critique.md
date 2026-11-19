@@ -1,4 +1,4 @@
-# Spec Critique: Automatic Weekly S3 Report Delivery (Northwind Media)
+# Spec Critique: Northwind Media — Automatic Weekly S3 Report Delivery
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -6,9 +6,9 @@
 
 ## Summary
 
-- **Critical Issues:** 2
+- **Critical Issues:** 1
 - **High Issues:** 6
-- **Medium Issues:** 5
+- **Medium Issues:** 7
 - **Blocking:** Yes
 
 ---
@@ -17,8 +17,10 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | **FR-013 (Kill-switch) has a title but NO body.** The FR header `**FR-013 — Kill-switch to disable S3 delivery**` is followed immediately by Section 4 — there is no Gherkin, no acceptance criteria, nothing. This is a referenced requirement (NFR-014, Information Requirements, Risk Mitigation all point to FR-013) with zero defined behavior. An engineer cannot build it and QA cannot test it. | Critical | §3 FR-013 | Add a full Gherkin body defining: who can flip the switch, scope (global vs per-customer), what happens to queued vs in-flight deliveries, and how the disabled state is surfaced. NFR-014 gives raw material but the FR itself must exist. |
-| CG-002 | **Report-generation failure (upstream of delivery) is undefined.** Every flow and FR begins with "a report has been generated." The spec never defines what happens when the existing weekly generation step itself fails or produces an empty/corrupt report. Does delivery deliver a zero-byte zip? Is that a success? The flowchart's `Generate` node has no failure edge. | Critical | §2 flow, §3 FR-005/FR-006 | Add an FR covering generation failure / empty report: delivery must not fire, the condition must be recorded distinctly from a *delivery* failure, and support must be alerted. Distinguish "nothing to deliver" from "delivery failed." |
+| CG-001 | **FR-013 (Kill-switch) has a title but NO Gherkin body.** The requirement is named in Section 3 and referenced by NFR-014 and Information Requirements, but its actual behavior (Given/When/Then) is entirely absent. Engineering cannot implement a requirement with no acceptance criteria. This is a hard blocker. | Critical | §3 FR-013 | Supply a full Gherkin body: `Given S3 delivery is globally enabled` / `When an on-call engineer flips the kill-switch to disabled` / `Then no new scheduled delivery jobs start` / `And an in-flight delivery completes under prior behavior` / `And the state change is recorded in the audit trail`. |
+| CG-002 | **No defined behavior for a report that fails to GENERATE (vs. fails to deliver).** The flow assumes `Generate → Zip → Deliver` always produces a file. There is no FR for "report generation itself fails or produces an empty/zero-byte artifact." The delivery path would zip and ship a corrupt/empty object, or fail with no classified reason. | High | §2, §3 FR-005/FR-006 | Add an FR covering generation failure and empty-artifact detection before delivery, with a distinct failure reason. |
+| CG-003 | **Compression failure is undefined.** BR-003/FR-006 mandate zipping, but no scenario covers the zip step failing (disk, memory, library error). Flow goes straight from Zip to Deliver with no failure branch for Zip. | High | §3 FR-006 | Add a failure branch: if compression fails, record a distinct "packaging failed" reason, do not deliver, alert per FR-011. |
+| CG-004 | **Onboarding validation (FR-003) has no timeout / hang handling.** If the customer's bucket is unreachable during validation, the flow loops `Validate → SetupFail → Onboard` but never bounds how long validation waits or what happens on an indefinite hang. | Medium | §2, §3 FR-003 | Define a validation timeout and its failure classification. |
 
 ---
 
@@ -28,40 +30,42 @@
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-002 | "should complete **well within** the weekly batch window... **typical** weekly report size... engineering sizing detail to confirm" | "Well within," "typical," and an unconfirmed size ceiling are not testable. A p95 < 10 min target has no denominator (10 min for *what size*?). | Given a weekly report of size ≤ [X] MB uncompressed, When delivery (compression + upload) runs, Then p95 end-to-end time measured over scheduled runs is < 10 minutes, and no single delivery exceeds [hard ceiling] minutes. **[X] must be set, not deferred.** |
-| NFR-001 | "complete within the batch window... **without delaying** generation or delivery for other customers" | "Without delaying" is not measurable without a defined window boundary or isolation criterion. | Given N onboarded customers in one weekly run, When customer A's delivery runs, Then customer A's delivery failure or slowness adds no more than [X] to any other customer's completion time, and the run completes within the [defined] batch window. |
-| NFR-014 | "New scheduled runs honor the disabled state **within 5 minutes** of the flip" | Testable number, but "a delivery already in flight completes under the prior behavior" is untestable without a defined max in-flight duration — an in-flight delivery could run arbitrarily long after the flip. | Given the kill-switch is flipped to disabled, When a delivery is in flight, Then it completes under prior behavior but no new attempt (including retries) starts, and no in-flight delivery persists beyond [max delivery duration] after the flip. |
-| FR-013 | *(no text at all)* | Cannot test an empty requirement. | See CG-001. |
+| NFR-002 | "should complete **well within** the weekly batch window... **typical** weekly report size... engineering sizing detail to confirm" | "Well within" and "typical" are not testable; the size assumption is explicitly deferred, so the p95<10min target has no defined input. | `Given a weekly report of size <= [DEFINED_CEILING] MB` / `When delivery (compression + upload) runs` / `Then p95 end-to-end delivery time per customer is under 10 minutes measured over scheduled runs`. Define DEFINED_CEILING. |
+| NFR-001 | "complete within the batch window... **without delaying** generation or delivery for other customers" | "Without delaying" is unquantified — no measurable threshold for acceptable impact on other customers. | `Given N customers share the weekly batch window` / `When S3 delivery runs for one customer` / `Then the batch completion time for other customers increases by no more than [X]%`. |
+| FR-009 / NFR-011 | "exponential backoff, up to a maximum of 3 attempts" | Backoff **base interval and multiplier are undefined** — "exponential backoff" alone is not testable. | Specify initial interval and multiplier, e.g. `Then the system retries after 30s, 60s, 120s` so retry timing is assertable. |
+| NFR-014 | "honor the disabled state **within 5 minutes**" | 5 minutes is testable, but "a delivery already in flight completes under the prior behavior" needs a bound — what if in-flight delivery itself hangs? | Add: `And an in-flight delivery that does not complete within [its own timeout] is force-terminated and recorded as failed`. |
+| NFR-003 | "delivery failure rate exceeds 1% of attempts for 5 minutes, sustained" | For a **weekly batch** feature with a single Phase-1 customer, "1% of attempts over 5 minutes" is nonsensical — attempt volume per week is tiny. Threshold is untestable against actual cadence. | Rewrite the alert threshold in terms of per-cycle failures for the batch cadence, not a per-minute rate. |
+
+*Note:* FR-001 through FR-012 are otherwise correctly expressed in Gherkin.
 
 ---
 
 ## 3. Risk Mitigation Audit
 
-| Risk (from spec §1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
+| Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| PII / customer-data delivery | Yes | PASS | NFR-009 (scoped single destination, encrypted transport) + FR-003 pre-validation + FR-012 audit. Adequately mitigated. |
-| Customer credential management | Partial | **FAIL** | Storage/logging/masking/scoping/offboarding all covered (NFR-004/005/007/008). **But the core BR-006 credential-model decision is unresolved**, and NFR-008 says credentials are "revoked/removed" on offboarding without defining revocation semantics for a *long-lived IAM key* (K4A cannot revoke the customer's own IAM key — it can only delete its stored copy). The mitigation is incomplete until BR-006 resolves. |
-| Multi-service integration | Partial | **FAIL** | "Mitigated when the affected-service inventory is confirmed in engineering discovery" — this defers the mitigation rather than defining it. The two KG lookups still disagree (see §4/CG). No requirement forces the config/execution split (report-config vs dispatcher) to be disambiguated before build; it is only aspirationally noted. |
-| Hard 6-week deadline | Partial | **FAIL** | Relies on BR-006 and BR-007 being "resolved early" — but both are still `[DECISION REQUIRED]` in this very document. The mitigation is contingent on open decisions the spec does not close. Kill-switch fallback (FR-013) is cited as mitigation but FR-013 has no body (CG-001). |
-| Audit-write failure | Yes | PASS | FR-012 + NFR-013 raise an operational alert rather than failing silently. Well handled. |
-| Entitlement bypass | Yes | PASS | NFR-006 server-side enforcement, fail-closed. Good. |
+| PII / customer-data delivery to external destination | Yes — NFR-009 (scoped, encrypted), FR-003 (validate before data leaves), FR-012 (audit) | PASS | Coherent chain. |
+| Customer credential management (headline risk) | Yes — NFR-004/005/007/008, FR-002/004 | PASS *with gap* | BR-006 credential-model decision is still open; several mitigations (what is stored, rotation) cannot be finalized until resolved. Mitigation framework exists but is decision-blocked. |
+| Multi-service integration / disagreeing KG lookups | Partial — "confirm affected-service inventory in discovery" | **FAIL (as a requirement)** | This is a *planning action*, not a functional requirement. No FR disambiguates the reporting-dispatcher vs. reporting-subscriptions-worker vs. scheduler delivery ownership. Risk is acknowledged but not mitigated by any testable behavior. |
+| Hard 6-week deadline | Partial — relies on resolving BR-006/BR-007 "early" and kill-switch fallback | FAIL (as a requirement) | A deadline is a project risk, not mitigable by an FR. Acceptable to note, but three [DECISION REQUIRED] items (BR-001, BR-006, BR-007) plus NFR-013 remain unresolved — these are the actual schedule risk and are not yet closed. |
+| Orphaned credentials after offboarding | Yes — NFR-008 | PASS | But no FR operationalizes offboarding as a flow (see Edge Cases). |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Empty / zero-row report:** If a given week produces no attribution data, is an empty zip delivered and recorded as success? Undefined (also CG-002).
-2. **Report larger than expected / S3 single-PUT limit:** No multipart-upload behavior defined for a report exceeding S3's 5 GB single-PUT ceiling. NFR-002's size assumption is deferred, so the upper bound is unknown.
-3. **Partial / interrupted upload:** If the upload fails mid-stream, does a truncated object land in the customer bucket? FR-008 idempotent-overwrite assumes a clean overwrite, but a partial object followed by exhausted retries could leave corrupt data in the customer's bucket with no cleanup requirement.
-4. **Customer revokes access mid-flight:** Permissions valid at FR-003 validation but revoked before the weekly run. Covered by FR-010 permanent-failure path conceptually, but the *detection timing* (stale validation state) is not specified — nothing forces re-validation at delivery time.
-5. **Bucket lifecycle / object-lock conflict:** If the customer's bucket has versioning or object-lock enabled, the idempotent "overwrite same object" in FR-008/NFR-012 may create a new version or be rejected. Not addressed.
-6. **Clock skew / "same report week" definition:** FR-007 and FR-008 key on "same customer and report week," but "report week" is never defined (timezone? ISO week? week-ending date?). Idempotency and overlap-prevention correctness depend on this definition.
-7. **Multiple weekly runs missed during an outage:** If the kill-switch (or a failure) keeps delivery off across several cycles, is there backfill, or are missed weeks silently skipped? No catch-up behavior defined.
-8. **Credential rotation race:** FR-004 revalidates on rotation, but if rotation occurs *while a delivery is in flight* (FR-007), which credential set does the in-flight attempt use? Undefined.
-9. **Validation passes but delivery path differs:** FR-003 validates write to "the configured bucket and path," but FR-008 writes a *zipped* object possibly at a different key pattern. Validation should write-test the *actual* delivery key, not just the prefix, to avoid a validation-passes/delivery-fails gap.
-10. **Audit-write failure during kill-switch:** NFR-013 alerts on audit-write failure, but if the system is already in a degraded/killed state, the alerting path's own availability is unaddressed.
-11. **Offboarding of a long-lived IAM key:** NFR-008 "revoke/remove" — K4A can only delete its stored copy; it cannot revoke the customer's IAM key. No requirement to notify the customer to deactivate the key on their side. Residual access risk.
-12. **Concurrent onboarding re-submission:** If support re-submits credentials while a validation (FR-003) is already running, overlap behavior is undefined (FR-007 only covers delivery overlap, not validation overlap).
+1. **Report generation produces an empty / zero-byte report:** No FR detects or blocks delivery of an empty artifact. Customer's pipeline ingests garbage silently.
+2. **Compression step failure:** Covered in CG-003 — no failure branch for the mandatory zip step.
+3. **Credentials expire *between* validation and the weekly run:** FR-004 covers rotation "when credentials are rotated," but silent server-side expiry of a long-lived key (if BR-006 chooses access keys) between cycles is not explicitly handled — it would surface only as an FR-010 permanent failure at delivery time, with no proactive re-validation.
+4. **Bucket deleted or region changed by customer after onboarding:** "Missing/unreachable bucket" is a named failure reason (FR-010), but there is no re-validation trigger comparable to FR-004 for destination (not credential) changes.
+5. **Partial / interrupted upload:** FR-008 covers overwrite idempotency, but a multipart upload interrupted mid-stream could leave a partial object. No requirement mandates atomic/complete-or-nothing write to the customer bucket.
+6. **Customer bucket is full / quota exceeded / object-lock or retention policy on bucket rejects overwrite:** FR-008 assumes overwrite always succeeds. S3 Object Lock or a deny-on-overwrite bucket policy would break idempotency. Unclassified failure.
+7. **Offboarding flow not defined as a sequence:** NFR-008 asserts credentials are revoked on offboarding, but no FR describes *who* triggers offboarding, *when* delivery stops, or the ordering (stop deliveries → revoke credentials → confirm). Race condition risk: a scheduled run firing during offboarding.
+8. **Kill-switch flipped mid-cycle for a customer whose delivery already failed:** Interaction between FR-013/NFR-014 and in-flight retry (FR-009) is undefined — does a pending retry honor the kill-switch?
+9. **Audit-write failure during a successful delivery:** FR-012 says an audit-write failure raises an alert, but does the *delivery* still count as success if its audit record was never written? Traceability gap.
+10. **Clock skew / report "week" boundary ambiguity:** FR-007/FR-008 key idempotency on "customer and report week." The definition of "report week" (timezone, boundary) is never specified — two runs near a week boundary could be treated as different weeks and double-deliver.
+11. **Entitlement source unreachable at delivery time (not just config time):** NFR-006 says the check fails closed if the entitlement source is unreachable — but this means a transient entitlement-service outage would *silently skip the weekly delivery* for an otherwise-valid customer. Is a skipped-due-to-fail-closed delivery alerted? Not specified.
+12. **Concurrent credential rotation during an active delivery:** FR-004 revalidation and FR-008 delivery could race — a rotation mid-delivery could invalidate the credentials the in-flight job is using.
 
 ---
 
@@ -69,21 +73,30 @@
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | **FAIL** | **FR-013 has no body at all** — not prose, not Gherkin, nothing (CG-001). All other FRs (FR-001 through FR-012) are correctly in Gherkin. |
-| Document contains only Sections 0–6 | **FAIL** | Document contains an `## Appendix: Engineering Reference` after Section 6 — a multi-paragraph narrative "Affected Services" analysis with its own curated/cross-check findings and planning recommendations. This is exactly the stray multi-paragraph KG-analysis appendix the format rule is meant to catch (it is NOT a Revision Summary and NOT a one-line `> **Label:**` metadata trailer). Additionally, §1 contains a "### KG cross-check note" subsection; this is borderline but acceptable as context within Section 1. The trailing Appendix is the violation. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 contains only bullet-list items with prose descriptions and inline Source/FR references; no attribute tables or type definitions. Compliant. |
+| All FRs in Gherkin (Given/When/Then) | **FAIL** | **FR-013** has a title only and **no Gherkin body at all** (see CG-001). All other FRs (FR-001–FR-012) are correctly in Gherkin. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains an **"Appendix: Engineering Reference"** after Section 6 — a multi-paragraph narrative section with its own curated/cross-check service analysis and recommendations. This is exactly the kind of stray narrative appendix the format rule is written to catch (it is NOT a Revision Summary and NOT a short one-line labeled metadata trailer). Additionally, the inline **"### KG cross-check note"** sub-block in Section 1 embeds discovery-analysis prose into the requirements. Recommend moving both out of the review document. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is bullet-list only; no attribute tables or type declarations present. |
 
-**KG cross-check (evidence vs. spec claims):** The spec's Appendix honestly reports that two lookups disagreed. My independent fresh lookup **confirms the discrepancy and sharpens it**: the fresh lookup did **not** re-surface `credentials-api` or `accounts-api` at all (both claimed by the spec's first lookup as the credential-store and entitlement services). Since the entire credential-security risk tier (NFR-004/005/007/008) and entitlement enforcement (NFR-006) implicitly rely on a credentials service and an accounts/entitlement service existing, the fact that the independent lookup cannot confirm either is a **material grounding gap**: the spec asserts a "secured credentials-handling path" (NFR-005) and an "authoritative account/entitlement source" (NFR-006, Information Requirements) as if they exist, but the independent evidence does not confirm the services that would provide them. This should be flagged as a scope/grounding risk in §1, not resolved by picking one lookup. (Correctly, the spec already treats service scope as discovery-required — but it should explicitly note that the *credential store itself* is unconfirmed, since that is the headline risk.)
+---
+
+## KG Cross-Check Finding (grounding against independent lookup)
+
+The spec's own Appendix concedes the two lookups disagreed, which is honest. Checking the spec's claims against the independent fresh KG lookup:
+
+- The spec's first-lookup services **`credentials-api`** and **`accounts-api`** did **NOT re-surface** in the independent cross-check at all. The spec builds its entire credential-security mitigation chain (NFR-005, NFR-007) and entitlement enforcement (NFR-006) around the *existence* of a dedicated credentials service and an authoritative entitlement/accounts service. **The fresh lookup found no such services.** This is a material discrepancy: the spec's "secured credentials-handling path" (FR-002/NFR-005) may not map to an existing `credentials-api` as assumed — it should be flagged as an unverified assumption, not treated as grounded reality.
+- The independent lookup ranks **`sam-report-scheduler`** as the only high-confidence service and surfaces **`reporting-subscriptions-worker`**, **`reporting-dispatcher`**, and **`reporting-api`** at only *medium* confidence with overlapping delivery roles. The spec treats `reporting-dispatcher` as "most load-bearing" — this is not supported by the independent evidence, which does not single it out above the subscriptions-worker or scheduler. The config/execution split (FR-005 delivery attachment) is genuinely unsettled; the spec correctly flags this but should not assert a load-bearing owner.
+
+This contradiction between the spec's claimed implementation reality (dedicated credentials/accounts services) and the independent evidence is the strongest reason the "Multi-service integration" risk must be resolved in discovery before build.
 
 ---
 
 ## 6. Recommendations
 
-1. **Write the FR-013 body (CG-001).** A referenced, load-bearing kill-switch FR cannot be empty. This is a Critical format + logic failure blocking engineering.
-2. **Define report-generation / empty-report failure handling (CG-002).** Add an FR distinguishing "nothing to deliver" and "generation failed" from delivery failures.
-3. **Remove or relocate the Engineering Reference Appendix** to satisfy format compliance — fold the confirmed service-scope-is-discovery-required point into Section 1's existing KG cross-check note; the appendix's narrative analysis cannot remain as a post-Section-6 section.
-4. **Resolve BR-006 (credential model) before build.** It gates NFR-008 revocation semantics, FR-002 storage, and every credential edge case. Clarify that for long-lived IAM keys, K4A revocation means deleting its stored copy only, and add a customer-side deactivation step.
-5. **Set NFR-002's report-size assumption to a concrete number** and add multipart-upload behavior for large/partial uploads (edge cases 2 & 3), including cleanup of truncated objects.
-6. **Define "report week" precisely** (timezone/week boundary) — FR-007 overlap prevention and FR-008 idempotency correctness depend on it.
-7. **Require delivery-time (not just onboarding-time) revalidation or stale-state detection** so a mid-period permission revocation is caught before an attempt (edge cases 4 & 9).
-8. **Confirm the credentials and accounts/entitlement services exist** in engineering discovery, since the independent KG lookup could not re-find either; flag this explicitly as a grounding risk for the headline credential risk tier.
+1. **Write the FR-013 Gherkin body (CG-001).** This is the single Critical blocker — the kill-switch is referenced everywhere but has no acceptance criteria. Cannot go to engineering as-is.
+2. **Add FRs for generation failure, empty-artifact detection, and compression failure (CG-002, CG-003).** The entire `Generate → Zip` half of the flow currently has no failure handling.
+3. **Resolve the credential-service assumption against the KG reality.** The independent lookup did not find `credentials-api` or `accounts-api`. Confirm the secured-credential-store and entitlement-source actually exist before committing NFR-005/006/007 as implementable.
+4. **Close the three open [DECISION REQUIRED] items (BR-001, BR-006, BR-007) and NFR-013 retention.** Per the spec's own deadline-risk analysis, these collapse the most uncertainty and are the real schedule risk.
+5. **Make NFR-002, NFR-001, NFR-003, and FR-009 backoff testable** — define the report-size ceiling, the acceptable other-customer delay, a cadence-appropriate alert threshold, and concrete backoff intervals.
+6. **Define "report week" precisely** (timezone + boundary) since idempotency (FR-007/FR-008) keys on it.
+7. **Add an offboarding flow FR** operationalizing NFR-008 (ordering: stop deliveries → revoke → confirm), and define whether a fail-closed skipped delivery (NFR-006) is alerted.
+8. **Move the Appendix and the inline "KG cross-check note" out of the review document** to restore Sections 0–6 format compliance.
