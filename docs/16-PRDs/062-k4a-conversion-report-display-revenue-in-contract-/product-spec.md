@@ -23,7 +23,7 @@ The requester (Mayank Ukey) grounded the scope through intake Q&A as follows, an
 - The behavior change applies **only to EU customers**.
 - The surface confirmed in Q&A is the **downloaded file / report** the customer receives.
 
-> **Unresolved scope tension — needs a human call.** The intake answers are in tension: "just Lumen Retail's one main account" describes a single account, while "only for EU customers" describes a population of accounts. These imply materially different products (flag one account vs. a contract-currency capability spanning all EU accounts). This spec treats the EU-customer population as the eligibility boundary and Lumen Retail as the first in-scope account, but the authoritative population boundary is a business decision. [DECISION REQUIRED]
+> **Scope population — resolved.** The reviewer confirmed the scope is **Lumen Retail's main account only** for now — a single-account flag, not a full EU-customer contract-currency capability. Other EU customers come later; only Lumen Retail needs to be live before their renewal. This spec therefore treats Lumen Retail's main account as the sole in-scope account for Phase 1, with the broader EU-customer population deferred to a later phase.
 
 > **On-screen vs. download-only surface — needs a human call.** Intake classified this as having **no** UI/frontend impact, but the Q&A reply ("yes, but only for EU customers") and the available engineering evidence both suggest a frontend display component may be involved. This spec scopes the **downloaded report** as the confirmed surface and treats on-screen display as a separate decision. Whether the on-screen K4A conversion report must also show contract currency is a business decision. [DECISION REQUIRED]
 
@@ -326,6 +326,13 @@ The codebase knowledge graph returned **two different, largely non-overlapping c
 
 Now reporting the decisions I flagged in Sections 4–6.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved DEC-001: scope is Lumen Retail's main account only for Phase 1, EU population deferred.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -337,7 +344,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Authoritative population boundary for the change: is it a single account (Lumen Retail's main account) or the full EU-customer population? The intake answers are in tension ('just their one main account' vs. 'only for EU customers'), and the two imply materially different products — flag-one-account vs. a contract-currency capability spanning all EU accounts — with very different scope against the renewal deadline. | Product owner (Mayank Ukey) | Treat EU-customer status as the eligibility boundary, with Lumen Retail's main account as the first in-scope account. Build the eligibility gate as a reusable EU-customer check rather than a hardcoded single-account carve-out, so enabling additional EU accounts later requires no code change. |
 | **DEC-002** | On-screen vs. download-only surface: must the on-screen K4A conversion report also show contract currency, or is the downloaded file the only surface? Intake classified UI/frontend impact as 'no', but the Q&A reply and engineering evidence both suggest a frontend display component may be involved. This determines whether a whole frontend FR set and frontend service work are in scope before the deadline. | Product owner (Mayank Ukey) | Scope the downloaded report as the only confirmed surface for Phase 1; defer on-screen display to a fast follow. If a quick check with the requester confirms on-screen is expected, add the mirrored display-surface FR set before build. |
 | **DEC-003** | How is a customer's contract currency determined — a stored currency field on the account, derived from billing-address region, or pulled from an external contract-management system? This is unresolved from discovery and changes which service owns the source of truth and whether new data surface area must be created and populated. | Product owner + Engineering (discovery) | Use an explicit stored contract-currency attribute on the account as the authoritative source, populated for in-scope EU accounts (EUR for Lumen Retail). Do not derive currency from billing-address region, to avoid coupling display currency to address data that may not reflect the contract. |
 | **DEC-004** | Failure posture when an eligible EU customer's contract currency (FR-006) or the required exchange rate (FR-010) cannot be resolved: block/withhold the report, or fall back to the prior USD behavior? This is billing/revenue data under a HIGH risk tier, so a wrong-currency figure and a withheld report carry different business costs. | Product owner + Compliance/Finance | Fail closed: do not deliver a revenue figure in an unverified or unconverted currency. Withhold the eligible-customer report and raise an operational alert rather than silently presenting a USD figure labeled as contract currency. |
@@ -347,6 +353,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Decisions Resolved
 
+- **DEC-001**: DEC-001 resolved: scope is Lumen Retail's main account only for Phase 1 (single-account flag), with the broader EU-customer contract-currency population deferred to a later phase; only Lumen Retail needs to be live before their renewal.
 - **DEC-007**: Engineering decides: Assume an existing exchange-rate mechanism must be confirmed first; if none exists, build against a single authoritative daily-refreshed rate source applied at report-generation time, with the rate used recorded per figure (FR-011). Confirm the rate source and refresh cadence with Finance before finalizing.
 - **DEC-008**: Engineering decides: p95 report-generation time stays within current baseline + 15%, measured under representative report-generation load; establish the current baseline from existing K4A conversion-report telemetry before coding.
 - **DEC-009**: Engineering decides: Reuse the existing authenticated, access-controlled K4A report delivery path; if it is a raw attachment, upgrade to a time-limited secure link before GA.
