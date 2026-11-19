@@ -3,199 +3,223 @@ id: product-spec
 title: Product Specification
 ---
 
-## 1. Business Logic & Context
+# 1. Business Logic & Context
 
-### Problem
+## Problem
 
-The K4A conversion report currently displays revenue values in USD in the downloaded file. Customers whose contracts are denominated in another currency (e.g. EUR) receive a report that does not match the currency of their contract terms. This forces manual reconciliation and undermines trust in the accuracy of the report against the signed agreement.
+The K4A conversion report currently displays revenue values in USD. For a customer whose contract is denominated in a non-USD currency (the triggering case is EUR), the downloaded report does not match the currency the customer is billed and contracted in. This forces the customer to manually reconcile or convert figures, and makes the report an unreliable reference against their contract terms.
 
-### Value
+## Value
 
-Displaying revenue in the customer's contract currency makes the downloaded conversion report directly reconcilable against the contract. It removes a manual conversion step for the customer, reduces reconciliation disputes, and ensures the report reflects the commercial reality of the relationship.
+Displaying revenue in the customer's contract currency makes the downloaded K4A conversion report directly consistent with the customer's billing and contract terms, removing manual reconciliation and reducing the risk of the customer misreading their revenue. This is a correctness/trust improvement to an existing, in-use report.
 
-### Scope Summary
+## Scope Summary
 
 - **Product/channel:** K4A
-- **Surface affected:** Downloaded file content **only**. There is no on-screen (console/UI) change — confirmed by the requester (Mayank Ukey): *"yes, in downloaded file only."*
-- **Core change:** Revenue values in the downloaded conversion report are expressed in the customer's contract currency rather than a fixed USD value.
+- **Surface affected:** The downloaded conversion report file only. There is no on-screen/UI change in K4A. (Confirmed by the requester: the customer sees this change in the downloaded file only.)
+- **Primary change:** The revenue values in the downloaded conversion report are expressed in the customer's contract currency instead of USD.
 
-### Business Rules
+## Business Rules
 
-- **BR-1 — Contract currency drives display.** Revenue in the downloaded conversion report is expressed in the currency of the customer's contract, not in a fixed USD value.
-- **BR-2 — Accuracy against contract terms.** The converted revenue values must reflect the customer's contract terms accurately. The report is a revenue/billing artifact and is treated as HIGH-risk; correctness is a release gate, not a nice-to-have.
-- **BR-3 — Download surface only.** The change applies exclusively to the content of the downloaded file. No on-screen view is in scope.
-- **BR-4 — Target currency source of truth.** The contract currency applied to a given customer's report is taken from the authoritative contract-currency configuration for that customer, not inferred, defaulted, or hard-coded.
-- **BR-5 — Conversion method and FX rate.** The report must apply a single, defined approach to currency conversion (which FX rate source, and the as-of date the rate is taken from — e.g. report-period date, contract date). The accuracy requirement in BR-2 cannot be met without this being pinned down. [DECISION REQUIRED: DEC-001]
-- **BR-6 — Multiple contracts / multiple currencies.** When a single customer has more than one contract in differing currencies within the scope of one report, the report must follow a defined rule for which currency applies (single currency per report, or segmented). [DECISION REQUIRED: DEC-002]
-- **BR-7 — Currency coverage.** EUR is the named near-term target. Whether other non-USD contract currencies are in scope for this phase affects the conversion coverage the report must support. [DECISION REQUIRED: DEC-003]
-- **BR-8 — Metadata labeling.** The report must indicate which currency the revenue figures are in so a reader is not left to assume USD. Whether this extends to column labels, headers, or other metadata — versus only the revenue values — is a product call. [DECISION REQUIRED: DEC-004]
+- **BR-1 — Contract currency is the display currency.** Revenue in the downloaded K4A conversion report is displayed in the currency of the customer's contract, not in USD, for any customer whose contract currency is a non-USD currency.
+- **BR-2 — USD customers are unchanged.** For a customer whose contract currency is USD, the report continues to display revenue in USD. The behavior is effectively a swap from "always USD" to "whatever the contract currency is," so USD-contract customers see no change.
+- **BR-3 — Source of truth for contract currency.** The contract currency applied to a report is derived from the customer's contract configuration as held in the authoritative customer-contract record, not entered by the user and not inferred from the report data itself.
+- **BR-4 — Accuracy against contract terms.** The revenue figures shown must accurately reflect the customer's contract terms — i.e. the converted/displayed amounts must be correct for the contract currency, not an approximation that drifts from what the customer is actually billed.
+- **BR-5 — Report metadata reflects the displayed currency.** Where the report currently identifies revenue as USD (for example a currency indication on a revenue column or in report metadata), that indication must reflect the actual currency displayed so the figures are not ambiguous or mislabeled. [DECISION REQUIRED]
+- **BR-6 — Multiple contracts / mixed currencies.** If a single customer has more than one contract in different currencies within the same report's scope, the report must resolve to a defined, unambiguous currency behavior rather than silently mixing currencies in one revenue column. [DECISION REQUIRED]
+- **BR-7 — Target currencies.** The triggering requirement is EUR. The feature must be built to handle the customer's contract currency generally (not EUR as a hardcoded special case), so additional non-USD contract currencies are supported without a code change per currency. [DECISION REQUIRED]
 
-### Note on affected-system evidence
+## Known Open Items Carried Into This Spec
 
-An independent knowledge-graph cross-check surfaced a meaningful discrepancy worth flagging for the engineering planning phase: the curated affected-service list and an independent fresh lookup point at **two different and partly contradictory clusters** of backend systems that could own the K4A conversion report. The two candidate ownership paths have materially different blast radii. Reconciling which codebase actually generates the K4A conversion report is a prerequisite to engineering estimation and is treated as an engineering-owned investigation in the planning phase. The supporting evidence is attached as a labeled appendix at the end of this document for the engineering team's reference.
-
-### Known open input
-
-- The specific customer requesting this change was not identified at intake ("Unknown, for engineering to confirm" — Mayank Ukey). This is recorded as an engineering/discovery follow-up and does not block specification of the behavior.
+- **Requesting customer identity:** The specific customer requesting this is not yet identified; the requester deferred this to engineering to confirm. This does not block defining the behavior, but it is required before the end-of-month deadline can be validated against that customer's actual contract data.
+- **Service-map uncertainty (noted, not resolved here):** The automated codebase analysis that informed this spec returned two substantially different sets of backend services for "where the K4A conversion report revenue is generated." One set centers on a reporting/cost pipeline; an independent cross-check instead surfaced a largely separate SAM-centric reporting stack, plus one console-UI component. These two sets may be two names for the same pipeline or may indicate the real implementation location is unsettled. This is flagged here because it directly affects (a) whether the "download-only, no UI change" boundary holds — one cross-check surfaced an on-screen console view of the conversion report — and (b) confidence in meeting the deadline. Resolving which stack actually generates the K4A conversion report is an engineering reconciliation task and is left to the engineering context/planning phase. (Specific service names are recorded in the engineering appendix at the end of this document, not here.)
 
 ---
 
-## 2. User Flows (Visuals)
-
-The actor is a K4A user downloading a conversion report. The flow covers the happy path (contract currency resolved and applied) and error states (no resolvable contract currency; conversion unavailable).
+# 2. User Flows (Visuals)
 
 ```mermaid
 flowchart TD
-    A[User requests conversion report download in K4A] --> B[System identifies customer for the report]
-    B --> C{Authoritative contract currency resolvable?}
+    A[Customer requests/downloads K4A conversion report] --> B[System identifies the customer for the report]
+    B --> C[Retrieve customer's contract currency from authoritative contract record]
+    C --> D{Contract currency found?}
 
-    C -->|Yes, single currency| D[Retrieve revenue values]
-    C -->|No contract currency found| E[Error state: cannot resolve contract currency]
-    C -->|Multiple currencies on contracts| F[Apply defined multi-currency rule]
+    D -- "Yes, non-USD (e.g. EUR)" --> E[Resolve revenue values into contract currency]
+    D -- "Yes, USD" --> F[Revenue values remain in USD]
 
-    D --> G{Convert revenue to contract currency}
-    F --> G
+    E --> G{Revenue values resolvable and accurate for contract currency?}
+    G -- Yes --> H[Generate downloaded report file with revenue in contract currency]
+    G -- "No - conversion/rate unavailable" --> I[Error state: report generation fails safely; no silently wrong-currency file produced]
 
-    G -->|Conversion succeeds| H[Build report with revenue in contract currency]
-    G -->|Conversion/FX rate unavailable| I[Error state: conversion unavailable]
+    F --> H
 
-    H --> J[Label report so applied currency is identifiable]
-    J --> K[Generate downloaded file with contract-currency revenue]
-    K --> L[User receives downloaded file]
+    D -- "No - contract currency missing/ambiguous" --> J[Error state: contract currency not determinable]
+    J --> I
 
-    E --> M[Fail the download with a clear, named error - do not silently emit USD]
-    I --> M
+    H --> K[Customer downloads file; revenue shown in contract currency; currency clearly labeled]
+    I --> L[Customer informed report could not be generated for currency reasons; no misleading figures delivered]
 ```
 
-**Flow notes:**
-- The report must not silently fall back to USD when the contract currency cannot be resolved or the conversion cannot be performed. Silently emitting USD when EUR was expected is a correctness failure on a revenue artifact (BR-2), so these paths surface a distinct, named error rather than an unlabeled wrong-currency file.
+**Happy path:** Customer downloads the K4A conversion report → system identifies the customer and looks up the contract currency → revenue is resolved into that contract currency (or stays USD if the contract is USD) → the file is generated with revenue in the correct currency, clearly labeled → customer downloads it.
+
+**Error state (contract currency undeterminable or conversion unavailable):** If the contract currency cannot be determined (missing, or ambiguous because of multiple differing-currency contracts) or the revenue cannot be accurately resolved into the contract currency, the system must not produce a file containing wrong-currency or mislabeled revenue. It fails safely and signals that the report could not be generated for currency reasons.
 
 ---
 
-## 3. Functional Requirements (The Core)
+# 3. Functional Requirements
 
-### Feature Area A — Contract Currency Resolution
+> Convention for this section: "contract currency" means the currency on the customer's contract as held in the authoritative customer-contract record. "The report" means the downloaded K4A conversion report file. No on-screen K4A UI behavior is specified here, consistent with the confirmed download-only scope.
 
-**FR-001 — Resolve contract currency for the report's customer**
+## Feature Area A — Contract Currency Resolution
+
+### FR-001 — Resolve contract currency for a report
 ```gherkin
-Given a K4A user requests a download of the conversion report for a customer
-And that customer has an authoritative contract currency configured
-When the system prepares the report
-Then the system retrieves that contract currency from the authoritative contract-currency source
-And uses it as the target currency for all revenue values in the report
+Scenario: Determine the display currency from the customer's contract
+  Given a K4A conversion report is being generated for a specific customer
+  And that customer has an authoritative contract record with a defined contract currency
+  When the system prepares the report's revenue values
+  Then the system retrieves the contract currency from the authoritative customer-contract record
+  And uses that contract currency as the display currency for revenue in the report
 ```
 
-**FR-002 — No contract currency resolvable**
+### FR-002 — USD-contract customer is unchanged
 ```gherkin
-Given a K4A user requests a download of the conversion report for a customer
-And no authoritative contract currency can be resolved for that customer
-When the system prepares the report
-Then the system does not generate a report with USD values silently substituted
-And the download fails with a distinct, named error indicating the contract currency could not be resolved
+Scenario: Customer on a USD contract sees no change
+  Given a K4A conversion report is being generated for a customer whose contract currency is USD
+  When the report's revenue values are prepared
+  Then revenue is displayed in USD
+  And the report output for this customer is unchanged from the pre-feature behavior
 ```
 
-**FR-003 — Authoritative source only, resolved per request**
+### FR-003 — Non-USD contract currency drives display (general, not EUR-only)
 ```gherkin
-Given the system needs the contract currency for a report
-When it determines which currency to apply
-Then it derives the currency from the authoritative contract-currency source on that request
-And it does not use a hard-coded, inferred, or client-supplied currency value
+Scenario: Customer on a non-USD contract sees contract-currency revenue
+  Given a K4A conversion report is being generated for a customer whose contract currency is a non-USD currency
+  When the report's revenue values are prepared
+  Then revenue is displayed in that contract currency
+  And the behavior applies to any supported non-USD contract currency, not EUR exclusively
 ```
 
-**FR-004 — Customer with multiple contracts in differing currencies**
+### FR-004 — Contract currency cannot be determined
 ```gherkin
-Given a customer has more than one contract with differing currencies within the scope of a single conversion report
-When the system prepares that report
-Then the system applies the defined multi-currency handling rule (see BR-6)
-And the report never mixes currencies within a single revenue figure without labeling which currency applies
-```
-> Depends on the multi-currency product decision flagged in BR-6.
-
-### Feature Area B — Revenue Conversion
-
-**FR-005 — Convert revenue values to contract currency**
-```gherkin
-Given the contract currency for the report's customer has been resolved
-And the revenue values for the report have been retrieved
-When the system builds the revenue figures for the report
-Then each revenue value is expressed in the resolved contract currency
-And the value reflects the applicable FX rate under the defined conversion method (see BR-5)
+Scenario: Contract currency is missing or not retrievable
+  Given a K4A conversion report is being generated for a customer
+  And the system cannot retrieve a defined contract currency from the authoritative contract record
+  When the report's revenue values are prepared
+  Then the system does not produce a report that silently labels or implies a currency it could not confirm
+  And report generation fails safely for that customer with a distinct, recorded reason indicating the contract currency could not be determined
 ```
 
-**FR-006 — Conversion applied consistently with aggregation**
+### FR-005 — Multiple contracts with differing currencies
 ```gherkin
-Given revenue values are aggregated across multiple underlying records for the report
-When those values are converted to the contract currency
-Then the conversion and aggregation are applied in a defined, consistent order
-So that the aggregated total equals the intended converted total and is not distorted by converting before or after summing inconsistently
+Scenario: Customer has more than one contract in different currencies within the report scope
+  Given a K4A conversion report is being generated for a customer
+  And that customer has more than one contract covering the report's scope
+  And those contracts are denominated in different currencies
+  When the system attempts to resolve a single display currency for the report
+  Then the system applies the defined mixed-currency resolution rule rather than mixing currencies within one revenue column
+  And if no unambiguous currency can be resolved, report generation fails safely with a distinct, recorded reason indicating ambiguous contract currency
+```
+> Note: the concrete mixed-currency resolution rule referenced here is the business decision flagged in Section 1 (BR-6); this FR enforces that *some* defined, unambiguous rule is applied and that silent mixing is never allowed.
+
+## Feature Area B — Revenue Value Conversion & Accuracy
+
+### FR-006 — Revenue resolved accurately into contract currency
+```gherkin
+Scenario: Revenue values are expressed accurately in the contract currency
+  Given a report whose display currency is a non-USD contract currency
+  When revenue values are resolved into that contract currency
+  Then each revenue value in the report reflects the contract currency accurately and consistently with the customer's contract terms
+  And no revenue value in the report remains expressed in USD
 ```
 
-**FR-007 — Conversion or FX rate unavailable**
+### FR-007 — Conversion inputs unavailable
 ```gherkin
-Given the contract currency has been resolved
-And the applicable FX rate or conversion result cannot be obtained
-When the system attempts to build the revenue figures
-Then the download fails with a distinct, named error indicating conversion is unavailable
-And the system does not emit a report containing unconverted USD values labeled as the contract currency
+Scenario: Revenue cannot be accurately resolved into the contract currency
+  Given a report whose display currency is a non-USD contract currency
+  And the inputs required to express revenue accurately in that currency are unavailable or cannot be applied
+  When the system attempts to resolve revenue values
+  Then the system does not emit approximate or USD-labeled-as-contract-currency figures
+  And report generation fails safely with a distinct, recorded reason indicating the revenue could not be resolved into the contract currency
 ```
 
-**FR-008 — No double conversion**
+### FR-008 — No regression for existing revenue figures
 ```gherkin
-Given a revenue value has already been converted to the contract currency upstream
-When the report is assembled downstream
-Then the system does not apply a second currency conversion to that value
-And the final figure in the file reflects exactly one conversion to the contract currency
+Scenario: Revenue totals remain internally consistent after the currency change
+  Given a report generated with revenue in the contract currency
+  When the revenue values and any totals/subtotals in the report are compared
+  Then the totals and subtotals are internally consistent in the single displayed currency
+  And no row mixes a USD value with contract-currency values in the same revenue column
 ```
 
-### Feature Area C — Downloaded File Output
+## Feature Area C — Report Output & Labeling
 
-**FR-009 — Revenue in contract currency appears in the downloaded file**
+### FR-009 — Currency labeling in the downloaded file
 ```gherkin
-Given a report has been built with revenue converted to the contract currency
-When the user downloads the file
-Then the revenue values in the downloaded file are the contract-currency values
-And they are not the fixed USD values previously produced
+Scenario: The downloaded report unambiguously indicates the currency of revenue
+  Given a downloaded K4A conversion report containing revenue values
+  When the customer opens the file
+  Then the revenue is unambiguously identified as being in the actual display currency used
+  And any currency indication that previously stated USD reflects the actual display currency instead
+```
+> Note: the exact extent of metadata/label changes (column labels, header, other metadata) is the business decision flagged in Section 1 (BR-5); this FR requires at minimum that displayed figures are never mislabeled relative to their actual currency.
+
+### FR-010 — Download-only scope boundary
+```gherkin
+Scenario: Change is confined to the downloaded file
+  Given the confirmed scope is the downloaded conversion report file only
+  When the feature is delivered
+  Then the change affects the revenue currency in the downloaded report file
+  And no on-screen K4A UI revenue display is introduced or modified as part of this work item
 ```
 
-**FR-010 — File identifies the applied currency**
+### FR-011 — Failed generation does not deliver a misleading file
 ```gherkin
-Given the downloaded file contains revenue in the contract currency
-When the user opens the file
-Then the file indicates which currency the revenue figures are expressed in
-So that a reader is not left to assume the values are in USD
-```
-> The extent of currency labeling (values only vs. column labels/headers/metadata) depends on the product decision flagged in BR-8.
-
-**FR-011 — Download surface only, no on-screen change**
-```gherkin
-Given this change applies to the downloaded file content only
-When a K4A user views the conversion report on screen
-Then the on-screen presentation is unchanged by this work
-And only the downloaded file content reflects the contract-currency revenue
+Scenario: A currency-related failure never yields a wrong-currency download
+  Given report generation has failed for a currency-related reason (FR-004, FR-005, or FR-007)
+  When the customer's download attempt resolves
+  Then no file containing wrong-currency or mislabeled revenue is delivered
+  And the customer receives a clear indication that the report could not be generated, distinct from an empty or zero-revenue report
 ```
 
-**FR-012 — File generation reads the converted value, not a cached USD value**
-```gherkin
-Given the file-generation path assembles the downloaded conversion report
-When it writes revenue into the file
-Then it reads the contract-currency-converted value
-And it does not read a separately cached or pre-stored USD revenue value
-```
+## Feature Area D — Backward Compatibility & Downstream Safety
 
-I used four `[DECISION REQUIRED: DEC-005]` tags in Sections 0–3 (BR-5 conversion method/FX rate, BR-6 multi-currency handling, BR-7 currency coverage, BR-8 metadata labeling). Reporting them now.
+### FR-012 — Existing USD consumers are not broken
+```gherkin
+Scenario: Downstream systems relying on USD revenue are not silently altered
+  Given downstream or integrated systems may consume revenue values associated with the conversion report
+  And some of those consumers may depend on revenue being in USD
+  When the report's displayed currency changes to the contract currency
+  Then the display-currency change in the downloaded file does not silently change the currency contract of any downstream consumer that depends on USD
+  And any such dependency identified is handled explicitly rather than broken implicitly
+```
+> Note: whether specific downstream systems (accounting, billing, analytics) depend on USD is an open engineering reconciliation item recorded in Section 1; this FR requires that such dependencies, where they exist, are not broken silently.
+
+### FR-013 — Feature can be disabled without a code deploy
+```gherkin
+Scenario: The currency-display behavior can be turned off during an incident
+  Given this is a HIGH-risk, multi-service change affecting revenue data
+  When an on-call engineer needs to disable the contract-currency display behavior
+  Then the behavior can be reverted to the prior USD behavior via configuration without a code deploy
+  And disabling it causes newly generated reports to fall back to the prior USD behavior
+```
+> Rationale: HIGH-risk, multi-service, revenue-handling change — a config-based kill-switch is warranted so the behavior can be pulled quickly in production without a release.
+
+I'll now report the decisions I flagged in Sections 0–3.
 
 ## 4. Information Requirements
 
-The system must track the following business information to satisfy the functional requirements above. This is a *what-must-be-known* list, not a schema.
+The system must track or reference the following business information to satisfy the functional requirements above. This is a product-level inventory of *what* information matters and *why* — not a schema, field list, or type definition (those belong in eng-plan).
 
-- **Contract currency (per customer).** The authoritative currency denomination of a customer's contract. Source: External/System — the authoritative contract-currency configuration retrieved for the customer. This is the target currency every revenue value in the report is expressed in (FR-001, FR-003); without it the report cannot be built (FR-002).
-- **Customer identity for the report.** The customer the requested report belongs to, used to look up the correct contract currency. Source: System-Derived from the report request context. Note the specific requesting customer was not identified at intake — see the known open input in Section 1.
-- **Raw revenue values (as currently produced).** The revenue figures the report is built from today, in their current form/currency. Source: System-Derived from the revenue calculation/aggregation pipeline. These are the inputs to conversion (FR-005, FR-006).
-- **Applicable FX rate and its as-of date.** The exchange rate used to convert raw revenue into the contract currency, and the date the rate is taken as-of. Source: External/System — the defined FX rate source (see BR-5). Directly governs accuracy (BR-2) and the correctness of every converted figure (FR-005, FR-007).
-- **Converted revenue values.** The revenue figures after conversion into the contract currency. Source: System-Derived. These are what appears in the downloaded file (FR-009) and must reflect exactly one conversion (FR-008).
-- **Applied-currency indicator.** The currency label/metadata carried into the file so a reader knows which currency the figures are in. Source: System-Derived from the resolved contract currency. Supports FR-010 and the labeling scope decision in BR-8.
-- **Contract set per customer (for multi-currency cases).** The set of contracts and their currencies in scope for a single report, needed to apply the multi-currency rule. Source: External/System — contract-currency configuration. Supports FR-004 / BR-6.
-- **Conversion/resolution outcome status.** Whether contract-currency resolution and conversion succeeded or failed, and which named failure occurred. Source: System-Derived. Drives the error paths (FR-002, FR-007) and the audit trail in Section 5.
+- **Report-subject customer identity** — The customer a given K4A conversion report is generated for. Source: System-Derived (from the report request context). Matters because contract currency is resolved per customer (FR-001); without a reliable customer identity there is no way to pick the correct contract currency.
+- **Contract currency** — The currency denomination of the customer's contract (e.g. USD, EUR). Source: External/authoritative customer-contract record (via the contract-configuration source of truth). Matters because it is the display currency for revenue (BR-1, BR-3, FR-001, FR-003) and the whole feature depends on it existing and being reliable per customer.
+- **Contract coverage / scope mapping** — Which contract(s) apply to the scope of a given report, and whether a customer has more than one contract covering that scope. Source: System-Derived from the contract record(s). Matters because the multiple-contracts / mixed-currency resolution (BR-6, FR-005) cannot be evaluated without knowing how many contracts, in which currencies, fall within a report's scope.
+- **Revenue values (pre-display)** — The revenue figures that populate the conversion report before display-currency resolution. Source: System-Derived (existing revenue calculation/aggregation pipeline). Matters because these are the values being expressed in the contract currency (FR-006) and whose internal consistency and totals must be preserved (FR-008).
+- **Currency-resolution inputs** — Whatever inputs are required to express revenue accurately in the contract currency (e.g. a conversion rate or an already-contract-currency revenue source). Source: System-Derived or External. Matters because their availability is the precondition for FR-006 and their absence triggers the fail-safe path in FR-007. The nature and source of these inputs is itself an open engineering reconciliation item (see Section 1) — whether revenue is stored pre-converted, converted at query time, or converted at file-generation time.
+- **Displayed-currency indicator / report metadata** — The currency label(s) shown in the downloaded file (column indication, header, or other metadata that currently states USD). Source: System-Derived from the resolved display currency. Matters because figures must never be mislabeled relative to their actual currency (BR-5, FR-009).
+- **Report-generation outcome and failure reason** — Whether a report generated successfully, or failed for a specific currency-related reason (contract currency undeterminable, ambiguous contract currency, or revenue not resolvable). Source: System-Derived. Matters because the fail-safe behavior (FR-004, FR-005, FR-007, FR-011) requires distinct, recorded reasons rather than one generic failure, and because a failure must be distinguishable from an empty/zero-revenue report.
+- **Kill-switch / feature-flag state** — Whether the contract-currency display behavior is currently enabled. Source: System configuration. Matters because the behavior must be revertible to prior USD behavior without a code deploy (FR-013, NFR-005).
+- **Downstream USD-dependency inventory** — The set of downstream/integrated consumers (if any) that depend on conversion-report revenue being in USD. Source: External/engineering reconciliation. Matters because such dependencies must be handled explicitly rather than broken silently (FR-012); this remains an open reconciliation item recorded in Section 1.
 
 ---
 
@@ -203,47 +227,37 @@ The system must track the following business information to satisfy the function
 
 ### Performance & Capacity
 
-**NFR-001 — Report generation latency.** Adding currency resolution and conversion must not materially degrade conversion-report download time. Target: p95 report-generation time stays within the current baseline plus a small margin, measured under representative concurrent download load. The exact acceptable baseline and margin are an engineering performance call to pin against the measured current baseline.
+- **NFR-001 — No material regression in report generation time.** Generating a K4A conversion report with contract-currency revenue must not materially degrade report generation latency versus the current USD-only generation. Target: report generation p95 must stay within the current baseline plus an acceptable margin, measured over a representative set of report generations. The concrete baseline and acceptable-margin figure are not supplied by the input and must be confirmed against the current report's measured performance. [DECISION REQUIRED]
+- **NFR-002 — Contract-currency lookup must not become a bottleneck.** Retrieving the contract currency from the authoritative contract record (FR-001) adds a dependency to the generation path. The lookup must be bounded and, where feasible, resolved once per report rather than repeatedly per revenue row. Alert when the contract-currency lookup error rate exceeds 1% for 5 minutes, sustained.
 
-**NFR-002 — Shared revenue/query path protection.** Currency resolution and conversion add read load against the revenue pipeline and the contract-currency source. If either is a shared resource, the report path must respect a rate cap protecting it so report generation cannot starve other consumers.
+### Reliability & Error Handling
 
-**NFR-003 — Conversion accuracy and rounding.** Converted revenue values must be computed to a defined decimal precision and rounding rule consistent with how a revenue/billing figure is expected to be presented, and aggregation must follow the defined convert-then-sum order established in FR-006 so totals reconcile. Precision/rounding convention is an engineering call aligned to existing revenue-reporting conventions.
+- **NFR-003 — Fail-closed on currency uncertainty.** For any currency-related uncertainty — contract currency undeterminable (FR-004), ambiguous multi-contract currency (FR-005), or revenue not resolvable into the contract currency (FR-007) — the system fails closed: it does not emit a report with wrong-currency, approximate, or mislabeled revenue. A false "no report" is safer than a false "wrong-currency report" for a revenue/billing document. Each distinct failure condition (currency undeterminable, ambiguous currency, revenue unresolvable) carries its own recorded reason and is never collapsed into a single generic error.
+- **NFR-004 — Bounded, backoff retries on the contract-currency dependency.** When the contract-currency retrieval or any currency-resolution dependency is called, failures are retried with bounded exponential backoff (default: 3 attempts) rather than retried indefinitely; a rate-limited response honors the dependency's Retry-After guidance rather than a fixed schedule. On exhaustion, the fail-closed posture (NFR-003) applies.
+
+### Rollout, Kill-Switch & Backward Compatibility
+
+- **NFR-005 — Config-based kill-switch (realizes FR-013).** The contract-currency display behavior is controllable via configuration with no code deploy required to disable it. An on-call engineer can disable it during an incident without a separate approval or escalation step. New report generations pick up a flag change within 5 minutes; reports already generated before the flip are not retroactively altered.
+- **NFR-006 — Staged rollout.** Given the HIGH risk tier and multi-service blast radius, the feature is rolled out in staged percentages (e.g. 1% → 10% → 50% → 100%) with a minimum hold period per stage (24 hours precedent) before advancing, so misbehavior is caught before broad exposure.
+- **NFR-007 — Rollback.** Rollback is achieved by disabling the kill-switch (NFR-005), reverting newly generated reports to prior USD behavior. Trigger: a confirmed currency-correctness defect or elevated currency-related failure rate in production. Owning authority: on-call engineering, no separate escalation. Timing target: effective for new reports within the flag propagation time (5 minutes). Already-produced report files are not retroactively reverted — only new generations are affected going forward.
+- **NFR-008 — Backward compatibility for existing consumers (realizes FR-012).** The change to the downloaded report's display currency must not silently change the currency contract of any downstream/integrated consumer that depends on conversion-report revenue being in USD. Any identified USD-dependent consumer is handled explicitly. Whether such consumers exist is an open engineering reconciliation item (Section 1); where none exist, that must be stated explicitly rather than assumed.
+
+### Accuracy & Integrity
+
+- **NFR-009 — Currency correctness is the primary quality bar.** Displayed revenue in the contract currency must accurately reflect the customer's contract terms (BR-4, FR-006). A visible figure that is wrong for the stated currency is a correctness defect of the highest severity for this feature and is a valid rollback trigger under NFR-007.
+- **NFR-010 — Single-currency internal consistency.** Within any single generated report, all revenue values, subtotals, and totals are internally consistent in exactly one displayed currency; no row or total mixes USD with contract-currency values (FR-008).
 
 ### Security & Data Handling
 
-**NFR-004 — Server-side enforcement of report access.** Eligibility to download a given customer's conversion report must be enforced server-side on every request from the authoritative source, never by UI-hiding alone. A direct request for a report a caller is not entitled to must be rejected (e.g. 403), and eligibility must be re-derived per request, failing closed if the authorizing system is unreachable.
+- **NFR-011 — Server-side enforcement of currency resolution.** The contract currency applied to a report is derived server-side from the authoritative contract record on generation (BR-3, FR-001); it is never supplied or overridden by a client/caller-provided value. If the authoritative contract-currency source is unreachable, the system fails closed (NFR-003) rather than falling back to a caller-supplied or assumed currency.
+- **NFR-012 — No sensitive data in logs.** Diagnostic and failure-reason logging for report generation must not log raw customer-identifying data, credentials, or secrets. Failure reasons are recorded at a granularity sufficient to distinguish the conditions in NFR-003 without exposing restricted data.
+- **NFR-013 — Secure delivery of the downloaded report.** The conversion report is a revenue/billing document. Its download must be delivered to the requesting customer over the existing authenticated, access-controlled download path; the currency change introduces no new, less-restricted delivery surface.
 
-**NFR-005 — No sensitive data in logs.** Revenue figures, contract terms, FX inputs, and customer-identifying data must not be written to logs in raw form. Operational logging records outcome and named error status, not the underlying revenue/contract values.
+### Risk Mitigation (explicit mapping to Context Seed risks)
 
-**NFR-006 — Secure delivery of the downloaded file.** Because the file contains customer revenue denominated against contract terms, it must be delivered through the product's existing authenticated download path and not exposed through any unauthenticated or shareable-by-default channel.
-
-### Auditability
-
-**NFR-007 — Audit trail for report generation.** Because this is a HIGH-risk revenue/billing artifact, each conversion-report generation must record an append-only, immutable audit entry: actor identity (user ID + account ID), the customer/report the request targeted, the resolved contract currency and FX-rate as-of date applied, the action, timestamp, and outcome/status (success or named failure). Audit writes occur asynchronously so they do not block report generation, but a failed audit write must raise an immediate operational alert rather than fail silently. Minimum retention: 12 months unless a contractual/compliance agreement requires longer. The 12-month floor is a provisional default pending compliance confirmation. [DECISION REQUIRED: DEC-006]
-
-### Resilience & Error Handling
-
-**NFR-008 — Failure posture is fail-closed.** On failure to resolve the contract currency or obtain a conversion (FR-002, FR-007), the report path fails closed — it must never emit a report with USD values silently substituted or mislabeled as the contract currency. On a revenue artifact a wrong-but-plausible value is worse than a clear failure.
-
-**NFR-009 — Distinct named failure conditions.** Contract-currency-unresolvable, FX-rate/conversion-unavailable, and downstream-dependency-unavailable are distinct conditions, each with its own user-facing message and its own recorded error status; they must not collapse into one generic error.
-
-**NFR-010 — Bounded retry on downstream dependencies.** Calls to downstream dependencies (contract-currency source, revenue/FX source) use bounded retry with exponential backoff — 3 attempts as the default, never indefinite — and honor a rate-limit Retry-After response rather than retrying on a fixed schedule.
-
-### Safe Rollout & Change Management
-
-**NFR-011 — Kill-switch.** Because this is HIGH-risk and multi-service, the contract-currency display behavior must be guarded by a config-based switch that disables it (reverting to the prior reporting behavior) without a code deploy. An on-call engineer can flip it during an incident without separate approval. New requests pick up the change within 5 minutes of a flip; in-flight report generations complete under the behavior in effect when they started.
-
-**NFR-012 — Backward compatibility of the revenue pipeline.** This change extends an existing revenue/reporting pipeline with existing consumers. Any system that currently relies on the conversion report's revenue being in USD must continue to receive USD unless explicitly migrated. The display change must not alter the revenue values or currency delivered to other reports, integrations, or downstream consumers (accounting, billing, analytics). Which downstream consumers depend on USD specifically must be confirmed during engineering planning before cutover. [DECISION REQUIRED: DEC-007]
-
-**NFR-013 — Rollback.** Trigger: any detected incorrect currency or converted-value discrepancy on a generated report. Authority: the on-call engineer via the NFR-011 kill-switch. Timing target: effective within 5 minutes for new report generations. Already-downloaded files are not retroactively revised; only reports generated after rollback revert to the prior behavior.
-
-### Risk Mitigation (from the Context Seed Risk Tier: HIGH)
-
-- **Multi-service blast radius.** Mitigated by NFR-012 (backward compatibility), NFR-011 (kill-switch), and by treating the service-ownership reconciliation (Section 1 note / Appendix) as a required engineering prerequisite before estimation.
-- **Billing/revenue data handling.** Mitigated by BR-2, NFR-003 (accuracy/rounding), NFR-007 (audit trail), and NFR-008 (fail-closed — never emit a silently wrong currency).
-- **Tight end-of-month deadline.** The deadline ("end of this month") is at risk given the unresolved service-ownership fork and unanswered conversion-method questions. The scope-control decisions in Section 6 and the open decisions flagged in this spec must be resolved early; the kill-switch (NFR-011) and staged rollout (NFR-014) de-risk shipping under time pressure.
-
-**NFR-014 — Staged rollout.** Given HIGH risk, the behavior rolls out in percentage stages (e.g. 1% → 10% → 50% → 100%) with a minimum hold period per stage (24 hours precedent) before advancing, so an accuracy regression is caught on a small population before full exposure.
+- **Multi-service blast radius (HIGH).** Mitigated by: the fail-closed posture (NFR-003), the config-based kill-switch (NFR-005), staged rollout (NFR-006), and explicit backward-compatibility handling (NFR-008). The unresolved service-map (two conflicting KG-derived service sets, recorded in Section 1 and the Engineering Reference appendix) must be reconciled by engineering before implementation commitment — this is a prerequisite to trusting the blast-radius estimate.
+- **Billing/revenue data handling (HIGH).** Mitigated by: correctness as the primary quality bar (NFR-009), single-currency internal consistency (NFR-010), server-side authoritative currency derivation (NFR-011), and the rule that a currency-related failure never yields a wrong-currency download (FR-011, NFR-003).
+- **Tight end-of-month deadline (HIGH).** Mitigated at the product level by strict scope control (download-file-only; USD customers unchanged; see Section 6). The deadline cannot be validated until the requesting customer is identified (their actual contract data must be confirmable) and the service-map is reconciled — both recorded as open items in Section 1. Whether the end-of-month deadline holds given those unresolved items is a scheduling call the business must make. [DECISION REQUIRED]
 
 ---
 
@@ -252,19 +266,19 @@ The system must track the following business information to satisfy the function
 ### Explicitly Out of Scope for Phase 1
 
 | Item | Rationale |
-|------|-----------|
-| On-screen / console display of revenue in contract currency | Requester confirmed the change is downloaded-file content only ("yes, in downloaded file only" — Mayank Ukey). |
-| Changing revenue currency in other reports or exports beyond the K4A conversion report | Scope is the K4A conversion report's downloaded file only; other artifacts stay unchanged (see NFR-012). |
-| Re-denominating already-downloaded / historical report files | Rollback and change behavior apply going forward only (NFR-013); no retroactive reversion of produced files. |
-| Migrating downstream consumers (accounting, billing, analytics) off USD | Those consumers continue to receive USD unless explicitly migrated (NFR-012); migration is a separate effort. |
-| Broad multi-currency support beyond the named near-term target | EUR is the named near-term target; wider currency coverage depends on the coverage decision (BR-7) and is deferred unless confirmed in scope. |
-| Customer-facing self-service choice of report currency | Not requested; the applied currency is derived from the authoritative contract configuration, not user-selected. |
+|---|---|
+| Any on-screen / in-K4A-UI revenue display change | Scope confirmed by the requester as the downloaded file only; no UI/frontend change (FR-010). If a console view of the conversion report exists (surfaced by one KG cross-check), confirming it is a separate scope question, not Phase 1 work. |
+| Backfill or re-generation of previously downloaded reports in the new currency | The change applies to newly generated reports going forward; already-produced files are not retroactively altered (NFR-007). Retroactive re-currency of historical reports is a distinct effort. |
+| Changing the currency contract of downstream consumers (accounting, billing, analytics) | Phase 1 must not break USD-dependent downstream consumers (FR-012, NFR-008); actively migrating those consumers to contract currency is separate downstream work, not this work item. |
+| Supporting user-selectable or on-the-fly report currency (letting a user pick a display currency) | The display currency is derived from the contract, not user-chosen (BR-3). A currency picker is a different feature. |
+| Multi-currency / mixed-currency presentation within a single report | Phase 1 resolves to a single unambiguous currency or fails closed (FR-005, BR-6). Presenting multiple currencies side by side in one report is out of scope. |
+| Per-currency custom formatting rules beyond unambiguous labeling | Phase 1 requires revenue be unambiguously labeled in its actual currency (FR-009); locale-specific or per-currency advanced formatting beyond that is not in scope. |
 
 ### Phasing Notes
 
-- **Phase 1 (this spec):** Downloaded K4A conversion report revenue expressed in the customer's contract currency (EUR as the named target), with fail-closed error handling, audit, kill-switch, and staged rollout.
-- **Prerequisite investigation (engineering-owned, before build):** Reconcile which codebase actually generates the K4A conversion report (see Section 1 note and the Appendix), confirm the authoritative contract-currency field exists per customer/subscription, and confirm which downstream consumers depend on USD.
-- **Potential later phases:** Additional non-USD currencies beyond the named target (BR-7); multi-currency-per-customer handling if that proves common (BR-6); on-screen parity if later requested.
+- **Phase 1 (this work item):** Downloaded K4A conversion report revenue is displayed in the customer's contract currency (generally, not EUR-only), USD customers unchanged, fail-closed on any currency uncertainty, kill-switch and staged rollout in place.
+- **Prerequisites that gate Phase 1 delivery (open items, not scope):** identifying the requesting customer and reconciling the conflicting service-map — both recorded in Section 1. These are not features to build; they are blockers that must clear before the Phase 1 build is committed against the deadline.
+- **Candidate future phases (not committed):** retroactive re-generation of historical reports; migrating downstream consumers to contract currency; on-screen console display in the contract currency; additional per-currency formatting.
 
 ---
 
@@ -274,24 +288,26 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 ### Affected Services (grounded context, not implementation direction)
 
-Two partly-contradictory clusters were surfaced by KG lookups. Both are recorded as given fact; reconciling which actually owns the K4A conversion report is an engineering prerequisite (see Section 1 note).
+Two substantially different KG-derived service sets were returned for "where the K4A conversion report revenue is generated." They may be two names for the same pipeline, or may indicate the real implementation location is unsettled. Reconciling which set actually generates the K4A conversion report is an engineering task (recorded as an open item in Section 1).
 
-**Curated affected-service list:**
-- `reporting-api` (backend) — K4A conversion report generation and data retrieval
-- `cost-v2` (backend) — Revenue calculation and currency conversion logic
-- `cost-revenue-workers` (backend) — Revenue processing and aggregation for reports
-- `k4a-mcp-server` (backend) — K4A data export and downloaded file generation
-- `accounts-api` (backend) — Customer contract currency configuration retrieval
-- `champaign-api` (backend) — Campaign and customer metadata for currency context
+**Curated set (Context Seed "Affected Services"):**
+- `reporting-api` (backend, high confidence) — K4A conversion report generation and data retrieval
+- `cost-v2` (backend, high confidence) — Revenue calculation and currency conversion logic (highest blast-radius risk: shared revenue/billing math)
+- `cost-revenue-workers` (backend, high confidence) — Revenue processing and aggregation for reports
+- `k4a-mcp-server` (backend, medium confidence) — K4A data export and downloaded file generation (owns the deliverable surface)
+- `accounts-api` (backend, medium confidence) — Customer contract currency configuration retrieval (presumed source of truth for contract currency)
+- `champaign-api` (backend, low confidence) — Campaign and customer metadata for currency context
 
-**Independent fresh KG cross-check (SAM-family cluster, not in the curated list above):**
-- `k4a-sam-backend` (backend) — likely owns conversion report data
-- `sam-api` (backend) — may serve conversion report revenue fields
-- `sam-performance-reporter` (backend) — generates SAM performance/conversion reports with revenue
-- `sam-mono` (backend) — may own conversion report logic
-- `sam-agent` (backend) — reads SAM revenue/currency fields; verify contract currency
-- `sam-report-scheduler` (backend) — schedules SAM reports consuming revenue data
-- `frontend-mos` (frontend) — console UI; PM confirmed no frontend change, likely out of scope, sanity-check the export isn't triggered through the console path
+**Independent cross-check set (fresh requirement-agent KG lookup) — discrepancy to reconcile:**
+- `k4a-sam-backend` (backend, medium confidence) — K4A backend likely serving conversion report revenue
+- `sam-performance-reporter` (backend, medium confidence) — Generates performance/conversion reports with revenue
+- `sam-api` (backend, low confidence) — May expose conversion report data
+- `cost-revenue-workers` (backend, low confidence) — Also appears in the curated set (the one overlapping service)
+- `frontend-mos` (frontend, low confidence) — Console UI displaying conversion report revenue; worth a sanity check against the confirmed "download-only, no UI change" scope
+- `sam-agent` (backend, low confidence) — Reads revenue/currency fields
+- `sam-report-scheduler` (backend, low confidence) — Schedules reports consuming revenue currency data; if reports are batch/scheduled, a currency change may need to apply to scheduled runs
+
+**Reconciliation note:** `cost-revenue-workers` is the only service appearing in both sets. The curated set centers on a reporting/cost pipeline; the cross-check surfaces a largely separate SAM-centric reporting stack plus a console UI component. The appearance of `frontend-mos` (console UI) specifically warrants confirming whether the conversion report is also shown on screen, which would narrow the "download-only" scope boundary stated in Section 1.
 
 ---
 ## Open Questions & Decisions Register
@@ -304,24 +320,29 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Which exchange rate should the report use to convert revenue into the contract currency, and as of what date should that rate be taken? | Product owner (with Finance/Billing) | Use the exchange rate in effect on the report period's end date, sourced from the same FX rate source Finance already uses for billing, so the report reconciles against invoices. |
-| **DEC-002** | When a single customer has more than one contract in different currencies within one report, should the report show a single currency, or break revenue out by currency? | Product owner | One currency per report: use the currency of the customer's primary/active contract; if contracts genuinely conflict in scope, fail the download with a clear error rather than silently mixing currencies. |
-| **DEC-003** | Besides EUR, are there other non-USD contract currencies customers will need in this phase, or is EUR the only target for now? | Product owner | Build the conversion to work for any contract currency on file, but only commit to validating and supporting EUR for this phase; treat other currencies as covered-but-unverified until a customer need is confirmed. |
-| **DEC-004** | In the downloaded file, should only the revenue numbers change to the contract currency, or should column labels, headers, and other metadata also show the currency? | Product owner | Change the revenue values and add a clear currency indicator (a currency code in the revenue column label or a header line), so a reader never has to assume the currency; leave all other metadata as-is. |
-| **DEC-005** | How long must we keep the audit records of conversion-report generation before they can be deleted? | Compliance/Security | 12 months minimum, extended to match any specific contractual or compliance agreement tied to the customer's data-sharing terms. |
-| **DEC-006** | Which downstream systems such as accounting, billing or analytics still need the revenue figure to stay in US dollars, so we don't break them when we switch the report to contract currency? | Product owner + Engineering | Assume accounting, billing and analytics consumers continue to receive USD unchanged; only the K4A conversion report download switches to contract currency, pending confirmation of the actual USD-dependent consumers during engineering planning. |
-| **DEC-007** | Conversion method and FX rate. The report must apply a single, defined approach to currency conversion (which FX rate source, and the as-of date the rate is taken from — e.g. report-period date, contract date). The accuracy requirement in this cannot be met without this being pinned down. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-001** | When revenue is shown in a non-USD contract currency, should the report also update the currency label on the revenue column and any header or metadata, or just the revenue numbers themselves? | Product owner | Update both the revenue values and the currency label on the revenue column (and any report metadata that currently names USD) so figures are never mislabeled; leave all other report structure unchanged. |
+| **DEC-002** | If one customer has multiple contracts in different currencies covered by the same report, what currency should that report show the revenue in? | Product owner | Produce one report per contract currency rather than mixing currencies in a single revenue column; if the report scope cannot be split cleanly, fail generation with a clear ambiguous-currency reason rather than guess. |
+| **DEC-003** | Beyond EUR, which non-USD contract currencies do we need this report to support, and should it support any contract currency on file automatically? | Product owner, with input from Finance | Support any contract currency present on the customer's contract record generically (no per-currency code change), with EUR as the first validated case; confirm the full list of real contract currencies before launch. |
+| **DEC-004** | When a customer has more than one contract in different currencies covering the same report, which single currency should the revenue appear in? | Product owner | Resolve to the currency of the single contract that covers the report scope; if more than one differing-currency contract applies, fail the report closed with an 'ambiguous contract currency' reason rather than mixing currencies, until a per-customer rule is defined. |
+| **DEC-005** | Beyond the revenue values themselves, should the report header, column labels, or other metadata also be changed to reflect the contract currency? | Product owner | At minimum, any currency indication that previously said USD must reflect the actual displayed currency so figures are never mislabeled; apply the same currency indicator to the revenue column and report metadata, with no other label restructuring in Phase 1. |
+| **DEC-006** | Besides EUR, which non-USD contract currencies should this feature be expected to support at launch? | Product owner | Build generically to display whatever the customer's contract currency is (no hardcoded per-currency logic); validate against EUR as the triggering case and treat any contract currency present in the authoritative contract records as in scope. |
+| **DEC-008** | Can the end-of-month deadline still hold given the requesting customer is not yet identified and the affected-service map is unresolved? | Product owner | Treat customer identification and service-map reconciliation as hard prerequisites; plan delivery from the date both clear rather than committing to end-of-month until they are resolved. |
+
+### Decisions Resolved
+
+- **DEC-007**: Engineering decides: Keep report-generation p95 within the current USD-only baseline plus 10%, measured over a representative set of generations; resolve the contract currency once per report, not per row.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: cross-service: The knowledge graph surfaced two conflicting owners for the K4A conversion report — a cost/reporting-api cluster AND a SAM-family cluster (sam-api, sam-performance-reporter, k4a-sam-backend). Which codebase actually generates the K4A conversion report? This needs confirming before anyone can scope the work.
-- **OQ-002**: accounts-api: Is there a reliable, single contract-currency field linked to each customer/subscription record today, or does contract currency need to be modeled/added?
-- **OQ-003**: cost-v2 / cost-revenue-workers: If a customer has multiple contracts in different currencies, should one report use a single currency, or can it mix currencies? Evidence can't determine the intended rule.
-- **OQ-004**: cost-v2: What FX rate and as-of date should drive USD→EUR conversion (contract date, report run date, a fixed contractual rate)? This affects accuracy and the 'reflects contract terms' success criterion.
-- **OQ-005**: k4a-mcp-server: Besides the revenue values, should the downloaded file's column labels/header/currency indicator also change to reflect the contract currency, or only the numeric values?
-- **OQ-006**: cost-v2: What other consumers read cost-v2's revenue output, and do any of them depend on revenue being in USD specifically (accounting/billing/analytics)? The blast radius of changing conversion is currently unmeasured.
-- **OQ-007**: general: Beyond this one EUR customer, how many customers / which other non-USD currencies should this support? That decides whether we build a generic contract-currency path or a one-off.
-- **OQ-008**: general: Which customer is actually requesting this (left as 'for engineering to confirm')? Needed to validate the contract-currency data path against a real account.
+- **OQ-001**: Cross-service: The curated service list (reporting-api, cost-v2, accounts-api) and the raw KG evidence (k4a-sam-backend, sam-performance-reporter, sam-api) name almost entirely different services for the same feature — which stack actually generates the K4A conversion report? Eng needs to reconcile this before the end-of-month deadline is realistic.
+- **OQ-002**: accounts-api: Does a reliable per-customer contract-currency field actually exist and is it populated today, or does this need to be built/backfilled? The whole feature depends on it and evidence only assumes it exists.
+- **OQ-003**: cost-revenue-workers/cost-v2: Is report revenue stored already-converted (in USD) or computed on the fly? If stored in USD, is there an expectation to re-convert/backfill historical conversion reports, or only new ones going forward?
+- **OQ-004**: cost-v2: cost-v2 is shared revenue/billing logic — are there downstream systems (billing, accounting, analytics) that depend on revenue being in USD specifically, such that we must NOT change the shared path and instead add a separate contract-currency output?
+- **OQ-005**: accounts-api: If a customer has multiple contracts in different currencies, should a single report use one currency, split by currency, or filter? This determines the data model work.
+- **OQ-006**: k4a-mcp-server: Beyond the revenue values, should the report header/column labels/metadata also show the contract currency (e.g. EUR symbol, 'Revenue (EUR)'), or only the numeric values?
+- **OQ-007**: Scope/volume: Is this EUR-for-one-customer only, or should we build general multi-currency support (other non-USD currencies, multiple customers)? This changes it from a targeted swap to a platform feature.
+- **OQ-008**: frontend-mos: The KG flags a console UI (frontend-mos) that displays conversion report revenue — does the on-screen report need to match, or is the 'download file only, no UI change' scope confirmed to exclude it?
+- **OQ-009**: Customer identity: Which customer is requesting this? Still marked unknown/for-eng-to-confirm — needed to validate the contract-currency data actually exists for them.
 
 ---
 > **Classification:** Type A
