@@ -426,4 +426,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-008**: OQ-008 resolved: the weekly report must be available for download by a fixed Monday 9:00am each week, before the finance team starts their work — a fixed weekly day/time, not merely availability before year-end close.
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
