@@ -22,7 +22,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
 - **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability. Because the report is not gated, no plan-entitlement enforcement should block access to it for any account; standard access control (authorized finance user of the owning account) is the only gate (OQ-004 resolved).
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
-- **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. There is no existing attribution report or format the finance team uses today, so the PDF can be a new design — a simple one-page layout is acceptable (OQ-007 resolved). Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
+- **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. There is no existing attribution report or format the finance team uses today, so the PDF can be a new design — a simple one-page layout is acceptable (OQ-007 resolved). The report content is the same for everyone on the finance team — it does not differ by finance team member or department (DEC-003 resolved).
 - **Historical window:** Whether each weekly report contains only the most recent completed week of attribution data, or a rolling window covering several prior weeks, is deferred to engineering discretion [DECISION REQUIRED: DEC-004].
 - **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side. Per reviewer resolution of the report-security question, the platform's standard access controls are sufficient for the downloaded PDFs and no extra audit trail beyond the platform standard is required for this feature.
 
@@ -95,9 +95,10 @@ Given the attribution data source for an account is available
 When a weekly report is generated
 Then the report content is derived from that account's attribution data for the period
 And the report contains last-touch attribution by channel, with spend, installs, and revenue per channel
+And the report content is the same for every finance team member, not varied by member or department
 And no attribution data from another account is included in the report
 ```
-> The report's field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Whether content additionally varies by finance team member or department remains open (DEC-003).
+> The report's field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Content is the same for everyone on the finance team and does not vary by member or department (DEC-003 resolved).
 
 **FR-004 — Weekly schedule does not run concurrently for the same period**
 ```gherkin
@@ -258,7 +259,7 @@ The system must track the following business information to support the function
 - **Weekly Attribution Report (artifact):** The generated PDF for a given account and weekly period. System-derived (produced by the generation run from attribution data). This is the core deliverable the finance team retrieves.
 - **Reporting Period:** The weekly period boundaries each report covers (start/end of the covered week). System-derived from the generation schedule. Needed so a user can confirm which week they are downloading (FR-002, FR-008) and so generation stays idempotent per period (FR-012).
 - **Report Generation Status:** The outcome of each weekly generation run for an account and period — e.g. not-yet-run, in-progress, ready, not-ready/failed. System-derived. Drives the "no report available" state (FR-007), the distinct failure messaging (FR-014), and the not-ready marking on failure (FR-015).
-- **Attribution Data (source content):** The account's attribution metrics for the period, consumed from the upstream attribution data source. External/upstream to this feature. This is what the report content is derived from (FR-003); the required field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Whether content additionally varies by finance team member or department remains open (DEC-003).
+- **Attribution Data (source content):** The account's attribution metrics for the period, consumed from the upstream attribution data source. External/upstream to this feature. This is what the report content is derived from (FR-003); the required field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Content is the same for everyone on the finance team and does not vary by member or department (DEC-003 resolved).
 - **Account & Plan Entitlement:** The owning account's identity and whether its plan includes the weekly attribution report capability. System-derived / sourced from the authoritative entitlement source. Drives plan-tier enforcement (FR-011) and account-scoping of report access (FR-003, FR-005).
 - **Requesting User Identity & Authorization:** The signed-in user, their account association, and their finance-team authorization. Sourced from the authoritative auth source on each request. Drives server-side authorization (FR-009, FR-010).
 - **Report Enrollment / Subscription:** Which accounts are enrolled to receive the weekly report. System-derived / configured. Determines which accounts the weekly schedule generates for (FR-001).
@@ -332,7 +333,7 @@ The Context Seed classifies this work as **HIGH risk** (hard year-end deadline, 
 |------|-------------------|-------|
 | Email/automatic push delivery of the report to finance inboxes | Delivery is on-demand UI download only (decided in Section 1); email push is explicitly not required. If email is ever requested, it would be a follow-on. | Future |
 | Rolling multi-week / historical window in each report | The report time-window scope (most-recent-completed-week vs. rolling multi-week) is deferred to engineering discretion (DEC-004, Section 1); if engineering selects most-recent-week only, a rolling multi-week window remains a future follow-on. | Future |
-| Per-member / per-department report content variation | Content variation is unsettled (flagged in Section 1); MVP produces a single standard report per account. | Future |
+| Per-member / per-department report content variation | Resolved (DEC-003): report content is the same for everyone on the finance team, so there is no per-member/per-department variation; MVP produces a single standard report per account. | Future |
 | In-console report preview (view before download) | Resolved (OQ-005): the finance team's UI is a download link only — no in-app report preview. Out of scope for this feature. | Future |
 | Delivery-status display in the UI | Resolved (OQ-005): the finance team's UI is a download link only — no delivery/generation status indicator. Out of scope for this feature. | Future |
 | Configurable / custom report cadence (other than weekly) | The requirement is specifically weekly. | Future |
@@ -362,9 +363,10 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Reopened the historical-window business rule as an engineering-discretion deferral per DEC-004.
-- Updated FR-002 note to reflect the historical-window scope is now an engineering-discretion deferral (DEC-004).
-- Updated Out-of-Scope row to reflect the rolling-window choice is now deferred to engineering (DEC-004).
+- Resolved DEC-003 in the Section 1 Report content rule: same content for all finance team members, no per-member/department variation.
+- Resolved DEC-003 in FR-003 and its note: added same-content-for-all criterion and updated the note to state no per-member/department variation.
+- Resolved DEC-003 in the Section 4 Attribution Data information-requirement bullet: content same for all, no per-member/department variation.
+- Updated the Section 6 per-member/per-department row to reflect DEC-003 resolution (content is the same for all finance team members).
 
 
 ---
@@ -372,18 +374,11 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-003** | What specific attribution metrics and data fields must the weekly report contain, and does that content need to differ by finance team member or department? | Product owner (with finance stakeholder) | Include the standard attribution metrics already exposed for the account for the weekly period, in a single uniform report for all finance users (no per-person or per-department variation) for Phase 1. |
-
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: the weekly attribution report PDF is included in the standard plan (Brightway's tier) — no gating, not a premium/entitled feature.
 - **DEC-002**: The finance team receives the weekly report as an on-demand download in the K4A console UI only — no automatic email delivery.
+- **DEC-003**: DEC-003 resolved: the weekly report contains the same content for everyone on the finance team (no differentiation by member or department); content is last-touch attribution by channel, with spend, installs, and revenue fields.
 - **DEC-004**: DEC-004 resolved: the choice between a single most-recent-completed-week vs. a rolling multi-week window is deferred to engineering discretion during discovery.
 
 ### Questions Resolved
