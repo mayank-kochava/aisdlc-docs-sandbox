@@ -20,7 +20,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Cadence:** The attribution report covers a weekly period and is regenerated on a weekly basis.
 - **Format:** The report is delivered as a PDF.
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
-- **Plan tier:** Brightway Retail is on the **standard plan**. Whether the weekly PDF attribution report is included in the standard plan or is a gated/entitled capability is not settled by the input. [DECISION REQUIRED: DEC-001]
+- **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability, and Brightway Retail receives it as part of its standard-plan entitlement.
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
 - **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Each weekly report contains only the most recent completed week of attribution data; it does not include a rolling window of prior weeks.
@@ -170,7 +170,7 @@ When the system evaluates the account's plan entitlement for this feature
 Then access is granted only if the account's plan includes the weekly attribution report capability
 And an account whose plan does not include the capability is rejected server-side with a forbidden response
 ```
-> Working default: treat the weekly attribution report as included for the standard plan so Brightway Retail (standard plan) receives it within the deadline. Whether the capability is actually standard-plan-included or gated depends on the plan-entitlement decision flagged in Section 1; if it is gated, this requirement blocks delivery to Brightway until entitlement is granted.
+> The weekly attribution report is included in the standard plan (resolved in Section 1), so Brightway Retail (standard plan) is entitled to it. This requirement still enforces plan entitlement server-side for correctness, but it does not block delivery to Brightway, whose standard plan includes the capability.
 
 ### Resilience, Idempotency & Observability
 
@@ -302,7 +302,7 @@ The system must track the following business information to support the function
 
 The Context Seed classifies this work as **HIGH risk** (hard year-end deadline, multi-service blast radius, finance/billing data sensitivity). Each risk and its mitigation condition:
 
-- **NFR-017 — Hard year-end deadline (~5 weeks):** The feature must be delivered and a report available for Brightway Retail's finance team before year-end close. Mitigated only when the plan-entitlement question (flagged in Section 1) is resolved early enough that it does not block Brightway's access, and when discovery time to resolve the service-boundary ambiguity (below) is budgeted explicitly rather than assumed. The MVP scope in Section 6 is deliberately minimal to protect this deadline.
+- **NFR-017 — Hard year-end deadline (~5 weeks):** The feature must be delivered and a report available for Brightway Retail's finance team before year-end close. The plan-entitlement question is resolved (Section 1): the report is included in the standard plan, so entitlement does not block Brightway's access. This risk is mitigated when discovery time to resolve the service-boundary ambiguity (below) is budgeted explicitly rather than assumed. The MVP scope in Section 6 is deliberately minimal to protect this deadline.
 - **NFR-018 — Multi-service blast radius / unsettled scope:** The codebase analysis produced two non-identical service lists (see Section 1 and the Engineering Reference appendix), so the blast radius is not confirmed. Mitigated when engineering discovery confirms the affected services and resolves the scheduling vs. PDF-generation ownership overlap before build estimation. A config-based kill-switch (FR-017) must exist so the feature can be disabled quickly if a multi-service interaction misbehaves in production.
 - **NFR-019 — Finance/billing data sensitivity:** The report exposes sensitive attribution data. Mitigated when server-side authorization (NFR-008), fail-closed posture (NFR-009), account isolation (NFR-010), secure expiring delivery (NFR-012), no-sensitive-data-in-logs (NFR-011), and immutable audit logging (NFR-013) are all in place and verified.
 
@@ -362,9 +362,9 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Resolved the historical-window business rule to most-recent-completed-week only, removing the DEC-004 tag.
-- Converted FR-002's working-default note on historical window into a stated resolved fact.
-- Updated the out-of-scope rolling-window row to reflect the resolved decision rather than an unsettled one.
+- Resolved DEC-001 in the Plan tier business rule: report is included in the standard plan, not gated.
+- Updated FR-011 note to reflect that the report is included in the standard plan (DEC-001 resolved), removing the gating caveat.
+- Updated NFR-017 to reflect the resolved plan-entitlement decision rather than treating it as an open blocker.
 
 
 ---
@@ -378,10 +378,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Is the weekly attribution report PDF included in the standard plan, or is it a gated premium capability that Brightway Retail would need an upgrade or special entitlement to receive? | Product owner | Treat the weekly attribution report as included in the standard plan, so Brightway Retail receives it within the year-end deadline. Revisit if the feature is meant to be a premium upsell. |
-| **DEC-002** | How should the finance team receive the weekly report — as an on-demand download in the K4A console, pushed automatically to their email inboxes each week, or both? | Product owner | On-demand UI download in the K4A console for Phase 1; add automatic weekly email delivery only if explicitly required before year-end close. |
 | **DEC-003** | What specific attribution metrics and data fields must the weekly report contain, and does that content need to differ by finance team member or department? | Product owner (with finance stakeholder) | Include the standard attribution metrics already exposed for the account for the weekly period, in a single uniform report for all finance users (no per-person or per-department variation) for Phase 1. |
 | **DEC-004** | Should each weekly report contain only the most recent completed week of attribution data, or a rolling window covering several prior weeks? | Product owner (with finance stakeholder) | Each report contains only the most recent completed week of attribution data; add a rolling/historical window only if finance confirms they need it for year-end reconciliation. |
+
+### Decisions Resolved
+
+- **DEC-001**: DEC-001 resolved: the weekly attribution report PDF is included in the standard plan (Brightway's tier) — no gating, not a premium/entitled feature.
+- **DEC-002**: The finance team receives the weekly report as an on-demand download in the K4A console UI only — no automatic email delivery.
 
 ### Open Questions (evidence gaps — needs more input)
 
