@@ -20,7 +20,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Cadence:** The attribution report covers a weekly period and is regenerated on a weekly basis. Each week's report must be available for download by **Monday 9:00am (the account's local/business time)**, before the finance team starts their work — a fixed weekly day/time deadline, not merely weekly availability at some point before year-end close (OQ-008 resolved).
 - **Format:** The report is delivered as a PDF.
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
-- **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability, and Brightway Retail receives it as part of its standard-plan entitlement.
+- **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability. Because the report is not gated, no plan-entitlement enforcement should block access to it for any account; standard access control (authorized finance user of the owning account) is the only gate (OQ-004 resolved).
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
 - **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. There is no existing attribution report or format the finance team uses today, so the PDF can be a new design — a simple one-page layout is acceptable (OQ-007 resolved). Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Each weekly report contains only the most recent completed week of attribution data; it does not include a rolling window of prior weeks.
@@ -36,7 +36,7 @@ This change spans multiple backend services and the K4A frontend console. The au
 
 ```mermaid
 flowchart TD
-    A[Finance user signs in to K4A console] --> B{Authorized finance user<br/>on an entitled account?}
+    A[Finance user signs in to K4A console] --> B{Authorized finance user<br/>of the owning account?}
     B -- No --> C[Access denied: report not available<br/>server-side rejection, not UI-hiding only]
     B -- Yes --> D[Open Weekly Attribution Report view]
     D --> E{A generated weekly report<br/>is available?}
@@ -111,7 +111,7 @@ And only one generation run executes for a given account and period at a time
 
 **FR-005 — Finance user downloads the available weekly report**
 ```gherkin
-Given an authorized finance user is signed in to the K4A console on an entitled account
+Given an authorized finance user is signed in to the K4A console on the owning account
 And a generated weekly report is available for that account
 When the user requests to download the report
 Then the system delivers the report as a PDF
@@ -163,14 +163,14 @@ Then the system denies access rather than allowing it
 And the denial is surfaced to the user as an access error, not a generic failure
 ```
 
-**FR-011 — Plan-tier entitlement enforcement**
+**FR-011 — No plan-entitlement gating for this feature**
 ```gherkin
 Given an account requests access to the weekly attribution report feature
-When the system evaluates the account's plan entitlement for this feature
-Then access is granted only if the account's plan includes the weekly attribution report capability
-And an account whose plan does not include the capability is rejected server-side with a forbidden response
+When the system evaluates the request
+Then access is not gated on plan entitlement, because the weekly attribution report is included in the standard plan (OQ-004 resolved)
+And access is governed only by standard access control: the requester must be an authorized user of the owning account
 ```
-> The weekly attribution report is included in the standard plan (resolved in Section 1), so Brightway Retail (standard plan) is entitled to it. This requirement still enforces plan entitlement server-side for correctness, but it does not block delivery to Brightway, whose standard plan includes the capability.
+> The weekly attribution report is included in the standard plan and is not a gated/entitled or premium capability (OQ-004 resolved in Section 1). There is therefore no plan-entitlement enforcement point for this feature; access is governed solely by server-side account-scoped authorization (FR-009, FR-010).
 
 ### Resilience, Idempotency & Observability
 
@@ -362,8 +362,10 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Added fixed Monday 9am weekly availability deadline to the Cadence business rule (OQ-008 resolved).
-- Tied NFR-004 generation-throughput target to the fixed Monday 9am availability deadline.
+- Updated the Plan tier business rule to state the report is not gated and no plan-entitlement enforcement should block it (OQ-004 resolved).
+- Removed the plan-entitlement ('entitled account') gate from the flowchart decision node, since the report is not gated (OQ-004 resolved).
+- Rewrote FR-011 to remove plan-entitlement gating entirely, since the report is included in the standard plan and not gated (OQ-004 resolved).
+- Removed 'entitled account' phrasing from FR-005 since the report is not gated (OQ-004 resolved).
 
 
 ---
@@ -385,15 +387,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-001**: DEC-001 resolved: the weekly attribution report PDF is included in the standard plan (Brightway's tier) — no gating, not a premium/entitled feature.
 - **DEC-002**: The finance team receives the weekly report as an on-demand download in the K4A console UI only — no automatic email delivery.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
-
 ### Questions Resolved
 
 - **OQ-001**: OQ-001 resolved: the weekly attribution report is delivered as an on-demand PDF download in the K4A UI only, with no email delivery — making frontend download core to the build and removing dispatcher/email services from scope.
 - **OQ-002**: Resolved OQ-002: the weekly attribution report must contain last-touch attribution by channel, with spend, installs, and revenue per channel.
 - **OQ-003**: OQ-003/DEC-004 resolved: each weekly report covers only the most recent completed week, with no rolling window of historical attribution data.
+- **OQ-004**: OQ-004 resolved: the weekly PDF attribution report is included in the standard plan (Brightway's tier) with no gating — it is not a premium/entitled feature, so no plan-entitlement enforcement should block it.
 - **OQ-005**: OQ-005 resolved: the finance team's UI is just a download link — no in-app report preview and no delivery/generation status indicator.
 - **OQ-006**: OQ-006 resolved: standard access controls are sufficient for the downloaded PDFs — no extra audit trail is required beyond what's standard.
 - **OQ-007**: OQ-007: There is no existing attribution report or format the finance team uses today; the PDF can be a new design — a simple one-page layout is acceptable.
