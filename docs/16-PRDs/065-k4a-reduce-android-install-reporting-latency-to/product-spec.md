@@ -263,14 +263,10 @@ The end-to-end trace spans: event ingest (event-manager-api / inboard-*) → agg
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
+### Decisions Resolved
 
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | For the Android install numbers, do you need the dashboard to update continuously throughout the day in near real time, or is it enough that the current day's totals are fully loaded by the end of that same day? | Product owner (Mayank Ukey / K4A) | Same-day end-of-day sufficiency: the current day's totals must be complete and visible by the close of that calendar day (aligned to Orion Mobile's day boundary), rather than requiring continuous intraday real-time updates. This meets the stated goal of eliminating the ~24-hour lag while leaving room to tighten to intraday later if the business needs it. |
-| **DEC-002** | Before we retire the current slower reporting path, how closely do the new same-day Android install totals need to match Orion Mobile's totals, and for how long should both run side by side, before we're comfortable switching over fully? | Product owner (Mayank Ukey) with Engineering | Run the new path alongside the existing one for a 1-week soak; require daily Android install totals to match Orion Mobile exactly (zero divergence) for every day in that window before decommissioning the old path. |
+- **DEC-001**: Assumed: Same-day end-of-day sufficiency: the current day's totals must be complete and visible by the close of that calendar day (aligned to Orion Mobile's day boundary), rather than requiring continuous intraday real-time updates. This meets the stated goal of eliminating the ~24-hour lag while leaving room to tighten to intraday later if the business needs it.
+- **DEC-002**: Assumed: Run the new path alongside the existing one for a 1-week soak; require daily Android install totals to match Orion Mobile exactly (zero divergence) for every day in that window before decommissioning the old path.
 
 ### Open Questions (evidence gaps — needs more input)
 

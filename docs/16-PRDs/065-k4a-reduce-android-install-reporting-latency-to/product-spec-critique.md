@@ -1,4 +1,4 @@
-# Spec Critique: K4A Android Install Reporting — Same-Day Sync
+# Spec Critique: K4A Android Install Reporting Same-Day Sync
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -6,12 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
+- **Critical Issues:** 2
 - **High Issues:** 6
-- **Medium Issues:** 7
-- **Blocking:** No
-
-The spec is unusually disciplined for a change whose root cause is admittedly unlocated. It correctly refuses to presuppose a fix location, defines guardrails that hold regardless of where the lag lives, and surfaces the KG discrepancy rather than hiding it. There are no Critical gaps that block engineering from *starting* discovery. However, several target-behavior FRs rest on quantities the spec never bounds (the parity "variance," the reconciliation window for late-arriving events, the definition of "same-day" itself), and two decision points (DEC-001, DEC-002) are still open. These must be closed before the *implementation* phase, not before discovery.
+- **Medium Issues:** 5
+- **Blocking:** Yes
 
 ---
 
@@ -19,11 +17,8 @@ The spec is unusually disciplined for a change whose root cause is admittedly un
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-004 requires late-arriving events to be "reconciled such that the final same-day total matches Orion Mobile's total," but defines no reconciliation window. If K4A publishes same-day totals at hour N and Orion Mobile keeps accepting late events until hour N+K, the two systems will *necessarily* disagree at any instant between N and N+K — violating BR-1/FR-002. The spec treats parity as a point check but the accelerated path makes it a moving target. | High | §3 FR-004, §5 NFR-005 | Define the reconciliation cutoff and state whether parity is asserted only at a settled end-of-day checkpoint or continuously. Tie NFR-005's "agreed variance" to that window. |
-| CG-002 | NFR-012 gates decommissioning on parity "within an agreed variance," but FR-002/NFR-005 demand "zero divergence" / "identical" totals. These are contradictory: one allows a tolerance band, the other allows none. Engineering cannot build a gate against two incompatible thresholds. | High | §5 NFR-005 vs NFR-012, §3 FR-002 | Reconcile: either parity is exact (variance = 0) at the settled checkpoint, or a named tolerance applies during soak only. State which. |
-| CG-003 | "Same-day" (BR-2, NFR-001) is undefined pending DEC-001 — intraday continuous vs. single end-of-day refresh. Every freshness and parity FR (FR-001, FR-005, FR-006, NFR-009 latency alert) depends on this. The alert in NFR-009 ("exceeds the same-day freshness target") cannot be configured against an undefined target. | High | §1 BR-2, §5 NFR-001/NFR-009 | Resolve DEC-001 before implementation. The hourly working default is sensible but is explicitly provisional; the latency SLO must be a concrete number before alerts can exist. |
-
-No issue here rises to data-loss/security Critical — FR-011/NFR-014 protect already-published data, and NFR-010/NFR-011 cover access and log safety. Hence Blocking = No.
+| CG-001 | **Core behavior gated on two unresolved DECISION REQUIRED flags.** BR-2/NFR-001 (DEC-001) leave "same-day" undefined (continuous intraday vs single end-of-day refresh), and NFR-012 (DEC-002) leaves the parity variance gate undefined. The headline acceptance criterion (FR-001) is therefore untestable as written — "same calendar day" could pass at 23:59 or require hourly refresh. Engineering cannot size, build, or verify against an undecided target. | Critical | 1, 5 | Resolve DEC-001 to a concrete refresh cadence and DEC-002 to a numeric parity variance (e.g. 0 rows or ±N) before engineering starts. Until then this is a blocking gap, not a working default. | 
+| CG-002 | **Evidence contradicts a named mitigation dependency.** FR-003 / FR-004 / BR-4 depend on attributing events to a reporting day and reconciling late-arriving/deduplicated events via the ingestion pipeline. The spec names `event-manager-api` as "event ingestion pipeline," but the KG evidence shows it exposes ONLY single-event CRUD endpoints (`DELETE /event/delete`, `DELETE /event/{id}`, `GET /event/{id}`, `GET /events/list`, `PATCH /event/{id}`) — no bulk ingestion or timing endpoint. The spec itself admits this parenthetically yet still relies on this service for timing/attribution. The actual ingest path per the fresh KG lookup is a different, unvalidated cluster (`inboard-*`). Building FR-003/FR-004 against `event-manager-api` would fail; the true attribution/reconciliation surface is unidentified. | Critical | 1, 4 (Appendix) | Do not treat `event-manager-api` as the ingestion/timing authority. The discovery trace (NFR-012) must first identify the real ingest/reconciliation service before FR-003/FR-004 can be implemented or tested. Flag that no bulk-ingest endpoint exists on the named service. |
 
 ---
 
@@ -33,12 +28,13 @@ No issue here rises to data-loss/security Critical — FR-011/NFR-014 protect al
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-001 | "...target intraday refresh at hourly aggregation granularity, which satisfies either interpretation." | "Satisfies either interpretation" is not a testable SLO; no max staleness bound is stated. | Given an Android install is recorded at time T, When the pipeline is operating normally, Then its count is reflected in the dashboard no later than T + 60 minutes, And the as-of timestamp advances at least once per hour. |
-| NFR-004 | "...must not add perceptible load time." | "Perceptible" is subjective and untestable. | Given representative concurrent dashboard load, When the Android install view with the freshness indicator renders, Then p95 render time does not exceed the measured pre-change p95 baseline by more than [X] ms. |
-| NFR-005 / NFR-012 | "...within an agreed variance" | The variance is never agreed in the spec, so no pass/fail can be coded. | Given the cutover soak, When K4A and Orion Mobile daily totals are compared at the settled checkpoint, Then absolute difference is 0 (or ≤ [agreed N installs]) for [M] consecutive days before decommission. |
-| FR-010 / NFR-013 | "revert...within 5 minutes" (good) BUT "runs already in flight...complete under the prior behavior" | "In flight at the moment of the flip" is undefined at the boundary — a run that started 1s before the flip vs. a run mid-dispatch may be treated differently. Ambiguous for an idempotency/rollback test. | Add: Given a reporting run whose processing has begun but not committed at flip time, Then it is [allowed to complete | aborted and re-run], defining the exact cut line. |
+| FR-001 | "...reflected in the K4A dashboard on that same calendar day" | "Same calendar day" has no cutoff until DEC-001 is resolved — not measurable. | `Given an Android install recorded at 00:00 on day D` `When the pipeline processes day D under normal operation` `Then the K4A dashboard reflects that install no later than <agreed cadence, e.g. D 23:59 in Orion Mobile's timezone, or within N hours of record>` |
+| FR-002 | "...the totals are identical" | No tolerance defined for the comparison window; "identical" at which point in the day? Conflicts with same-day-in-progress totals that legitimately differ until end of day. | `Given both dashboards have completed their day-D reporting cycle` `When day-D totals are compared after the agreed parity point` `Then K4A's day-D total equals Orion Mobile's day-D total exactly` |
+| FR-005 | "...reflecting the actual recency of the displayed data" / "the most recent point to which same-day data has been loaded" | "Actual recency" not bounded — how stale can the as-of be before it is a defect? No max skew between as-of and wall clock. | `Given the dashboard shows an as-of timestamp T` `When compared to the latest data the serving layer holds` `Then T equals the timestamp of the newest loaded datapoint, and T is never shown as more recent than the actual data` |
+| NFR-001 | "...target intraday refresh at hourly aggregation granularity, which satisfies either interpretation" | A "working default" for an undecided requirement is not a testable acceptance criterion; it pre-commits engineering to a cadence the business hasn't agreed. | Resolve DEC-001; then: `Given same-day data for day D` `When the hourly refresh runs` `Then dashboard data is no more than 60 minutes behind the serving layer` |
+| NFR-004 | "...must not add perceptible load time" | "Perceptible" is subjective; the row then gives a measurable p95 rule — the vague clause should be deleted. | `Given representative concurrent dashboard load` `When the Android install view with the freshness indicator renders` `Then p95 render time does not exceed the current measured baseline` |
 
-Note: FR-001 through FR-012 are all authored in proper Gherkin (Given/When/Then). The vagueness above is concentrated in the NFR prose, which is acceptable as prose but still needs measurable thresholds.
+All FRs (FR-001 through FR-012) are written in Gherkin — no prose FRs. The vagueness above is in the acceptance *content*, not the format.
 
 ---
 
@@ -46,27 +42,28 @@ Note: FR-001 through FR-012 are all authored in proper Gherkin (Given/When/Then)
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard month-end deadline + unlocated root cause | Yes — NFR-012 discovery-first, BR-3 scope boundary | PASS | Good: explicitly surfaces the small-fix-vs-rearchitecture spread to the deadline owner. |
-| Multi-service blast radius | Yes — NFR-002, NFR-003, FR-008, FR-009, NFR-013/014 | PASS | Shared-resource rate cap (NFR-003) with 80%/5min alert is concrete. |
-| Unknown latency source | Yes — NFR-008 named failure conditions, NFR-012 per-hop trace | PASS | Distinct named conditions is the right call for locating the lag. |
-| KG cross-check discrepancy (two lookups disagree on services) | Partially — discovery trace to reconcile both sets | PASS (with caveat) | Mitigation is "reconcile during discovery," which is appropriate, but see §4 edge cases: the trace has no stated exit criterion for *what counts as reconciled*. |
-| Late-arriving-event accuracy vs. speed (BR-4) | Partially — FR-004, NFR-006 | FAIL | The risk is acknowledged but the mitigation is incomplete: no reconciliation window/cutoff is specified (see CG-001). A mitigation that cannot be measured is not a mitigation. |
-| Accuracy of parity claim itself (BR-1) | Contradicted — NFR-005 "zero divergence" vs NFR-012 "agreed variance" | FAIL | The two mitigations for the same risk contradict each other (see CG-002). |
+| Hard month-end deadline + unlocated root cause | Yes — NFR-012 (discovery trace first), BR-3 (scope boundary) | PASS | Mitigation is a real requirement, not just a listed risk. Caveat: discovery outcome could blow the deadline; spec acknowledges the spread must be surfaced to the deadline owner. |
+| Multi-service blast radius | Yes — NFR-002, NFR-003, FR-008, FR-009, NFR-013, NFR-014 | PASS | Collateral-impact and kill-switch requirements are concrete. |
+| Unknown latency source | Yes — NFR-008 (named failure conditions), NFR-012 (per-hop timing) | PASS | Observability requirements exist to locate the lag. |
+| KG cross-check discrepancy (two lookups disagree on affected services) | Partial — "discovery trace reconciles both sets" | FAIL | The mitigation is a hand-wave: there is no requirement defining *how* reconciliation is decided, what evidence closes the discrepancy, or which set gates the cutover. CG-002 shows one claimed service (`event-manager-api`) is contradicted by its own endpoint evidence — the spec surfaces this but does not require it be resolved before build. Add a requirement: the discovery trace must produce a single reconciled, evidence-backed service map before implementation scope is fixed. |
+| Accuracy sacrificed for speed (late-arriving events / dedup) | Yes — FR-004, NFR-005, NFR-006 | PASS | But see EC list — behavior when late events arrive *after* the day is closed/published is underspecified. |
+| Accelerated path misbehaves in prod | Yes — FR-010/011/012, NFR-013/014 | PASS | Kill-switch, idempotency, and data-preservation are concrete and testable. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Reconciliation window undefined:** Late events arriving after K4A's same-day publish but before Orion Mobile's settle create a guaranteed transient divergence (see CG-001). No FR states how long K4A keeps revising a published day.
-2. **Day-boundary clock skew / DST:** FR-003 defers to Orion Mobile's convention, but no requirement covers what happens if Orion Mobile's and K4A's host clocks drift, or across a DST transition, where an install could land in two different days. "Follows Orion's convention" doesn't specify *re-derivation on each run* vs. a cached boundary.
-3. **Orion Mobile unavailable during soak:** NFR-012's parity gate assumes Orion totals are queryable. No behavior defined if the comparison baseline itself is down during the soak window — does the gate fail open, fail closed, or stall the cutover?
-4. **As-of timestamp staleness ceiling:** FR-006 shows last-known totals with a truthful timestamp indefinitely (flow node K). There is no upper bound at which an extremely stale "as-of" (e.g., >24h old again) escalates to an alert or a visibly degraded state. A truthful-but-ancient timestamp still erodes trust silently.
-5. **Negative/corrected totals (install reversals/fraud clawbacks):** If an install is later invalidated upstream, same-day totals may need to *decrease*. No FR addresses whether same-day totals can move downward and how FR-011 ("already-published data remains intact") interacts with a legitimate downward correction.
-6. **Partial-day cutover:** If the kill-switch is flipped mid-day (FR-010), the day's total is assembled partly by the accelerated path and partly by the old path. FR-012 idempotency covers retries of the *same* path, not a path change mid-day. Divergence risk unaddressed.
-7. **Shared-resource cap backpressure:** NFR-003 caps the accelerated path's load, but if the cap throttles install reporting hard enough, same-day freshness (NFR-001) may be missed — the two NFRs can conflict under load and no priority/precedence is stated.
-8. **Timezone of the freshness indicator display:** FR-005's "as-of" timestamp has no stated display timezone; a user in a different TZ than the reporting-day boundary could misread currency.
-9. **Dashboard cache invalidation trigger:** FR-007 requires caches not to mask fresh data but defines no invalidation mechanism/TTL; "does not cause data to appear delayed" is an outcome, not a trigger.
-10. **Multiple concurrent consumers mid-rollback (NFR-015):** Backward-compat says existing consumers must not break, but doesn't address a consumer reading mid-flip where format is identical but *timing semantics* changed — a consumer that polls expecting day-old data might now receive same-day data earlier than its own logic expects.
+1. **Late-arriving events after same-day publication:** FR-004 says late events are "reconciled such that the final same-day total matches Orion Mobile." But what if Orion Mobile *also* only reconciles later? The window during which K4A and Orion Mobile legitimately disagree (both still settling) is undefined — FR-002's "identical" would falsely fail during this window.
+2. **Orion Mobile is itself delayed or down:** Every parity requirement (FR-002, NFR-005, NFR-012) assumes Orion Mobile is the available, correct baseline. No behavior defined if Orion Mobile's own numbers are late, wrong, or unreachable during the parity check/soak.
+3. **Day-boundary / DST transition:** FR-003 aligns to Orion Mobile's convention, but behavior across a DST shift or if Orion Mobile changes its convention is undefined — installs near the boundary on a 23- or 25-hour day.
+4. **Backfill / historical correction:** If upstream corrects a prior day's totals, does K4A's same-day path propagate the correction? FR-011 says published data is not retroactively altered on rollback — but legitimate upstream corrections are a different case and are unaddressed.
+5. **Parallel-run divergence during soak (NFR-012):** If old and new paths disagree during the parallel run, which is shown to users? No requirement defines the user-facing source of truth during cutover.
+6. **Kill-switch flip mid-day (FR-010):** Runs in flight complete under prior behavior, new runs revert — but the dashboard could then show a mix of same-day and prior-day totals within one calendar day. User-facing consistency during the 5-minute transition is undefined.
+7. **Freshness indicator when zero installs vs no data:** A legitimate zero-install day is indistinguishable from "data not yet loaded" in the current flow. FR-006 covers stale data but not the zero-vs-null ambiguity.
+8. **Shared-resource rate cap (NFR-003) throttles install reporting itself:** The cap protects unrelated reporting, but if it throttles the accelerated path, same-day target (FR-001) may silently miss. No requirement defines precedence when the cap and the freshness target conflict.
+9. **Partial-day / mid-processing dashboard load:** User loads the dashboard while aggregation for the current hour is in progress — is a partial total shown with an as-of timestamp, or suppressed? FR-007 covers cache staleness but not partial-aggregation reads.
+10. **Idempotency key collision across reporting days (FR-012/NFR-006):** Idempotency is keyed on "reporting-day key." If a reprocessing run spans a day boundary or carries a mis-attributed key, the upsert could overwrite the wrong day. Key-derivation correctness is assumed, not required.
+11. **Access-control re-derivation under caching (NFR-010 vs FR-007):** NFR-010 requires per-request server-side access checks; FR-007 permits display-layer caching. A cached view could serve data to a role whose access changed between cache fill and read. Interaction is unspecified.
 
 ---
 
@@ -74,20 +71,19 @@ Note: FR-001 through FR-012 are all authored in proper Gherkin (Given/When/Then)
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-012 are all well-formed Gherkin. NFRs are prose, which is expected for NFRs. |
-| Document contains only Sections 0–6 | FAIL | The document ends with an **"Appendix: Engineering Reference"** containing a multi-paragraph narrative analysis — "Affected Services," "Independent KG cross-check," and a pipeline-shape walkthrough with its own findings prose. This is exactly the stray multi-paragraph KG cross-check analysis appendix that is *not* exempt (it is not a Revision Summary and not a one-line `> **Label:**` metadata trailer). Fold its grounding into Section 1's existing "KG Cross-Check Discrepancy" subsection or remove it; it should not be a standalone appendix beyond Sections 0–6. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a pure bullet list; data types/schema are explicitly deferred to engineering, with only business-level descriptors and source tags (System-derived/External), no attribute tables. |
-
-**KG cross-check finding (critique-task grounding, not a format issue):** The spec's own Appendix honestly reports that the independent KG lookup did **not** re-surface the Context Seed's claimed services (k4a-sam-backend, reporting-dispatcher, cost-revenue-workers, frontend-mos, event-manager-api) and instead surfaced a different low-confidence cluster (inboard-*, rollup-*, krep*/summary-report-cloud, reporting-api). This matches the independent evidence provided to me — the spec does not contradict the cross-check; it correctly flags the disagreement as unresolved rather than picking a side. One concrete contradiction worth engineering's attention: the spec names `event-manager-api` as the "event ingestion pipeline" that "validates timing of Android install events," yet its own catalogued endpoints are all single-event CRUD (`DELETE/GET/PATCH /event/{id}`, `GET /events/list`) with **no bulk ingestion or timing endpoint** — the spec notes this honestly, but it weakens the claim that this service is on the high-volume install-ingest latency path. The discovery trace should treat `event-manager-api`'s role as unconfirmed, not assumed.
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-012 are all in Gherkin fenced blocks. |
+| Document contains only Sections 0–6 | FAIL | The document ends with an **"## Appendix: Engineering Reference"** containing multi-paragraph narrative analysis (affected-services lists, KG cross-check prose, pipeline-shape discussion). This is NOT a sanctioned Revision Summary trailer nor a short one-line `> **Label:** ...` metadata blockquote — it is exactly the "multi-paragraph narrative KG cross-check appendix" the format rule is written to catch. Section 1's "KG Cross-Check Discrepancy" subsection also pushes KG-reconciliation detail into the body; acceptable in-section, but the standalone Appendix must be removed or relocated out of the spec. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a bullet list described at business level; it names no data types/schemas (the "*System-derived*/*External*" tags are sourcing annotations, not type declarations). No attribute tables present. |
 
 ---
 
 ## 6. Recommendations
 
-1. **Resolve DEC-001 (definition of "same-day")** before implementation — every freshness FR and the NFR-009 latency alert depend on a concrete SLO (CG-003).
-2. **Reconcile the parity contradiction** between NFR-005 ("zero divergence") and NFR-012 ("agreed variance"), and define the **late-arriving-event reconciliation window** (CG-001, CG-002). State whether parity is exact at a settled checkpoint or tolerance-banded during soak only.
-3. **Move the Engineering Reference Appendix content into Section 1's KG Cross-Check subsection** (or drop it) so the document stays within Sections 0–6 — this is the only format FAIL.
-4. **Add edge-case FRs** for mid-day kill-switch cutover (partial-day totals), downward corrections/reversals, and the as-of-timestamp staleness ceiling (edge cases 4, 5, 6).
-5. **Define precedence** between NFR-003 (shared-resource cap) and NFR-001 (same-day freshness) under contention (edge case 7).
-6. **Specify the parity-gate behavior when Orion Mobile is unavailable** during the soak (edge case 3), and the freshness-indicator display timezone (edge case 8).
-7. **Flag `event-manager-api`'s role as unconfirmed** for the discovery trace, given its endpoints show no bulk-ingest/timing surface.
+1. **Resolve CG-001 (DEC-001 and DEC-002) before any engineering.** Pin "same-day" to a concrete cadence and define the numeric parity variance gate. The entire acceptance suite is untestable until this is fixed. (Blocking)
+2. **Resolve CG-002: stop treating `event-manager-api` as the ingestion/timing authority.** Its endpoints (per KG evidence) are single-event CRUD only — no bulk ingest/timing surface. Make the discovery trace identify and validate the real ingest/reconciliation service before FR-003/FR-004 are built. (Blocking)
+3. **Add a concrete reconciliation requirement for the KG service-set discrepancy** (Risk Audit FAIL): define what evidence closes the discrepancy and that a single reconciled service map gates implementation scope.
+4. **Define behavior when Orion Mobile (the parity baseline) is late/wrong/unavailable**, and define the legitimate "both still settling" window so FR-002 doesn't false-fail (EC-1, EC-2).
+5. **Remove or relocate the "Appendix: Engineering Reference"** so the document contains only Sections 0–6 (plus any sanctioned Revision Summary / metadata trailer).
+6. **Specify user-facing source-of-truth and consistency rules** during parallel-run soak (EC-5) and during the kill-switch 5-minute transition (EC-6).
+7. **Tighten vague acceptance clauses** in FR-005, NFR-001, NFR-004 per Section 2 rewrites; delete "perceptible" and the "working default" cadence once DEC-001 lands.
+8. **Address the remaining edge cases** (zero-vs-null freshness, rate-cap vs freshness precedence, cache-vs-access-control interaction, idempotency key derivation).
