@@ -22,7 +22,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
 - **Plan tier:** Brightway Retail is on the **standard plan**. Whether the weekly PDF attribution report is included in the standard plan or is a gated/entitled capability is not settled by the input. [DECISION REQUIRED: DEC-001]
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
-- **Report content:** The specific data fields and metrics the report must contain — and whether that content differs by finance team member or department — are not settled by the input. [DECISION REQUIRED: DEC-003]
+- **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Whether each weekly report contains only the most recent week of attribution data or a rolling window of prior weeks is not settled by the input. [DECISION REQUIRED: DEC-004]
 - **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side.
 
@@ -94,9 +94,10 @@ And the report is labelled with the weekly period boundaries it represents
 Given the attribution data source for an account is available
 When a weekly report is generated
 Then the report content is derived from that account's attribution data for the period
+And the report contains last-touch attribution by channel, with spend, installs, and revenue per channel
 And no attribution data from another account is included in the report
 ```
-> Working default: the report contains the standard attribution metrics already exposed for the account for the period. The exact field/metric set depends on the report-content decision flagged in Section 1.
+> The report's field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Whether content additionally varies by finance team member or department remains open (DEC-003).
 
 **FR-004 — Weekly schedule does not run concurrently for the same period**
 ```gherkin
@@ -257,7 +258,7 @@ The system must track the following business information to support the function
 - **Weekly Attribution Report (artifact):** The generated PDF for a given account and weekly period. System-derived (produced by the generation run from attribution data). This is the core deliverable the finance team retrieves.
 - **Reporting Period:** The weekly period boundaries each report covers (start/end of the covered week). System-derived from the generation schedule. Needed so a user can confirm which week they are downloading (FR-002, FR-008) and so generation stays idempotent per period (FR-012).
 - **Report Generation Status:** The outcome of each weekly generation run for an account and period — e.g. not-yet-run, in-progress, ready, not-ready/failed. System-derived. Drives the "no report available" state (FR-007), the distinct failure messaging (FR-014), and the not-ready marking on failure (FR-015).
-- **Attribution Data (source content):** The account's attribution metrics for the period, consumed from the upstream attribution data source. External/upstream to this feature. This is what the report content is derived from (FR-003); the exact field/metric set depends on the report-content decision flagged in Section 1.
+- **Attribution Data (source content):** The account's attribution metrics for the period, consumed from the upstream attribution data source. External/upstream to this feature. This is what the report content is derived from (FR-003); the required field/metric set is last-touch attribution by channel, with spend, installs, and revenue per channel. Whether content additionally varies by finance team member or department remains open (DEC-003).
 - **Account & Plan Entitlement:** The owning account's identity and whether its plan includes the weekly attribution report capability. System-derived / sourced from the authoritative entitlement source. Drives plan-tier enforcement (FR-011) and account-scoping of report access (FR-003, FR-005).
 - **Requesting User Identity & Authorization:** The signed-in user, their account association, and their finance-team authorization. Sourced from the authoritative auth source on each request. Drives server-side authorization (FR-009, FR-010).
 - **Report Enrollment / Subscription:** Which accounts are enrolled to receive the weekly report. System-derived / configured. Determines which accounts the weekly schedule generates for (FR-001).
@@ -361,9 +362,9 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Resolved DEC-002/OQ-001 in Section 1 business rules: delivery is on-demand UI download only, no email.
-- Updated FR-005 note to state on-demand UI download only, email not required, per resolved delivery decision.
-- Updated out-of-scope email row rationale to reflect that on-demand UI download only is now a decision, not a default.
+- Set report content to last-touch attribution by channel (spend, installs, revenue per channel), narrowing DEC-003 to only the per-member/department variation question.
+- Added the specified last-touch-by-channel metrics (spend, installs, revenue) to FR-003 and updated its note.
+- Updated the Attribution Data information-requirement to name the specified last-touch-by-channel metric set.
 
 
 ---
@@ -384,7 +385,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: What specific data fields and metrics must the weekly attribution report contain? We need this to confirm whether the existing attribution data source already exposes everything the report needs.
 - **OQ-003**: Should each weekly report cover only the most recent week, or include a rolling window of historical attribution data? If historical, how many weeks?
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
 - **OQ-005**: For the finance team's UI, do you want just a download link, or also an in-app report preview and a delivery/generation status indicator? This directly drives the frontend scope.
@@ -395,6 +395,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: OQ-001 resolved: the weekly attribution report is delivered as an on-demand PDF download in the K4A UI only, with no email delivery — making frontend download core to the build and removing dispatcher/email services from scope.
+- **OQ-002**: Resolved OQ-002: the weekly attribution report must contain last-touch attribution by channel, with spend, installs, and revenue per channel.
 
 ---
 > **Classification:** Type A
