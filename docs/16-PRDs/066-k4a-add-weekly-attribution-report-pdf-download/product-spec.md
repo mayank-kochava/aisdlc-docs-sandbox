@@ -21,7 +21,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Format:** The report is delivered as a PDF.
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
 - **Plan tier:** Brightway Retail is on the **standard plan**. Whether the weekly PDF attribution report is included in the standard plan or is a gated/entitled capability is not settled by the input. [DECISION REQUIRED: DEC-001]
-- **Delivery mechanism:** Whether the report is delivered by on-demand UI download, pushed automatically to finance inboxes (email), or both, is not settled by the input. [DECISION REQUIRED: DEC-002]
+- **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
 - **Report content:** The specific data fields and metrics the report must contain — and whether that content differs by finance team member or department — are not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Whether each weekly report contains only the most recent week of attribution data or a rolling window of prior weeks is not settled by the input. [DECISION REQUIRED: DEC-004]
 - **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side.
@@ -116,7 +116,7 @@ When the user requests to download the report
 Then the system delivers the report as a PDF
 And the download is scoped to that user's own account data only
 ```
-> Working default: delivery is via on-demand UI download in the K4A console. Whether email push is also required depends on the delivery-mechanism decision flagged in Section 1.
+> Delivery is via on-demand UI download in the K4A console only; automatic email push is not required (delivery-mechanism decision resolved in Section 1).
 
 **FR-006 — Sensitive report delivered via time-limited secure link**
 ```gherkin
@@ -329,7 +329,7 @@ The Context Seed classifies this work as **HIGH risk** (hard year-end deadline, 
 
 | Item | Rationale / Notes | Phase |
 |------|-------------------|-------|
-| Email/automatic push delivery of the report to finance inboxes | Delivery mechanism is unsettled (flagged in Section 1); MVP defaults to on-demand UI download to protect the deadline. If email is required, it is a follow-on. | Future |
+| Email/automatic push delivery of the report to finance inboxes | Delivery is on-demand UI download only (decided in Section 1); email push is explicitly not required. If email is ever requested, it would be a follow-on. | Future |
 | Rolling multi-week / historical window in each report | Historical-window is unsettled (flagged in Section 1); MVP defaults to most-recent-completed-week only. | Future |
 | Per-member / per-department report content variation | Content variation is unsettled (flagged in Section 1); MVP produces a single standard report per account. | Future |
 | In-console report preview (view before download) | Preview was surfaced as a possible UI capability in the analysis but is not required for the download objective. | Future |
@@ -357,6 +357,15 @@ Primary codebase-analysis service list (6 services):
 
 Discrepancy from the independent cross-check: the fresh lookup did **not** re-find `k4a-mcp-server`, and additionally surfaced `koch-query-api` (query layer feeding attribution report data) and `summary-report-cloud` (generates summary report content for attribution), both at low confidence. The scheduling responsibility (reporting-dispatcher vs. reporting-subscriptions-worker) and the PDF-generation responsibility (reporting-api vs. reporting-subscriptions-worker) each appear in more than one service. Engineering must confirm the true blast radius and resolve these ownership overlaps during discovery before build estimation.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved DEC-002/OQ-001 in Section 1 business rules: delivery is on-demand UI download only, no email.
+- Updated FR-005 note to state on-demand UI download only, email not required, per resolved delivery decision.
+- Updated out-of-scope email row rationale to reflect that on-demand UI download only is now a decision, not a default.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -375,7 +384,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Should the weekly report be delivered automatically to finance's email inboxes, downloaded on-demand through the K4A UI, or both? This changes which services are core to the build (dispatcher/email vs. frontend download).
 - **OQ-002**: What specific data fields and metrics must the weekly attribution report contain? We need this to confirm whether the existing attribution data source already exposes everything the report needs.
 - **OQ-003**: Should each weekly report cover only the most recent week, or include a rolling window of historical attribution data? If historical, how many weeks?
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
@@ -383,6 +391,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-006**: Are there requirements around report security, access controls, or audit trails for the downloaded PDFs, given this is finance/billing-sensitive data?
 - **OQ-007**: Is there an existing attribution report or format the finance team uses today that this PDF should match or build on, rather than designing from scratch?
 - **OQ-008**: Does finance need the report on a fixed day each week, or is weekly cadence with availability before year-end close sufficient?
+
+### Questions Resolved
+
+- **OQ-001**: OQ-001 resolved: the weekly attribution report is delivered as an on-demand PDF download in the K4A UI only, with no email delivery — making frontend download core to the build and removing dispatcher/email services from scope.
 
 ---
 > **Classification:** Type A
