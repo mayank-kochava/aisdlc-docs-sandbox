@@ -24,7 +24,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
 - **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Whether each weekly report contains only the most recent week of attribution data or a rolling window of prior weeks is not settled by the input. [DECISION REQUIRED: DEC-004]
-- **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side.
+- **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side. Per reviewer resolution of the report-security question, the platform's standard access controls are sufficient for the downloaded PDFs and no extra audit trail beyond the platform standard is required for this feature.
 
 ### Known Scope / Blast-Radius Note
 
@@ -362,9 +362,7 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Set report content to last-touch attribution by channel (spend, installs, revenue per channel), narrowing DEC-003 to only the per-member/department variation question.
-- Added the specified last-touch-by-channel metrics (spend, installs, revenue) to FR-003 and updated its note.
-- Updated the Attribution Data information-requirement to name the specified last-touch-by-channel metric set.
+- Recorded OQ-006 resolution in the Data sensitivity business rule: standard access controls sufficient, no extra audit trail required.
 
 
 ---
@@ -388,7 +386,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Should each weekly report cover only the most recent week, or include a rolling window of historical attribution data? If historical, how many weeks?
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
 - **OQ-005**: For the finance team's UI, do you want just a download link, or also an in-app report preview and a delivery/generation status indicator? This directly drives the frontend scope.
-- **OQ-006**: Are there requirements around report security, access controls, or audit trails for the downloaded PDFs, given this is finance/billing-sensitive data?
 - **OQ-007**: Is there an existing attribution report or format the finance team uses today that this PDF should match or build on, rather than designing from scratch?
 - **OQ-008**: Does finance need the report on a fixed day each week, or is weekly cadence with availability before year-end close sufficient?
 
@@ -396,6 +393,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: OQ-001 resolved: the weekly attribution report is delivered as an on-demand PDF download in the K4A UI only, with no email delivery — making frontend download core to the build and removing dispatcher/email services from scope.
 - **OQ-002**: Resolved OQ-002: the weekly attribution report must contain last-touch attribution by channel, with spend, installs, and revenue per channel.
+- **OQ-006**: OQ-006 resolved: standard access controls are sufficient for the downloaded PDFs — no extra audit trail is required beyond what's standard.
 
 ---
 > **Classification:** Type A
