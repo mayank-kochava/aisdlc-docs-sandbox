@@ -23,7 +23,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability. Because the report is not gated, no plan-entitlement enforcement should block access to it for any account; standard access control (authorized finance user of the owning account) is the only gate (OQ-004 resolved).
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
 - **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. There is no existing attribution report or format the finance team uses today, so the PDF can be a new design — a simple one-page layout is acceptable (OQ-007 resolved). Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
-- **Historical window:** Each weekly report contains only the most recent completed week of attribution data; it does not include a rolling window of prior weeks.
+- **Historical window:** Whether each weekly report contains only the most recent completed week of attribution data, or a rolling window covering several prior weeks, is deferred to engineering discretion [DECISION REQUIRED: DEC-004].
 - **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side. Per reviewer resolution of the report-security question, the platform's standard access controls are sufficient for the downloaded PDFs and no extra audit trail beyond the platform standard is required for this feature.
 
 ### Known Scope / Blast-Radius Note
@@ -87,7 +87,7 @@ When the report content is assembled
 Then the report includes attribution data for that weekly period
 And the report is labelled with the weekly period boundaries it represents
 ```
-> Each report contains the most recent completed week of attribution data only (no rolling multi-week history), per the resolved historical-window decision in Section 1.
+> Whether each report contains the most recent completed week only or a rolling multi-week window is deferred to engineering discretion (DEC-004, Section 1).
 
 **FR-003 — Report content sourced from attribution data**
 ```gherkin
@@ -331,7 +331,7 @@ The Context Seed classifies this work as **HIGH risk** (hard year-end deadline, 
 | Item | Rationale / Notes | Phase |
 |------|-------------------|-------|
 | Email/automatic push delivery of the report to finance inboxes | Delivery is on-demand UI download only (decided in Section 1); email push is explicitly not required. If email is ever requested, it would be a follow-on. | Future |
-| Rolling multi-week / historical window in each report | Historical-window is resolved to most-recent-completed-week only (Section 1); a rolling multi-week window is out of scope. | Future |
+| Rolling multi-week / historical window in each report | The report time-window scope (most-recent-completed-week vs. rolling multi-week) is deferred to engineering discretion (DEC-004, Section 1); if engineering selects most-recent-week only, a rolling multi-week window remains a future follow-on. | Future |
 | Per-member / per-department report content variation | Content variation is unsettled (flagged in Section 1); MVP produces a single standard report per account. | Future |
 | In-console report preview (view before download) | Resolved (OQ-005): the finance team's UI is a download link only — no in-app report preview. Out of scope for this feature. | Future |
 | Delivery-status display in the UI | Resolved (OQ-005): the finance team's UI is a download link only — no delivery/generation status indicator. Out of scope for this feature. | Future |
@@ -362,10 +362,9 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Updated the Plan tier business rule to state the report is not gated and no plan-entitlement enforcement should block it (OQ-004 resolved).
-- Removed the plan-entitlement ('entitled account') gate from the flowchart decision node, since the report is not gated (OQ-004 resolved).
-- Rewrote FR-011 to remove plan-entitlement gating entirely, since the report is included in the standard plan and not gated (OQ-004 resolved).
-- Removed 'entitled account' phrasing from FR-005 since the report is not gated (OQ-004 resolved).
+- Reopened the historical-window business rule as an engineering-discretion deferral per DEC-004.
+- Updated FR-002 note to reflect the historical-window scope is now an engineering-discretion deferral (DEC-004).
+- Updated Out-of-Scope row to reflect the rolling-window choice is now deferred to engineering (DEC-004).
 
 
 ---
@@ -380,12 +379,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-003** | What specific attribution metrics and data fields must the weekly report contain, and does that content need to differ by finance team member or department? | Product owner (with finance stakeholder) | Include the standard attribution metrics already exposed for the account for the weekly period, in a single uniform report for all finance users (no per-person or per-department variation) for Phase 1. |
-| **DEC-004** | Should each weekly report contain only the most recent completed week of attribution data, or a rolling window covering several prior weeks? | Product owner (with finance stakeholder) | Each report contains only the most recent completed week of attribution data; add a rolling/historical window only if finance confirms they need it for year-end reconciliation. |
 
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: the weekly attribution report PDF is included in the standard plan (Brightway's tier) — no gating, not a premium/entitled feature.
 - **DEC-002**: The finance team receives the weekly report as an on-demand download in the K4A console UI only — no automatic email delivery.
+- **DEC-004**: DEC-004 resolved: the choice between a single most-recent-completed-week vs. a rolling multi-week window is deferred to engineering discretion during discovery.
 
 ### Questions Resolved
 
