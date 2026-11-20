@@ -64,9 +64,10 @@ flowchart TD
 ```gherkin
 Given an Android install event is recorded on a given calendar day
   And the install-reporting pipeline is operating normally
+  And the prior behavior delayed that install's appearance by approximately 24 hours
 When the reporting pipeline processes that day's install data
 Then the corresponding install count is reflected in the K4A dashboard on that same calendar day
-  And it is no longer delayed by approximately 24 hours
+  And the approximately 24-hour Android data delay window is eliminated
 ```
 
 **FR-002 — Totals match Orion Mobile's internal dashboard**
@@ -75,7 +76,7 @@ Given the K4A dashboard displays Android install totals for a given calendar day
   And Orion Mobile's internal dashboard displays Android install totals for the same calendar day
 When both dashboards are compared for that day
 Then the totals are identical
-  And the only prior difference (the ~24-hour timing lag) is eliminated
+  And the only prior difference (the approximately 24-hour Android data delay window) is eliminated
 ```
 
 **FR-003 — Day-boundary alignment with Orion Mobile**
@@ -108,6 +109,7 @@ Then the dashboard presents a freshness indicator (an "as-of" timestamp) reflect
 **FR-006 — Stale data is never presented as current**
 ```gherkin
 Given same-day Android install data for the current day is not yet available in the dashboard
+  And the Android install data may still be within its approximately 24-hour delay window
 When a user views the Android install figures
 Then the dashboard displays the last known totals together with their true "as-of" timestamp
   And it does not present delayed or prior-day totals as if they were same-day current totals
@@ -257,6 +259,28 @@ Independent KG cross-check (fresh lookup — did **not** re-surface the services
 - **reporting-api** (backend, low confidence) — Serves install-reporting data to downstream consumers; likely the read side.
 
 The end-to-end trace spans: event ingest (event-manager-api / inboard-*) → aggregation/rollup (cost-revenue-workers / rollup-*) → report generation (krep* / summary-report-cloud) → dispatch (reporting-dispatcher) → serve (reporting-api) → display/cache (frontend-mos). The KG evidence describes the *shape* of the pipeline but does **not** locate the lag.
+
+## Revision Summary
+
+### Changes from v1
+
+| Critique ID | Issue | Resolution | Status |
+|-------------|-------|------------|--------|
+| PM instruction | Acceptance criteria should mention the Android data delay window | Added the ~24-hour Android data delay window to FR-001, FR-002, and FR-006 Gherkin | Resolved |
+| CG-001 | Core behavior gated on unresolved DEC-001/DEC-002 | Already tracked as DEC-001 (same-day definition) and DEC-002 (parity variance); not re-flagged | Deferred to tracked decisions |
+| CG-002 | event-manager-api named as ingestion authority but exposes only single-event CRUD | Not addressed this round per PM focus; remains open | Not addressed |
+| Section 2 vague FRs (FR-005, NFR-001, NFR-004) | Vague acceptance clauses | Not addressed this round per PM focus | Not addressed |
+| Section 4 edge cases (EC-1–EC-11) | Missed edge cases | Not addressed this round per PM focus | Not addressed |
+| Format FAIL (Appendix) | Engineering Reference appendix should be removed/relocated | Not addressed this round per PM focus | Not addressed |
+
+### Decisions Required
+
+No new business decisions were surfaced this round. DEC-001 (same-day refresh cadence) and DEC-002 (numeric parity variance gate) remain tracked and unresolved; they continue to gate testability of the acceptance suite per CG-001.
+
+### New Requirements Added
+
+No new functional requirements were added this round. The change scoped to the PM's instruction amended existing acceptance criteria (FR-001, FR-002, FR-006) to explicitly reference the approximately 24-hour Android data delay window.
+
 
 ---
 ## Open Questions & Decisions Register
