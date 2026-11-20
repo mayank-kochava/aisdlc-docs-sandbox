@@ -22,7 +22,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
 - **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability, and Brightway Retail receives it as part of its standard-plan entitlement.
 - **Delivery mechanism:** The report is delivered exclusively via on-demand PDF download in the K4A console UI. Automatic email push to finance inboxes is not required and is out of scope.
-- **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
+- **Report content:** The report must contain last-touch attribution by channel, with spend, installs, and revenue per channel. There is no existing attribution report or format the finance team uses today, so the PDF can be a new design — a simple one-page layout is acceptable (OQ-007 resolved). Whether that content additionally differs by finance team member or department is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **Historical window:** Each weekly report contains only the most recent completed week of attribution data; it does not include a rolling window of prior weeks.
 - **Data sensitivity:** The report carries finance/billing-sensitive attribution data; access must be restricted to authorized users of the owning account and enforced server-side. Per reviewer resolution of the report-security question, the platform's standard access controls are sufficient for the downloaded PDFs and no extra audit trail beyond the platform standard is required for this feature.
 
@@ -362,8 +362,7 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Updated the preview and delivery-status Out-of-Scope rationales to reflect OQ-005 resolution (download link only).
-- Updated frontend-mos appendix description to download link only, removing preview and status display per OQ-005.
+- Recorded OQ-007 resolution in Section 1: no existing format; a simple one-page PDF layout is acceptable.
 
 
 ---
@@ -388,7 +387,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
-- **OQ-007**: Is there an existing attribution report or format the finance team uses today that this PDF should match or build on, rather than designing from scratch?
 - **OQ-008**: Does finance need the report on a fixed day each week, or is weekly cadence with availability before year-end close sufficient?
 
 ### Questions Resolved
@@ -398,6 +396,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003/DEC-004 resolved: each weekly report covers only the most recent completed week, with no rolling window of historical attribution data.
 - **OQ-005**: OQ-005 resolved: the finance team's UI is just a download link — no in-app report preview and no delivery/generation status indicator.
 - **OQ-006**: OQ-006 resolved: standard access controls are sufficient for the downloaded PDFs — no extra audit trail is required beyond what's standard.
+- **OQ-007**: OQ-007: There is no existing attribution report or format the finance team uses today; the PDF can be a new design — a simple one-page layout is acceptable.
 
 ---
 > **Classification:** Type A
