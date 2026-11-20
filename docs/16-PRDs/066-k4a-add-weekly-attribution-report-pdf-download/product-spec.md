@@ -333,8 +333,8 @@ The Context Seed classifies this work as **HIGH risk** (hard year-end deadline, 
 | Email/automatic push delivery of the report to finance inboxes | Delivery is on-demand UI download only (decided in Section 1); email push is explicitly not required. If email is ever requested, it would be a follow-on. | Future |
 | Rolling multi-week / historical window in each report | Historical-window is resolved to most-recent-completed-week only (Section 1); a rolling multi-week window is out of scope. | Future |
 | Per-member / per-department report content variation | Content variation is unsettled (flagged in Section 1); MVP produces a single standard report per account. | Future |
-| In-console report preview (view before download) | Preview was surfaced as a possible UI capability in the analysis but is not required for the download objective. | Future |
-| Delivery-status display in the UI | Surfaced as a possible UI capability but not required for the core download objective. | Future |
+| In-console report preview (view before download) | Resolved (OQ-005): the finance team's UI is a download link only — no in-app report preview. Out of scope for this feature. | Future |
+| Delivery-status display in the UI | Resolved (OQ-005): the finance team's UI is a download link only — no delivery/generation status indicator. Out of scope for this feature. | Future |
 | Configurable / custom report cadence (other than weekly) | The requirement is specifically weekly. | Future |
 | Self-service report enrollment/subscription management UI | MVP enrollment can be configured operationally for the initial customer. | Future |
 | Rollout to customers beyond the initial enrolled account(s) | MVP targets Brightway Retail's year-end need; broader rollout follows once the capability is proven. | Future |
@@ -352,7 +352,7 @@ Primary codebase-analysis service list (6 services):
 - **reporting-api** (backend): Attribution report generation and delivery API.
 - **reporting-dispatcher** (backend): Scheduled weekly report dispatch and delivery mechanism.
 - **reporting-subscriptions-worker** (backend): Weekly subscription scheduling and PDF report generation.
-- **frontend-mos** (frontend): K4A UI — download link, report preview, delivery status display.
+- **frontend-mos** (frontend): K4A UI — download link only (per OQ-005 resolution, no report preview and no delivery/generation status indicator).
 - **k4a-mcp-server** (backend): K4A MCP server coordination and plan entitlement check.
 - **pubsuite-attribution** (backend): Attribution data source the K4A report references and displays (read dependency).
 
@@ -362,9 +362,8 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Resolved DEC-001 in the Plan tier business rule: report is included in the standard plan, not gated.
-- Updated FR-011 note to reflect that the report is included in the standard plan (DEC-001 resolved), removing the gating caveat.
-- Updated NFR-017 to reflect the resolved plan-entitlement decision rather than treating it as an open blocker.
+- Updated the preview and delivery-status Out-of-Scope rationales to reflect OQ-005 resolution (download link only).
+- Updated frontend-mos appendix description to download link only, removing preview and status display per OQ-005.
 
 
 ---
@@ -389,7 +388,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
-- **OQ-005**: For the finance team's UI, do you want just a download link, or also an in-app report preview and a delivery/generation status indicator? This directly drives the frontend scope.
 - **OQ-007**: Is there an existing attribution report or format the finance team uses today that this PDF should match or build on, rather than designing from scratch?
 - **OQ-008**: Does finance need the report on a fixed day each week, or is weekly cadence with availability before year-end close sufficient?
 
@@ -398,6 +396,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: OQ-001 resolved: the weekly attribution report is delivered as an on-demand PDF download in the K4A UI only, with no email delivery — making frontend download core to the build and removing dispatcher/email services from scope.
 - **OQ-002**: Resolved OQ-002: the weekly attribution report must contain last-touch attribution by channel, with spend, installs, and revenue per channel.
 - **OQ-003**: OQ-003/DEC-004 resolved: each weekly report covers only the most recent completed week, with no rolling window of historical attribution data.
+- **OQ-005**: OQ-005 resolved: the finance team's UI is just a download link — no in-app report preview and no delivery/generation status indicator.
 - **OQ-006**: OQ-006 resolved: standard access controls are sufficient for the downloaded PDFs — no extra audit trail is required beyond what's standard.
 
 ---
