@@ -48,6 +48,9 @@ flowchart TD
     I -- Dependency/generation failure --> K[Show specific failure message<br/>timeout vs unavailable vs not-ready<br/>failure recorded with distinct status]
     K --> L[User may retry download]
     L --> I
+    J --> T{Download link expired<br/>or failed on reuse?}
+    T -- Yes, user still authorized --> U[User regenerates link from UI:<br/>fresh 7-day secure link issued]
+    U --> I
 
     subgraph Weekly generation (system-triggered)
     M[Weekly schedule fires] --> N{Report already generated<br/>for this period?}
@@ -120,12 +123,25 @@ And the download is scoped to that user's own account data only
 ```
 > Delivery is via on-demand UI download in the K4A console only; automatic email push is not required (delivery-mechanism decision resolved in Section 1).
 
+**FR-005a — User can regenerate an expired or failed download link from the UI**
+```gherkin
+Given an authorized finance user holds a download link for an available weekly report
+And that link has expired or has failed to deliver the PDF
+When the user requests the report again from the K4A console UI
+Then the system issues a fresh time-limited secure download link to the still-authorized user
+And the newly issued link is valid for 7 days from issuance
+And re-issuance re-derives the user's authorization server-side rather than relying on the prior link
+And no dead-end error is surfaced when a fresh link can be issued
+```
+
 **FR-006 — Sensitive report delivered via time-limited secure link**
 ```gherkin
 Given a finance user has requested a weekly attribution report download
 When the system provides access to the generated PDF artifact
 Then the artifact is served via a time-limited secure link rather than an unauthenticated raw file location
+And the link is valid for 7 days from issuance
 And the link is no longer usable after its validity window expires
+And on access to an expired link, the still-authorized user can regenerate a fresh link from the UI (FR-005a)
 ```
 
 **FR-007 — No report available state**
@@ -263,7 +279,7 @@ The system must track the following business information to support the function
 - **Account & Plan Entitlement:** The owning account's identity and whether its plan includes the weekly attribution report capability. System-derived / sourced from the authoritative entitlement source. Drives plan-tier enforcement (FR-011) and account-scoping of report access (FR-003, FR-005).
 - **Requesting User Identity & Authorization:** The signed-in user, their account association, and their finance-team authorization. Sourced from the authoritative auth source on each request. Drives server-side authorization (FR-009, FR-010).
 - **Report Enrollment / Subscription:** Which accounts are enrolled to receive the weekly report. System-derived / configured. Determines which accounts the weekly schedule generates for (FR-001).
-- **Secure Download Link:** The time-limited access reference by which a user retrieves a generated PDF. System-derived at download time. Supports secure, expiring delivery of sensitive artifacts (FR-006).
+- **Secure Download Link:** The time-limited (7-day validity) access reference by which a user retrieves a generated PDF. System-derived at download time and re-issuable from the UI when expired or failed. Supports secure, expiring delivery of sensitive artifacts (FR-006) and user-initiated regeneration (FR-005a).
 - **Audit Record:** The record of each report access/download — actor identity, resource identity (account + period), action, timestamp, outcome. System-derived. Supports the audit requirements (FR-018, FR-019).
 - **Feature Kill-Switch State:** The configuration flag enabling/disabling the feature. Configured/operational. Supports incident response (FR-017).
 
@@ -290,7 +306,7 @@ The system must track the following business information to support the function
 - **NFR-009 — Fail-closed access posture:** Access/entitlement checks fail closed — if the auth or entitlement source is unreachable, access is denied, never granted by default (reinforces FR-010). This is the appropriate posture because the report carries finance/billing-sensitive data where a false allow is worse than a false deny.
 - **NFR-010 — Account data isolation:** A report must never contain or expose another account's attribution data; account scoping is enforced on both generation and retrieval.
 - **NFR-011 — Sensitive-data handling in logs:** Raw finance/billing-sensitive attribution data, credentials, secrets, and tokens are never written to logs (reinforces FR-016).
-- **NFR-012 — Secure, expiring delivery:** The generated PDF is delivered via a time-limited secure link, never an unauthenticated raw file location or a persistent public URL (reinforces FR-006).
+- **NFR-012 — Secure, expiring delivery:** The generated PDF is delivered via a time-limited secure link valid for 7 days from issuance, never an unauthenticated raw file location or a persistent public URL; a still-authorized user can regenerate a fresh link from the UI once it expires or fails (reinforces FR-006, FR-005a).
 - **NFR-013 — Audit immutability & retention:** Audit records are append-only, cannot be edited or deleted by any role or code path, and are retained for a minimum of 12 months within the established platform range; a longer retention period applies only if a specific finance/compliance agreement requires it (reinforces FR-019).
 
 ### Resilience & Idempotency
@@ -361,12 +377,29 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 ## Revision Summary
 
-_Applied reviewer's request._
+### Changes from v1
 
-- Resolved DEC-003 in the Section 1 Report content rule: same content for all finance team members, no per-member/department variation.
-- Resolved DEC-003 in FR-003 and its note: added same-content-for-all criterion and updated the note to state no per-member/department variation.
-- Resolved DEC-003 in the Section 4 Attribution Data information-requirement bullet: content same for all, no per-member/department variation.
-- Updated the Section 6 per-member/per-department row to reflect DEC-003 resolution (content is the same for all finance team members).
+| Critique ID | Issue | Resolution | Status |
+|-------------|-------|------------|--------|
+| CG-001 | DEC-004 historical window delegated to engineering | Not addressed this round (outside PM's prioritized scope) | Deferred |
+| CG-002 | Forward-only rollback leaves corrupted artifacts downloadable | Not addressed this round (outside PM's prioritized scope) | Deferred |
+| CG-003 | Expired secure link has no re-issuance flow for still-authorized user | Added FR-005a (UI regeneration, 7-day validity), updated FR-006, NFR-012, Information Requirements, and user flow | Resolved |
+| CG-004 | Timezone/DST basis for Monday 9:00am deadline undefined | Not addressed this round (outside PM's prioritized scope) | Deferred |
+| Testability (NFR-001/004/017, NFR-013) | Vague/non-binding thresholds | Not addressed this round (outside PM's prioritized scope) | Deferred |
+| Edge Cases 2–12 | Various (corrupted artifact recall, partial data, zero-activity, mid-week enrollment, etc.) | Not addressed this round (outside PM's prioritized scope) | Deferred |
+| Edge Case 1 | Expired secure-link re-issuance | Resolved via FR-005a (same as CG-003) | Resolved |
+
+> This revision round was scoped by the PM to the single priority: adding a requirement for user-initiated regeneration of an expired or failed download link from the K4A UI with a 7-day validity window. That request maps to critique items CG-003 / Edge Case 1, which are now resolved. The remaining critique findings are intentionally untouched this round and remain open for a subsequent pass.
+
+### Decisions Required
+
+No new business decisions were surfaced by this revision. The 7-day link validity and UI-regeneration behavior were specified directly by the PM instruction for this round, so no stakeholder trade-off remains open on this point.
+
+### New Requirements Added
+
+| FR ID | Description | Source |
+|-------|-------------|--------|
+| FR-005a | Authorized user can regenerate an expired or failed download link from the K4A UI; fresh link valid 7 days, authorization re-derived server-side, no dead-end error | CG-003 / Edge Case 1 (PM priority) |
 
 
 ---
