@@ -17,7 +17,7 @@ Delivering a weekly attribution report as a downloadable PDF gives the finance t
 
 ### Business Rules
 
-- **Cadence:** The attribution report covers a weekly period and is regenerated on a weekly basis.
+- **Cadence:** The attribution report covers a weekly period and is regenerated on a weekly basis. Each week's report must be available for download by **Monday 9:00am (the account's local/business time)**, before the finance team starts their work — a fixed weekly day/time deadline, not merely weekly availability at some point before year-end close (OQ-008 resolved).
 - **Format:** The report is delivered as a PDF.
 - **Audience:** The finance team of the subscribing customer account (initial customer: Brightway Retail) is the intended consumer.
 - **Plan tier:** Brightway Retail is on the **standard plan**. The weekly PDF attribution report is included in the standard plan — it is not a gated/entitled or premium capability, and Brightway Retail receives it as part of its standard-plan entitlement.
@@ -275,7 +275,7 @@ The system must track the following business information to support the function
 - **NFR-001 — Download responsiveness:** When a generated report is already available, the PDF download request should respond within a p95 latency target measured under expected concurrent finance-user load (p95 ≤ 2s for the download-initiation response, measured across representative concurrent download requests). Engineering may refine the exact threshold against real artifact sizes.
 - **NFR-002 — Read-path rate limiting:** The report view/download (read) path must enforce its own rate limit, separate from any backend generation limits, to protect the shared artifact-serving and attribution-query resources from excessive on-demand requests.
 - **NFR-003 — Shared attribution source protection:** Because report generation reads from a shared attribution data source consumed by other systems, generation must operate within an explicit rate cap against that source so added reporting load does not degrade existing consumers.
-- **NFR-004 — Generation throughput for cadence:** The weekly generation path must complete all enrolled accounts' reports within the weekly window with margin, so that a report is reliably available before each covered week's consumers need it.
+- **NFR-004 — Generation throughput for cadence:** The weekly generation path must complete all enrolled accounts' reports within the weekly window with margin, so that each week's report is reliably available for download by the fixed **Monday 9:00am** availability deadline (OQ-008 resolved), before the finance team starts their work.
 
 ### Availability & Monitoring
 
@@ -362,7 +362,8 @@ Discrepancy from the independent cross-check: the fresh lookup did **not** re-fi
 
 _Applied reviewer's request._
 
-- Recorded OQ-007 resolution in Section 1: no existing format; a simple one-page PDF layout is acceptable.
+- Added fixed Monday 9am weekly availability deadline to the Cadence business rule (OQ-008 resolved).
+- Tied NFR-004 generation-throughput target to the fixed Monday 9am availability deadline.
 
 
 ---
@@ -387,7 +388,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-004**: Is this weekly PDF report included in the standard plan (Brightway's tier), or is it a premium/entitled feature that should be gated? There's a plan-entitlement enforcement point that needs a decision here.
-- **OQ-008**: Does finance need the report on a fixed day each week, or is weekly cadence with availability before year-end close sufficient?
 
 ### Questions Resolved
 
@@ -397,6 +397,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-005**: OQ-005 resolved: the finance team's UI is just a download link — no in-app report preview and no delivery/generation status indicator.
 - **OQ-006**: OQ-006 resolved: standard access controls are sufficient for the downloaded PDFs — no extra audit trail is required beyond what's standard.
 - **OQ-007**: OQ-007: There is no existing attribution report or format the finance team uses today; the PDF can be a new design — a simple one-page layout is acceptable.
+- **OQ-008**: OQ-008 resolved: the weekly report must be available for download by a fixed Monday 9:00am each week, before the finance team starts their work — a fixed weekly day/time, not merely availability before year-end close.
 
 ---
 > **Classification:** Type A
