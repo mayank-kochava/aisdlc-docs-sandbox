@@ -22,7 +22,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
 - **BR-6 — Channels displayed:** Meridian Travel tracks four channels — email, paid search, paid social, and display. All four run through K4A today, so all have spend data available within the product; none require manual aggregation from external sources (per the requester, answering OQ-003/DEC-004).
 - **BR-7 — Zero / missing data handling:** How the email treats a channel with zero spend or missing data for the reporting week (omit the line, or show the channel with a zero/placeholder value) is a product decision not yet settled. [DECISION REQUIRED: DEC-005]
-- **BR-8 — Delivery failure notification:** If weekly generation or delivery fails, the team must not be left silently without their expected email. The system records the failure and raises an operational alert so a human is aware the email did not go out (see Section 5).
+- **BR-8 — Delivery failure notification:** If weekly generation or delivery fails, the team must not be left silently without their expected email. The system retries the failed run once; if the retry also fails, it records the failure and sends an alert email to the marketing ops owner so a human is aware the email did not go out (per the requester, answering OQ-008; see Section 5).
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -36,8 +36,10 @@ flowchart TD
     B -->|"no"| A
     B -->|"yes"| C["Query spend-by-channel data for the reporting week"]
     C --> D{"Spend data retrieved successfully?"}
-    D -->|"no (query failed or data unavailable)"| E["Record failure and raise operational alert"]
-    E --> F["No email sent this run; team notified of failure via alert"]
+    D -->|"no (query failed or data unavailable)"| R{"Already retried once this run?"}
+    R -->|"no"| C
+    R -->|"yes"| E["Record failure and email the marketing ops owner"]
+    E --> F["No email sent this run; marketing ops owner notified of failure via alert email"]
     D -->|"yes"| G["Aggregate total spend per channel"]
     G --> H["Render email: one line per channel"]
     H --> I["Deliver email to Meridian Travel marketing team"]
@@ -124,8 +126,9 @@ And it applies that rule consistently for every channel in the same state
 Given the weekly generation job is running
 When the spend data retrieval fails or no spend data can be obtained for the reporting week
 Then the system does not send an email containing incomplete or empty spend data
-And it records the failure with a distinct failure reason
-And it raises an operational alert that the summary could not be generated
+And it retries the run once
+And if the retry also fails it records the failure with a distinct failure reason
+And it sends an alert email to the marketing ops owner that the summary could not be generated
 ```
 
 ### Feature Area C — Email Rendering
@@ -160,7 +163,8 @@ Then it delivers the email to all configured recipients for that account
 Given a rendered weekly spend summary email is ready to send
 When delivery to the configured recipients fails
 Then the system records the delivery failure with a distinct failure reason separate from a data-retrieval failure
-And it raises an operational alert that the email was not delivered
+And it retries delivery once
+And if the retry also fails it sends an alert email to the marketing ops owner that the email was not delivered
 And the marketing team is not left to assume the email was sent
 ```
 
@@ -168,9 +172,9 @@ And the marketing team is not left to assume the email was sent
 ```gherkin
 Given email delivery fails for a transient reason
 When the system attempts recovery
-Then it retries delivery a bounded number of times using exponential backoff
-And it does not retry indefinitely
-And if all retries are exhausted it records the failure and raises an operational alert
+Then it retries delivery exactly once
+And it does not retry further after that single retry
+And if the retry is also exhausted it records the failure and sends an alert email to the marketing ops owner
 ```
 
 I have completed Sections 0–3. Reporting the decisions I tagged.
@@ -185,6 +189,8 @@ The system must track the following business information to support the function
 
 - **Recipient list** — The address or distribution list for the Meridian Travel marketing team that should receive the email. *Source: User-Entered / configured.* *Why it matters: FR-012 delivers to configured recipients; BR-4.*
 
+- **Marketing ops owner (failure-alert recipient)** — The address of the marketing ops owner who receives the failure alert email when a run fails after its single retry. *Source: User-Entered / configured.* *Why it matters: BR-8, FR-009, FR-013, FR-014 send the failure alert to this owner.*
+
 - **Channel set** — The four channels tracked for the account — email, paid search, paid social, and display — all of which have in-product spend data flowing through K4A today; none require external aggregation. *Source: System-Derived (from spend/channel data), confirmed by the requester.* *Why it matters: FR-006, FR-007, FR-010; BR-6.*
 
 - **Spend records (scoped to account + reporting week)** — Individual spend amounts with their channel attribution for the reporting week. *Source: System-Derived (queried from the spend/channel data source).* *Why it matters: FR-006 and FR-007 depend on retrieving and summing these.*
@@ -195,7 +201,7 @@ The system must track the following business information to support the function
 
 - **Zero / missing-data state per channel** — Whether a channel had zero spend or no available data for the reporting week. *Source: System-Derived.* *Why it matters: FR-008 applies the configured handling rule; BR-7.*
 
-- **Run / delivery status and failure reason** — The outcome of each weekly run (generated, sent, failed) with a distinct, named failure reason (data-retrieval failure vs. delivery failure). *Source: System-Derived.* *Why it matters: FR-009, FR-013, FR-014, BR-8, and the operational alerting in Section 5.*
+- **Run / delivery status and failure reason** — The outcome of each weekly run (generated, sent, retried, failed) with a distinct, named failure reason (data-retrieval failure vs. delivery failure), including whether the single permitted retry was used. *Source: System-Derived.* *Why it matters: FR-009, FR-013, FR-014, BR-8, and the failure alert email to the marketing ops owner in Section 5.*
 
 - **Idempotency key** — The account + reporting-week identity used to detect a repeat run. *Source: System-Derived.* *Why it matters: FR-005 prevents duplicate emails and double-counted totals.*
 
@@ -207,11 +213,11 @@ The system must track the following business information to support the function
 
 - **NFR-002 — Scheduler timeliness:** The weekly email must be delivered within a bounded window of its configured send time so the marketing team can rely on it arriving on a predictable schedule. *Measurement:* ≥ 99% of scheduled runs deliver (or raise a failure alert) within 60 minutes of the configured send time.
 
-- **NFR-003 — Operational alerting convention:** Raise an alert when the weekly job's failure rate exceeds 1% of scheduled runs over a 15-minute window, sustained, and when any single account's expected weekly email fails to send. This applies to both data-retrieval failures (FR-009) and delivery failures (FR-013).
+- **NFR-003 — Operational alerting convention:** When any single account's expected weekly email fails after its single permitted retry, send a failure alert email to the configured marketing ops owner (per the requester, answering OQ-008). Additionally, raise a standard operational alert when the weekly job's failure rate exceeds 1% of scheduled runs over a 15-minute window, sustained. This applies to both data-retrieval failures (FR-009) and delivery failures (FR-013).
 
 ### Reliability & Failure Handling
 
-- **NFR-004 — Bounded retry with backoff:** Transient failures (spend-data retrieval or email delivery) retry a bounded number of times — default 3 attempts — with exponential backoff, never indefinitely (supports FR-014). Honor any downstream rate-limit `Retry-After` response rather than retrying on a fixed schedule.
+- **NFR-004 — Bounded retry with backoff:** Transient failures (spend-data retrieval or email delivery) retry exactly once before the run is treated as failed, never indefinitely (supports FR-014; per the requester, answering OQ-008). Honor any downstream rate-limit `Retry-After` response on that retry rather than retrying on a fixed schedule.
 
 - **NFR-005 — Fail-closed on incomplete data:** On an unrecoverable data-retrieval failure, the system must not send a partial or empty summary. It records the failure with a distinct reason and alerts (supports FR-009, BR-8). Availability of the email is secondary to correctness of the spend totals the marketing team relies on.
 
@@ -237,7 +243,7 @@ The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadlin
 
 - **NFR-013 — Email-delivery dependency failure:** Delivery depends on a downstream email path. *Mitigated when:* delivery failures are retried within bounds (NFR-004), recorded with a distinct reason, and alerted so the team is never silently left without their expected email (FR-013, FR-014, BR-8).
 
-- **NFR-014 — Silent non-delivery:** The core user-facing risk is the team assuming the email arrived when it did not. *Mitigated when:* every generation or delivery failure raises an operational alert (NFR-003) so a human can intervene before the marketing team is blocked.
+- **NFR-014 — Silent non-delivery:** The core user-facing risk is the team assuming the email arrived when it did not. *Mitigated when:* every generation or delivery failure that persists after the single permitted retry sends a failure alert email to the marketing ops owner (NFR-003) so a human can intervene before the marketing team is blocked.
 
 ### Rollback
 
@@ -291,7 +297,16 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Updated Section 6 out-of-scope rationale to record the requester's answer that plain one-line-per-channel with no branding is acceptable (resolves OQ-007).
+- Updated BR-8 to specify retry-once-then-email-marketing-ops-owner failure handling per OQ-008 resolution.
+- Updated flowchart to add a retry-once gate and change the failure node to email the marketing ops owner.
+- Updated FR-009 to retry once then email the marketing ops owner on data-retrieval failure.
+- Updated FR-013 to retry delivery once then email the marketing ops owner on delivery failure.
+- Updated FR-014 to a single retry then alert email to the marketing ops owner.
+- Updated NFR-004 retry count from default 3 attempts to exactly one retry per OQ-008.
+- Updated the run/delivery status information item to track the single retry and the marketing-ops-owner alert.
+- Added a Marketing ops owner information item as the failure-alert recipient per OQ-008.
+- Updated NFR-003 to send the per-account failure alert as an email to the marketing ops owner.
+- Updated NFR-014 mitigation to reference the single retry and the marketing-ops-owner alert email.
 
 
 ---
@@ -318,7 +333,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
 - **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
-- **OQ-008**: If the weekly data pull or send fails, what should happen — silent skip, retry, or an alert to someone? There's no evidence of existing failure handling and the deadline is hard, so this needs a decision.
 
 ### Questions Resolved
 
@@ -326,6 +340,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
 - **OQ-005**: Resolved OQ-005 — totals-only (total spend per channel) is locked as the version-one scope; no comparison metrics (week-over-week, budget variance, performance).
 - **OQ-007**: OQ-007 resolved — requester confirmed a plain one-line-per-channel layout is acceptable with no branding/template requirements.
+- **OQ-008**: OQ-008 resolved — on a weekly data-pull or send failure, the system retries once, then emails the marketing ops owner.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The desired behavior is clearly specified (weekly email with one-line-per-channel spend totals, confirmed by requester), and the remaining open questions are routine design details (send time, recipient list, zero-spend handling) rather than genuine product ambiguity; the work is multi-service backend integration across query/scheduler/dispatch/data services, which is engineering-led design, not discovery.
