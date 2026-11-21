@@ -20,11 +20,11 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 - **BR-1 — Cadence:** The report is generated and made available on a weekly cadence.
 - **BR-2 — Format:** The report is delivered as a PDF.
 - **BR-3 — Reporting window:** The report covers the last quarter only, meaning the most recent completed quarter relative to the generation date, recalculated every week.
-- **BR-4 — Customer scope:** This capability applies to Brightway Retail, a standard-plan customer. Whether the feature is gated to Brightway Retail specifically, to all standard-plan accounts, or to all K4A accounts is not settled by the input. [DECISION REQUIRED: DEC-002]
-- **BR-5 — Access:** Access is restricted to the finance team: only finance-team users on the Brightway Retail account may download the report, not any user on the account (resolves OQ-006, DEC-003). The exact mechanism for identifying finance-team membership (role/group) is an engineering default to set during `eng-plan`.
+- **BR-4 — Customer scope:** This capability applies to Brightway Retail, a standard-plan customer. Working assumption (not confirmed by the PM — see DEC-002): for this phase the feature is gated to the Brightway Retail account only, enforced server-side. Broader eligibility (all standard-plan accounts or all K4A accounts) is a later expansion, not in scope now.
+- **BR-5 — Access:** Working assumption (not confirmed by the PM — DEC-003): any user with access to the Brightway Retail K4A account may download the report, enforced server-side; access is not further restricted to a finance-team subset. This remains an assumption until the PM confirms.
 - **BR-6 — Delivery mechanism:** The finance team triggers the report themselves from the K4A console (manual on-demand trigger from the console). The report is not automatically emailed and is not generated without a user-initiated trigger in the console.
 - **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly mark the report as containing partial data (indicating that some data was incomplete at generation time), rather than blocking or delaying generation. Confirmed by the reviewer (resolves OQ-005) — see FR-013.
-- **BR-8 — Retention:** Historical weekly reports remain downloadable for two years, after which they may be archived or removed (resolves OQ-007, DEC-005).
+- **BR-8 — Retention:** Working assumption (not confirmed by the PM — see DEC-005): historical weekly reports remain downloadable for 12 months, after which they are archived. This remains an assumption until the PM confirms.
 
 ### Content of the report
 
@@ -45,9 +45,9 @@ flowchart TD
     C --> F["Produce PDF and make it available for the account"]
     D --> F
     F --> G["Finance user opens K4A report area"]
-    G --> H{"User a finance-team member authorized for this account?"}
+    G --> H{"User has access to this Brightway Retail account?"}
     H -->|"yes"| I["User downloads PDF"]
-    H -->|"no (non-finance or ineligible)"| J["Reject with authorization error (403)"]
+    H -->|"no (not authorized for this account)"| J["Reject with authorization error (403)"]
     I --> K["Download succeeds"]
     E --> L["No report available for that week; prior report still downloadable"]
     G --> M{"Report available for requested week?"}
@@ -169,7 +169,7 @@ Given a weekly report has been successfully generated for the account
 When generation completes
 Then the report is made available to the Brightway Retail account through the K4A console
 ```
-> Whether availability also includes automated email delivery or manual trigger is governed by BR-6 (Section 1). Working default: reports are continuously available for download in the K4A console.
+> Working assumption (not confirmed by the PM — DEC-004), clearly labeled as an assumption: reports are continuously available for download in the K4A console, with no automated email delivery in this phase. This remains an assumption until the PM confirms.
 
 **FR-010 — Download the report as PDF**
 ```gherkin
@@ -204,7 +204,7 @@ Then the backend re-derives the user's eligibility from the authoritative source
 And a request from a user not authorized for that account is rejected with a 403
 And authorization is enforced server-side regardless of whether the UI showed or hid the download action
 ```
-> The authorized set is governed by BR-5 (Section 1): only finance-team users on the Brightway Retail account may download, enforced server-side. A request from a non-finance user on the account is rejected with a 403.
+> The authorized set is governed by BR-5 (Section 1): working assumption (DEC-003) is that any user with access to the Brightway Retail account may download, enforced server-side. A request from a user not authorized for the account is rejected with a 403.
 
 **FR-016 — Account/plan eligibility gating**
 ```gherkin
@@ -246,9 +246,9 @@ The system must track the following business information to support the function
 - **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to mark the report as partial data when some data was incomplete at generation time (FR-013).
 - **Attribution data for the window** — the source metrics/data points the report renders: total attributed revenue and conversions by channel, plus the change from the prior week, presented in a single simple table. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006.
 - **Account / plan eligibility** — whether a requesting account is in scope for this feature. System-derived from the authoritative account source on each request. Needed for eligibility gating (FR-016); the scope itself is governed by BR-4.
-- **User download authorization** — whether a requesting user may download reports for the account, i.e. whether the user is a finance-team member on the account (BR-5). System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is finance-team users only per BR-5.
+- **User download authorization** — whether a requesting user may download reports for the account, i.e. whether the user has access to the Brightway Retail account (BR-5). System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; per the BR-5 working assumption (DEC-003), the authorized set is any user with access to the account.
 - **Secure download link** — a time-limited reference used to serve a PDF. System-derived at download time. Needed for FR-015.
-- **Report retention record** — how long a generated report remains available for download. System-derived; per BR-8, reports remain downloadable for two years before they may be archived or removed.
+- **Report retention record** — how long a generated report remains available for download. System-derived; per BR-8 (working assumption, DEC-005), reports remain downloadable for 12 months before they are archived.
 - **Operational/audit trail of generation and download activity** — actor identity (user ID + account ID), the report/window identity, the action (generate / download), timestamp, and outcome/status. System-derived. Needed to trace who downloaded which report when, and to support the alerting and audit guardrails in Section 5.
 
 ## 5. Non-Functional Requirements & Guardrails
@@ -274,12 +274,12 @@ The system must track the following business information to support the function
 - **NFR-011 — Secure, expiring downloads.** Reports are delivered via a time-limited secure link, not a permanently public URL; the link is unusable after expiry (supports FR-015). Working default link lifetime: 15 minutes.
 - **NFR-012 — No sensitive data in logs.** Raw user-identifying data, credentials, secrets, and tokens are never written to logs (supports FR-018).
 
-> The report PDF contains attribution business data for a single customer account. Whether any of that content is a contractually restricted data class requiring a separate store is not indicated by the input; if it is, the separate-store and masking handling from Kochava's data-sensitivity convention applies. [DECISION REQUIRED: DEC-007]
+> The report PDF contains attribution business data for a single customer account. Working assumption (not confirmed by Compliance — DEC-007), clearly labeled as an assumption: report content is treated as ordinary single-account business data — no separate restricted store and no masking — handled like ordinary account reporting data. This remains an assumption until Compliance confirms otherwise; if any of the content turns out to be a contractually or legally restricted data class, the separate-store and masking handling from Kochava's data-sensitivity convention applies.
 
 ### Audit / Compliance Logging
 
 - **NFR-013 — Audit trail for generation and download.** Each report generation and each report download is recorded in an append-only, immutable audit trail capturing actor identity (user ID + account ID), report + reporting-window identity, action (generate/download), timestamp, and outcome/status. The audit write is asynchronous so it never blocks the primary operation, but an audit-write failure fires an immediate operational alert rather than failing silently.
-- **NFR-014 — Audit retention.** Audit records are retained for a minimum of 12 months. Because this report supports a customer's financial year-end close, a longer retention aligned to that financial cycle may be required. [DECISION REQUIRED: DEC-008]
+- **NFR-014 — Audit retention.** Working assumption (not confirmed by the PM — DEC-008), clearly labeled as an assumption: audit records are retained for a minimum of 24 months to cover a full financial year-end cycle plus a prior-year comparison. This remains an assumption until the PM confirms.
 
 ### Operability
 
@@ -322,7 +322,7 @@ Explicit treatment of each risk from the Context Seed:
 | Manual on-demand report triggering by the finance team | Delivery mechanism unsettled (BR-6); weekly scheduled generation is the Phase 1 path | Future, pending decision |
 | Rollout to all standard-plan accounts or all K4A accounts | Phase 1 scoped to Brightway Retail (BR-4); broader eligibility is a later expansion | Future, pending decision |
 | Reports for windows other than the last quarter (e.g. arbitrary date ranges, full-year) | Context Seed scopes this to last quarter only | Future |
-| Long-term report archival / retention tooling beyond basic availability (archival/removal of reports older than the 2-year retention window per BR-8) | Reports stay downloadable for two years (BR-8); tooling to archive/remove reports past that window is deferred | Future |
+| Long-term report archival / retention tooling beyond basic availability (archival/removal of reports older than the 12-month retention window per BR-8) | Reports stay downloadable for 12 months (BR-8, working assumption per DEC-005); tooling to archive/remove reports past that window is deferred | Future |
 | Configurable report content/templates chosen by the customer | Phase 1 ships one defined report (revenue + conversions by channel with week-over-week change, single table); customer-configurable content is deferred | Future |
 | Non-PDF export formats (CSV, XLSX, etc.) | Context Seed specifies PDF only | Future |
 
@@ -347,7 +347,17 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Updated Value bullet to record OQ-008 resolution: build account-specific for Brightway Retail now, not generalized.
+- Replaced BR-4's DEC-002 inline tag with a labeled working assumption: gated to Brightway Retail account only for this phase, enforced server-side.
+- Updated BR-5 to the DEC-003 working assumption (any Brightway Retail account user may download, enforced server-side), labeled as an assumption.
+- Updated the user-flow diagram authorization node to account-access (not finance-team) gating per DEC-003 assumption.
+- Updated FR-012 note to the DEC-003 account-access assumption instead of finance-team-only.
+- Updated the User download authorization information item to the DEC-003 account-access assumption.
+- Recorded the DEC-004 working assumption (continuous download in console, no email) under FR-009.
+- Updated BR-8 retention to the 12-month working assumption for DEC-005, labeled as an assumption.
+- Updated Information Requirements retention record to the 12-month working assumption (DEC-005).
+- Updated Section 6 phasing row to the 12-month working assumption (DEC-005).
+- Resolved the inline DEC-007 tag with a labeled working assumption: treat report content as ordinary single-account business data (no separate store, no masking) until Compliance confirms.
+- Resolved DEC-008 in NFR-014 with working assumption of 24-month audit retention, replacing the DECISION REQUIRED tag.
 
 
 ---
@@ -355,23 +365,16 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | Should this weekly report capability be available only to the Brightway Retail account, to every standard-plan account, or to all K4A accounts? | Product owner | Gated to the Brightway Retail account only for this phase, enforced server-side. |
-| **DEC-003** | Which users within the Brightway Retail account are allowed to download these reports, or can any user on the account download them? | Product owner (with Brightway Retail finance team) | Any user with access to the Brightway Retail K4A account may download, enforced server-side. |
-| **DEC-004** | Should the finance team get the report by manually triggering it each week, by automated email delivery, or simply by it being continuously available for download in the K4A console? | Product owner (with Brightway Retail finance team) | Reports are continuously available for download in the K4A console, no email delivery in this phase. |
-| **DEC-005** | How long should historical weekly reports stay downloadable before they are archived or removed? | Product owner (with Compliance input) | Keep weekly reports downloadable for 12 months, then archive. |
-| **DEC-007** | Does the report PDF contain any contractually or legally restricted customer data that must be kept in a separate store and masked, rather than handled like ordinary account reporting data? | Compliance/Security + Product owner | Treat report content as ordinary single-account business data (no separate restricted store, no masking) until Compliance confirms otherwise. |
-| **DEC-008** | How long must the audit trail of who generated and downloaded these reports be retained, given this supports a customer's financial year-end close? | Compliance/Security | Retain audit records for a minimum of 24 months to cover a full financial year-end cycle plus a prior-year comparison. |
-
 ### Decisions Resolved
 
 - **DEC-001**: Duplicate of OQ-004; settled by the same answer — report covers the most recent completed quarter, recalculated each week.
+- **DEC-002**: Working assumption recorded for DEC-002: the capability is gated to the Brightway Retail account only for this phase, enforced server-side. Labeled as an assumption since the PM declined to decide.
+- **DEC-003**: Working assumption adopted for DEC-003: any user with access to the Brightway Retail K4A account may download the reports, enforced server-side.
+- **DEC-004**: Assumed: Reports are continuously available for download in the K4A console, no email delivery in this phase.
+- **DEC-005**: Assumed: Keep weekly reports downloadable for 12 months, then archive.
 - **DEC-006**: Resolved — the report must contain total attributed revenue and conversions by channel, plus the change from last week, presented as one simple table. Same answer as OQ-001.
+- **DEC-007**: Treat report content as ordinary single-account business data (no separate restricted store, no masking) until Compliance confirms otherwise.
+- **DEC-008**: Working assumption recorded for DEC-008: retain audit records for a minimum of 24 months to cover a full financial year-end cycle plus a prior-year comparison.
 
 ### Questions Resolved
 
