@@ -40,7 +40,7 @@ The specific attribution metrics the PDF must contain and the layout Brightway R
 
 ### Historical Retention
 
-How many prior weekly reports remain downloadable (current week only, full quarter, rolling 12 months) is not resolved by the Context Seed and affects what the download interface must list. [DECISION REQUIRED]
+Historical weekly report PDFs are retained and remain downloadable for **two years** (per reviewer decision, resolving DEC-004 / OQ-007). The download interface lists every weekly report within this two-year window.
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -233,7 +233,7 @@ The system must track the following business information to support the Function
 - **Secure Download Link / Validity Window** — the time-limited means by which a PDF is delivered. *System-derived.* Needed by FR-009 and FR-013 to deliver content securely and expire access.
 - **Email Delivery Recipient List (conditional)** — the designated finance-team recipients, if automatic weekly email delivery is in scope. *User-/product-configured.* Needed by FR-014; conditional on the Delivery Mechanism decision in Section 1.
 - **Audit Record of Report Access/Download** — actor identity (user + account), report identity (account + covered week), action (list/download), timestamp, and outcome. *System-derived.* Needed by NFR-009 given the finance-facing, year-end-close sensitivity of this data.
-- **Report Retention Horizon** — how many prior weekly reports remain listed and downloadable. *Product-configured*, pending the Historical Retention decision in Section 1. Needed by FR-008 to determine what the interface lists.
+- **Report Retention Horizon** — how many prior weekly reports remain listed and downloadable: a **two-year** window per reviewer decision (see Section 1). *Product-configured.* Needed by FR-008 to determine what the interface lists.
 
 ---
 
@@ -279,7 +279,7 @@ The following are explicitly **NOT** included in Phase 1 to prevent scope creep.
 | In-browser PDF preview | Out of scope (Phase 1) — confirmed | Resolved (reviewer): in-browser PDF preview is not required. Delivery is a plain download button only, with no in-browser preview, to avoid increasing frontend scope on the tight deadline. |
 | Report content/metric customization per customer | Out of scope (Phase 1) | Phase 1 generates the report using the standard K4A attribution metric set and marks it as partial data until the full metric/layout specification is confirmed. Brightway-specific layouts/metrics are not a Phase 1 commitment. |
 | Automatic weekly email delivery | Conditional / deferred | Pending the Delivery Mechanism decision (Section 1). Self-service download is the Phase 1 primary path; email is additive (FR-014) and built only if confirmed in scope. |
-| Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is an open decision (Section 1); Phase 1 serves at least the current week plus whatever horizon is confirmed, not an open-ended archive. |
+| Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is confirmed at two years (Section 1); Phase 1 serves weekly reports for the two-year window, not an open-ended archive. |
 | Reports for products other than K4A | Out of scope (Phase 1) | This work item is scoped to K4A only. |
 | Plans other than standard | Out of scope (Phase 1) | Brightway Retail is on the standard plan; cross-plan eligibility is not in scope. |
 | Date ranges other than the most recent completed quarter (e.g. custom ranges, full year) | Out of scope (Phase 1) | Each report is scoped to the most recent completed quarter, recalculated weekly. |
@@ -306,10 +306,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved Report Content & Layout: generate with standard metric set and mark as partial data; removed [DECISION REQUIRED] tag.
-- Updated FR-003 to generate with standard metrics and mark output as partial data, replacing the pending-decision note.
-- Updated Report Content Definition info requirement to reflect partial-data resolution instead of pending decision.
-- Updated Section 6 row to reflect partial-data generation resolution rather than a pending decision.
+- Resolved Historical Retention in Section 1 to a two-year retention/downloadability window per reviewer decision.
+- Updated Report Retention Horizon in Information Requirements to the confirmed two-year window.
+- Updated Out-of-Scope rationale for historical archive to reflect the confirmed two-year retention horizon.
 
 
 ---
@@ -340,13 +339,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Should delivery be a self-service download portal, an automatic weekly email of the PDF, or both? This decides which backend services (subscriptions/dispatch vs. just download endpoint) are actually in scope.
 - **OQ-004**: Who on the finance team needs access, and does this report need role/permission gating distinct from existing K4A console access? There's no evidence of how report access is currently restricted.
 - **OQ-006**: What should happen on a failed weekly generation — alert, auto-retry, or skip? This drives whether we build monitoring/retry into the scheduler and dispatcher.
-- **OQ-007**: Are there compliance, audit, or retention requirements for these financial reports, and how long must historical weekly PDFs remain downloadable (current week, full quarter, rolling 12 months)?
 
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001: in-browser PDF preview is not required — delivery is a plain download button only, with no preview, to avoid increasing frontend scope on the tight deadline.
 - **OQ-003**: Resolved OQ-003: 'last quarter only' means the most recent completed quarter, recalculated every week.
 - **OQ-005**: Resolved OQ-005 (and its duplicate DEC-003): generate the report anyway using the standard K4A attribution metric set and mark it as partial data until the full metric/layout specification is confirmed.
+- **OQ-007**: OQ-007 resolved — historical weekly financial report PDFs must be retained and remain downloadable for two years.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly PDF attribution report, last-quarter data, finance-team download) and the open questions are standard engineering/design decisions (metrics layout, retention, failure handling) rather than genuine product ambiguity — so this is engineering-led design across 6 backend+frontend services, not discovery.
