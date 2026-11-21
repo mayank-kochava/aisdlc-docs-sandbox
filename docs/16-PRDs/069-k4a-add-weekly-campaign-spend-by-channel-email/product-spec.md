@@ -26,7 +26,7 @@ Automatically generate a weekly summary of campaign spend grouped by channel for
 - **BR-3 — Accuracy (business-critical):** The automated numbers must reconcile against the figures the analyst currently produces by hand before launch. Accuracy is the core success criterion — a wrong number in the automated email is worse than the manual process it replaces.
 - **BR-4 — Scope of recipients:** The summary is delivered to the Meridian Travel marketing team's distribution list. The marketing ops lead owns membership of this list; adding or removing recipients must be possible without engineering involvement (i.e. the recipient list is configurable by the marketing team, not hard-coded in a developer-owned job).
 - **BR-5 — Report content & format:** Whether the email contains totals only, totals with prior-week or budget comparisons, or per-campaign breakdowns within each channel must be confirmed. [DECISION REQUIRED: DEC-004]
-- **BR-6 — Partial / missing data handling:** The business behavior when upstream spend data is missing, delayed, or incomplete — send with partial data, delay delivery, or alert the team — must be confirmed. [DECISION REQUIRED: DEC-005]
+- **BR-6 — Partial / missing data handling:** When upstream spend data is missing, delayed, or incomplete at send time, the email is still sent on schedule with the channels that are available; it must not be held back or delayed. The email explicitly notes which channel(s) are missing so partial data is never mistaken for a complete summary.
 - **BR-7 — Customer tier:** Meridian Travel is a Standard plan customer; the feature must operate within whatever entitlements that tier allows.
 
 ### Known Scope Ambiguity (for downstream engineering, not product review)
@@ -52,8 +52,8 @@ flowchart TD
     J --> K{"Retries exhausted?"}
     K -->|"no"| G
     K -->|"yes"| L["Record failure and raise operational alert"]
-    D -->|"no (missing/delayed/incomplete)"| M["Apply partial-data handling policy"]
-    M --> N["Alert team and/or follow configured partial-data behavior"]
+    D -->|"no (missing/delayed/incomplete)"| M["Send with available channels; note missing channel(s) in the email"]
+    M --> F
 ```
 
 ---
@@ -127,7 +127,7 @@ And it is not silently omitted in a way that could be mistaken for missing data
 Given a weekly summary generation run has started
 When the system cannot retrieve complete spend data for one or more channels
 Then the run flags the data as incomplete
-And proceeds according to the confirmed partial-data policy rather than treating incomplete data as complete
+And proceeds to send the summary with the channels that are available, noting the missing channel(s) in the email, rather than treating incomplete data as complete or holding delivery back
 ```
 
 **FR-009 — Distinct handling of upstream failure conditions**
@@ -141,9 +141,9 @@ And retries against the upstream source use bounded retry with exponential backo
 **FR-010 — Partial-data notification**
 ```gherkin
 Given spend data for the reporting period is missing, delayed, or incomplete at delivery time
-When the configured partial-data policy requires notifying the team
-Then the marketing team is alerted about the incomplete data
-And the alert distinguishes incomplete data from a normal complete summary
+When the summary is composed and sent with the channels that are available
+Then the email explicitly notes which channel(s) are missing
+And the recipient can distinguish a partial summary from a normal complete summary
 ```
 
 ### Feature Area D — Email Composition & Delivery
@@ -220,7 +220,7 @@ The system must track the following business information to support the function
 - **Recipient list** — The Meridian Travel marketing team's distribution list — the members who receive the email. Membership is owned by the marketing ops lead and must be editable without engineering involvement. Source: marketing ops lead / customer (BR-4). Drives delivery in FR-012 and FR-012a.
 - **Report content & format profile** — Whether the summary is totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns. Source: Product owner decision (BR-5). Shapes composition in FR-011.
 - **Data completeness status** — Per-run indication of whether spend data was complete, partial, delayed, or missing, per channel. Source: System-derived during retrieval (FR-008). Drives partial-data handling and notification (FR-010).
-- **Partial-data policy** — The configured business behavior when data is incomplete (send partial, delay, or alert). Source: Product owner decision (BR-6). Governs FR-008 and FR-010.
+- **Partial-data policy** — The confirmed business behavior when data is incomplete: send the email on schedule with the channels that are available and note which channel(s) are missing; never delay or hold back delivery (BR-6). Source: Product owner decision (BR-6). Governs FR-008 and FR-010.
 - **Reconciliation result** — The comparison between automated per-channel totals and the analyst's manual figures during pre-launch validation, including any discrepancies flagged. Source: System-derived during validation (FR-006). Gates launch readiness.
 - **Run outcome record** — Per-run operational record: outcome (completed/failed/skipped), timestamp, reporting period, and delivery status. Source: System-derived (FR-016). Supports traceability and the audit trail.
 - **Upstream failure condition** — The distinct failure type encountered when retrieving data (timeout, unavailable, rate-limited) and delivery failures. Source: System-derived (FR-009, FR-013). Needed for distinct handling and alerting.
@@ -240,7 +240,7 @@ The system must track the following business information to support the function
 ### Reliability & Idempotency
 
 - **NFR-004 — Single execution per period.** The scheduled job must not run concurrently with itself for the same period; overlapping automatic re-runs are disabled at the scheduler level (complementing the idempotency in FR-003). A retry of a failed run produces the same end state and never a duplicate or conflicting email for the same week.
-- **NFR-005 — Bounded dependency handling.** All calls to upstream data sources and the email delivery mechanism use bounded retry with exponential backoff (never indefinite), honoring any rate-limit Retry-After response. The default retry posture is **graceful degradation with notification** rather than fail-closed: when data cannot be fully retrieved, the run follows the confirmed partial-data policy (BR-6) rather than silently blocking — final behavior is governed by that product decision.
+- **NFR-005 — Bounded dependency handling.** All calls to upstream data sources and the email delivery mechanism use bounded retry with exponential backoff (never indefinite), honoring any rate-limit Retry-After response. The default retry posture is **graceful degradation with notification** rather than fail-closed: when data cannot be fully retrieved, the run follows the confirmed partial-data policy (BR-6) — sending on schedule with the channels that are available and noting the missing channel(s) in the email — rather than silently blocking or delaying delivery.
 
 ### Security & Access Control
 
@@ -258,7 +258,7 @@ Addressing each risk from the Context Seed:
 
 - **Hard 5-week deadline before live campaign (HIGH).** Mitigated when: a short discovery spike resolves service-ownership ambiguity (scheduling, email send, and spend-data source) early, and the accuracy reconciliation (FR-006) is scheduled with enough buffer before the summer launch. The reuse-vs-build question for existing report-subscription paths is an engineering scoping call that directly affects whether the deadline is achievable.
 - **Affects 5 backend services (HIGH).** Mitigated when: a single owner is chosen for scheduling and a single owner for email dispatch, avoiding duplicate/conflicting logic across the overlapping candidate services; the kill-switch (FR-015) is in place so the multi-service feature can be disabled quickly if it misbehaves.
-- **Data accuracy is business-critical (HIGH).** Mitigated when: the authoritative spend-by-channel source is confirmed (the performance reporter — the channel spend totals the analyst pulls by hand each Monday), the automated totals reconcile against the current manual figures within the agreed tolerance before launch (FR-006, BR-3), and discrepancies are surfaced rather than silently delivered. Any missing/partial data follows the confirmed partial-data policy (BR-6) instead of being presented as complete.
+- **Data accuracy is business-critical (HIGH).** Mitigated when: the authoritative spend-by-channel source is confirmed (the performance reporter — the channel spend totals the analyst pulls by hand each Monday), the automated totals reconcile against the current manual figures within the agreed tolerance before launch (FR-006, BR-3), and discrepancies are surfaced rather than silently delivered. Any missing/partial data follows the confirmed partial-data policy (BR-6) — the email is sent with the available channels and the missing channel(s) are noted — instead of being presented as complete or held back.
 
 ### Rollout & Rollback (HIGH-risk, multi-service)
 
@@ -310,11 +310,13 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Resolved BR-4: recipients are the marketing distribution list, membership owned by marketing ops lead and configurable without a developer.
-- Updated FR-012 to the distribution list and added FR-012a requiring recipient membership changes without engineering involvement.
-- Updated Recipient list information requirement to reflect marketing-ops-owned, developer-free-editable distribution list.
-- Updated NFR-008 to reference the marketing distribution list rather than an undefined recipient list.
-- Split the config-UI out-of-scope row to keep schedule config deferred while noting recipient-list editability is in scope per BR-4/FR-012a.
+- Resolved BR-6: send email with available channels on schedule and note missing channels, replacing the DEC-005 tag.
+- Updated the flow diagram's partial-data branch to send with available channels and note missing ones, flowing into email composition.
+- Updated FR-008 to send available channels and note missing ones instead of referencing an unconfirmed policy.
+- Updated FR-010 to note missing channels within the sent email rather than describing a conditional alert policy.
+- Updated the Partial-data policy info requirement to the confirmed send-with-available-channels behavior.
+- Updated NFR-005 to describe the confirmed partial-data behavior explicitly instead of deferring to a pending decision.
+- Updated the data-accuracy risk mitigation to reflect the confirmed partial-data behavior.
 
 
 ---
@@ -331,17 +333,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-001** | What day and time each week should the spend summary email be sent? | Product owner (Mayank Ukey / Meridian Travel marketing) | Monday 08:00 in the marketing team's local timezone, matching the existing manual Monday pull it replaces. |
 | **DEC-003** | Who exactly should receive the weekly summary email? | Product owner (Meridian Travel marketing) | The same marketing team distribution list or individuals who receive the manual Monday report today; a single team distribution address if one exists. |
 | **DEC-004** | What level of detail should the spend numbers show: totals only, totals with prior-week or budget comparisons, or a breakdown by campaign within each channel? | Product owner (Meridian Travel marketing) | Per-channel spend totals for the week as a static summary table, matching the current manual report's content, with prior-week comparison added only if the manual report already includes it. |
-| **DEC-005** | When upstream spend data is missing, delayed, or incomplete at send time, should the email still go out with partial data, be delayed, or should the team just be alerted instead? | Product owner (Meridian Travel marketing) | Do not send a silently-partial summary; alert the marketing team that data is incomplete and hold the summary until data is complete or the team decides, so an inaccurate number never lands unflagged. |
 | **DEC-006** | Before we switch off the manual Monday report, how long should the automated email run side by side with the manual one, and how close do the numbers need to match before we trust the automation and stop the manual pull? | Product owner (Mayank Ukey) with marketing analyst input | Run in parallel for 3 consecutive weeks; retire the manual pull once automated per-channel totals match the manual figures exactly (zero variance) for all 3 weeks. |
 | **DEC-007** | For the first version, is a simple static table of spend by channel in the email enough, or does the marketing team need clickable links to drill into each channel's detail? | Product owner with Meridian Travel marketing team | Static summary table only for Phase 1; drill-down links deferred to a future phase. |
 
 ### Decisions Resolved
 
 - **DEC-002**: Resolved — channels to include are paid search, paid social, display, email and affiliate, the same set every week, all reported in USD with no special per-channel calculation or transformation required.
+- **DEC-005**: Duplicate of OQ-005; settled by the same answer — send with available channels and note the missing one, do not hold it back.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-005**: When upstream spend data is missing, delayed, or incomplete, should the email still send with partial data, delay delivery, or send an alert instead?
 - **OQ-006**: What level of detail should the numbers show — totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns within each channel?
 - **OQ-007**: Does the email need interactive/drill-down links, or is a static summary table sufficient?
 - **OQ-008**: Is any human review or approval required before each weekly send, or is it fully automated once deployed?
@@ -353,6 +354,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Resolved OQ-002/DEC-002: the weekly summary includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate — all reported in USD, with no other special calculation or transformation required.
 - **OQ-003**: Resolved DEC-001/OQ-003 — the weekly email is sent every Monday at 8:00 AM Eastern Time.
 - **OQ-004**: OQ-004 resolved: recipients are the marketing team's distribution list, with the marketing ops lead deciding membership, and the list must be configurable (add/remove people) without developer involvement.
+- **OQ-005**: Resolved — when upstream spend data is missing, delayed, or incomplete, the email is still sent on schedule with the channels that are available, explicitly noting which channel(s) are missing; delivery is never held back or delayed. Settles both DEC-005 and OQ-005.
 
 ---
 > **Classification:** Type A
