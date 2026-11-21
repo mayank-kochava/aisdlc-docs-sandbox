@@ -279,7 +279,7 @@ The following are explicitly **NOT** in Phase 1, to prevent scope creep:
 | Budget comparison figures, impressions, or conversions | Out of scope | Confirmed under BR-5: the summary shows total spend per channel (plus a prior-week comparison if easy to add); no budget comparisons, impressions, or conversions. |
 | Self-service UI for day/time send-schedule configuration | Out of scope (future phase) | The schedule can launch fixed (BR-1); any console/MCP schedule-config surface is deferred. Recipient-list membership is NOT deferred — it must be editable by the marketing ops lead without engineering (BR-4, FR-012a), though the mechanism (managed distribution list, config entry, or UI) is for eng-plan to determine. |
 | Self-service onboarding for other customers / other products | Out of scope | Phase 1 targets Meridian Travel on K4A only. |
-| Approval/review step before each send | Out of scope | Phase 1 is fully automated once validated; a human review gate contradicts the "no manual intervention" objective. Governed by the partial-data policy (BR-6) for the exception case only. |
+| Approval/review step before each send | Out of scope | Confirmed: no human review or approval step is required before each weekly send — once live, the summary goes out fully automatically every Monday morning. A human review gate contradicts the "no manual intervention" objective. Governed by the partial-data policy (BR-6) for the exception case only. |
 | Additional report channels beyond email (e.g. Slack, in-app) | Out of scope | Request specifies email delivery only. |
 | General-purpose data-warehouse / reporting-tool integration beyond what's needed to source spend-by-channel | Out of scope | Phase 1 sources only the data required for this summary; broader integration is a separate initiative. |
 
@@ -310,7 +310,7 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Resolved DEC-007/OQ-007: marked interactive drill-down email elements out of scope, confirming a static table is sufficient and removing the DECISION REQUIRED tag.
+- Updated the approval-step out-of-scope rationale to reflect the confirmed decision that no review step is required and sends are fully automatic.
 
 
 ---
@@ -338,7 +338,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-006**: What level of detail should the numbers show — totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns within each channel?
-- **OQ-008**: Is any human review or approval required before each weekly send, or is it fully automated once deployed?
 - **OQ-009**: Is there an existing scheduled-report / email-subscription capability the team already uses that this should build on, rather than a net-new pipeline?
 
 ### Questions Resolved
@@ -349,6 +348,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: OQ-004 resolved: recipients are the marketing team's distribution list, with the marketing ops lead deciding membership, and the list must be configurable (add/remove people) without developer involvement.
 - **OQ-005**: Resolved — when upstream spend data is missing, delayed, or incomplete, the email is still sent on schedule with the channels that are available, explicitly noting which channel(s) are missing; delivery is never held back or delayed. Settles both DEC-005 and OQ-005.
 - **OQ-007**: Resolved DEC-007/OQ-007: the email needs no interactive drill-down links; a static summary table is sufficient for Phase 1.
+- **OQ-008**: Resolved OQ-008 — no human review or approval step is required before each weekly send; once live it goes out fully automatically every Monday morning.
 
 ---
 > **Classification:** Type A
