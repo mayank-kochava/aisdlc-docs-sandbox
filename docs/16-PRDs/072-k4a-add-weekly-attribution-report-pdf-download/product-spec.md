@@ -23,7 +23,7 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 - **BR-4 — Customer scope:** This capability applies to Brightway Retail, a standard-plan customer. Whether the feature is gated to Brightway Retail specifically, to all standard-plan accounts, or to all K4A accounts is not settled by the input. [DECISION REQUIRED: DEC-002]
 - **BR-5 — Access:** Who within the Brightway Retail account may download the report is not settled by the input. [DECISION REQUIRED: DEC-003]
 - **BR-6 — Delivery mechanism:** The finance team triggers the report themselves from the K4A console (manual on-demand trigger from the console). The report is not automatically emailed and is not generated without a user-initiated trigger in the console.
-- **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly indicate on the report that some data was incomplete at generation time, rather than blocking generation (default posture — see FR-013).
+- **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly mark the report as containing partial data (indicating that some data was incomplete at generation time), rather than blocking or delaying generation. Confirmed by the reviewer (resolves OQ-005) — see FR-013.
 - **BR-8 — Retention:** How long historical weekly reports remain downloadable is not settled by the input. [DECISION REQUIRED: DEC-005]
 
 ### Content of the report
@@ -40,7 +40,7 @@ Two independent knowledge-graph lookups of the affected codebase disagree on the
 flowchart TD
     A["Weekly generation (system-triggered)"] --> B{"Attribution data for window available?"}
     B -->|"yes (data final)"| C["Generate attribution report for last quarter"]
-    B -->|"partial (some data still processing)"| D["Generate report against final data + flag incomplete data on report"]
+    B -->|"partial (some data still processing)"| D["Generate report against final data + mark report as partial data"]
     B -->|"no data at all"| E["Record generation failure + fire operational alert"]
     C --> F["Produce PDF and make it available for the account"]
     D --> F
@@ -146,10 +146,10 @@ And these conditions are not collapsed into a single generic failure
 Given some attribution data for the reporting window is still processing or incomplete when generation runs
 When the report is generated
 Then the system generates the report against the data that is final for the window
-And the report clearly indicates that some data was incomplete at generation time
+And the report is clearly marked as containing partial data, indicating that some data was incomplete at generation time
 And generation is not blocked or delayed waiting for all data to finalize
 ```
-> This encodes the BR-7 default posture. If the finance team requires the report to instead block until all window data is finalized, that reverses this requirement — see BR-7 and the data-readiness decision in Section 1.
+> This encodes the confirmed BR-7 posture (resolves OQ-005): generate against final data and mark the report as partial; generation is never blocked or delayed waiting for data to finalize.
 
 **FR-014 — No attribution data available**
 ```gherkin
@@ -243,7 +243,7 @@ The system must track the following business information to support the function
 - **Weekly Report instance** — a single generated attribution report for an account and reporting window. System-derived (produced by the weekly generation cycle). Needed to make reports available for download (FR-009), list past reports (FR-011), and enforce idempotency so a retry doesn't create a duplicate (FR-004).
 - **Reporting window** — the last-quarter date range a given report covers, i.e. the most recent completed quarter relative to the generation date, recalculated every week (BR-3). System-derived from the generation date. Needed to scope report contents (FR-003) and to key a report instance uniquely per account+window (FR-004).
 - **Generation run status** — the outcome of each weekly generation attempt, including the distinct named failure conditions (timeout, dependency-unavailable, rate-limited, no-data). System-derived. Needed for FR-007, FR-008, FR-014, and for operational alerting.
-- **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to flag incomplete data on the report (FR-013).
+- **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to mark the report as partial data when some data was incomplete at generation time (FR-013).
 - **Attribution data for the window** — the source metrics/data points the report renders: total attributed revenue and conversions by channel, plus the change from the prior week, presented in a single simple table. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006.
 - **Account / plan eligibility** — whether a requesting account is in scope for this feature. System-derived from the authoritative account source on each request. Needed for eligibility gating (FR-016); the scope itself is governed by BR-4.
 - **User download authorization** — whether a requesting user may download reports for the account. System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is governed by BR-5.
@@ -292,7 +292,7 @@ Explicit treatment of each risk from the Context Seed:
 - **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (delivery mechanism, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
 - **Multi-service blast radius (6 services, with disagreement across KG passes).** Mitigated by (a) reconciling the actual service map during `eng-context`/`eng-plan` before scope is locked — see the Section 1 service-map note — and (b) the kill-switch (NFR-015) so the feature can be pulled without a deploy if any participating service misbehaves.
 - **UX scope (confirmed: simple download button).** The PM has confirmed finance wants only a simple download button, not a full report management/listing interface. Phase 1 is therefore constrained to the minimum viable surface (see Section 6): a download action plus a basic availability/"no report" state, with any richer management interface explicitly deferred.
-- **Attribution data incompleteness / mid-processing reads.** Mitigated by FR-013/FR-014 and the BR-7 default posture (generate against final data, flag incomplete, never block), and by NFR-006 bounded retries against the source.
+- **Attribution data incompleteness / mid-processing reads.** Mitigated by FR-013/FR-014 and the confirmed BR-7 posture (generate against final data, mark the report as partial, never block — resolves OQ-005), and by NFR-006 bounded retries against the source.
 
 ### Rollback
 
@@ -347,7 +347,11 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Added FR-019: generated weekly attribution report PDF must include the Brightway logo.
+- Updated BR-7 to state the generate-anyway-mark-partial posture as confirmed (resolves OQ-005).
+- Updated FR-013 to reflect confirmed partial-data marking and removed the reversal caveat (resolves OQ-005).
+- Updated the flow diagram's partial-data branch to say the report is marked as partial data.
+- Updated the data-completeness indicator information requirement to reference marking the report as partial.
+- Updated the Risk Mitigation entry to reflect confirmed BR-7 posture resolving OQ-005.
 
 
 ---
@@ -375,7 +379,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-005**: How should the report handle weeks where attribution data is still processing or incomplete, generate anyway, or block/delay until finalized?
 - **OQ-006**: Are access controls needed (e.g. finance-only), or can any user on the Brightway Retail account download these reports?
 - **OQ-007**: Should historical weekly reports stay downloadable indefinitely, or is there a retention/archival policy?
 - **OQ-008**: Is this a one-off for Brightway Retail (standard plan) or expected to become a general capability for other customers/plans? This affects whether we build account-specific or generalized.
@@ -386,6 +389,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Resolved OQ-002 — PM confirmed the UI is just a simple download button, not a full report management/listing interface.
 - **OQ-003**: OQ-003 resolved: finance triggers the report themselves from the K4A console (manually triggered from the console).
 - **OQ-004**: Resolved OQ-004 (and DEC-001, the same question): "last quarter only" means the most recent completed quarter relative to the generation date, recalculated every week.
+- **OQ-005**: Resolved OQ-005: when attribution data is still processing or incomplete, the report is generated anyway but marked as partial data (confirming the existing BR-7/FR-013 posture).
 
 ---
 > **Classification:** Type A
