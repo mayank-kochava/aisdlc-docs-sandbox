@@ -26,7 +26,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 
 ### Knowledge-Graph Cross-Check Note
 
-An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code; it is not a product decision and does not change the behavior this spec requires. The grounding detail is attached as a separate appendix at the end of this document.
+An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code (see OQ-001); it is not a product decision and does not change the behavior this spec requires. The requester has confirmed the service choice is an engineering call and advised that scheduling should be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the concrete service names still need engineering confirmation against the code. The grounding detail is attached as a separate appendix at the end of this document.
 
 ## 2. User Flows (Visuals)
 
@@ -231,7 +231,7 @@ The system must track the following business information to support the function
 
 The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadline, multi-service blast radius, email-delivery dependencies). Each risk and its mitigation condition:
 
-- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. The exact launch date is not stated in the input. [DECISION REQUIRED: DEC-006]
+- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. Per the requester, the specific service assignment is an engineering call: scheduling should be owned by whichever service already schedules weekly/recurring reports today, rather than standing up a new scheduler (see OQ-001). The exact launch date is not stated in the input. [DECISION REQUIRED: DEC-006]
 
 - **NFR-012 — Multi-service blast radius / kill-switch:** Because this spans multiple backend services and is HIGH risk, delivery of the weekly email must be controllable by a config-based kill-switch that an on-call engineer can disable during an incident without a separate approval step, with no code deploy. *Mitigated when:* the switch exists, disables new weekly runs within 5 minutes of being flipped, and in-flight runs already started complete under prior behavior.
 
@@ -287,6 +287,14 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 - **cost-v2** — alternate spend/cost-by-channel data source.
 - **sam-agent** — reads SAM spend fields ("verify field shape").
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Added requester guidance to NFR-011 that scheduling should reuse the existing weekly-report scheduler (OQ-001).
+- Noted in the Section 1 cross-check that the requester deferred service choice to engineering with a reuse-existing-scheduler steer (OQ-001).
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -308,7 +316,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Which service actually owns scheduling the weekly job and which owns sending the email? The codebase graph names competing candidates (reporting-dispatcher vs sam-report-scheduler vs reporting-subscriptions-worker for scheduling; k4a-mcp-server vs notifications-api for delivery) and can't resolve it — we need to confirm the intended pipeline before scoping.
+- **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
 - **OQ-002**: Is there an existing spend-by-channel report we can reuse? Several services (k4a-sam-backend, sam-performance-reporter) already appear to generate spend summaries — if one is close enough, this could be a small extension rather than new build. Can eng confirm what already exists before we commit to the 5-week estimate?
 - **OQ-003**: What exactly counts as a 'channel' for Meridian Travel, and do all their channels have spend data flowing through K4A/SAM, or do some come from external sources that aren't in our systems today?
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
