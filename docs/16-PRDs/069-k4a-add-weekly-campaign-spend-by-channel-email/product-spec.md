@@ -24,7 +24,7 @@ Automatically generate a weekly summary of campaign spend grouped by channel for
 - **BR-1 — Cadence:** The summary is generated and delivered once per week on a fixed, recurring schedule: every Monday at 8:00 AM Eastern Time.
 - **BR-2 — Grouping:** Spend is grouped by channel. The channel set is fixed: paid search, paid social, display, email, and affiliate — the same set every week. All channels are reported in USD; no other per-channel calculation or transformation is required before display.
 - **BR-3 — Accuracy (business-critical):** The automated numbers must reconcile against the figures the analyst currently produces by hand before launch. Accuracy is the core success criterion — a wrong number in the automated email is worse than the manual process it replaces.
-- **BR-4 — Scope of recipients:** The summary is delivered to Meridian Travel's marketing team. The exact recipient list is not yet defined. [DECISION REQUIRED: DEC-003]
+- **BR-4 — Scope of recipients:** The summary is delivered to the Meridian Travel marketing team's distribution list. The marketing ops lead owns membership of this list; adding or removing recipients must be possible without engineering involvement (i.e. the recipient list is configurable by the marketing team, not hard-coded in a developer-owned job).
 - **BR-5 — Report content & format:** Whether the email contains totals only, totals with prior-week or budget comparisons, or per-campaign breakdowns within each channel must be confirmed. [DECISION REQUIRED: DEC-004]
 - **BR-6 — Partial / missing data handling:** The business behavior when upstream spend data is missing, delayed, or incomplete — send with partial data, delay delivery, or alert the team — must be confirmed. [DECISION REQUIRED: DEC-005]
 - **BR-7 — Customer tier:** Meridian Travel is a Standard plan customer; the feature must operate within whatever entitlements that tier allows.
@@ -160,8 +160,15 @@ And it clearly identifies the reporting period it covers
 ```gherkin
 Given a weekly summary email has been composed
 When the system dispatches it
-Then it is delivered to the confirmed Meridian Travel marketing team recipient list
+Then it is delivered to the Meridian Travel marketing team distribution list
 And delivery occurs without any manual send step
+```
+
+**FR-012a — Recipient list configurable without engineering**
+```gherkin
+Given the marketing ops lead owns membership of the recipient distribution list
+When a recipient is added to or removed from the list
+Then the change takes effect for subsequent sends without any code change or engineering deployment
 ```
 
 **FR-013 — Delivery failure retry and alerting**
@@ -210,7 +217,7 @@ The system must track the following business information to support the function
 - **Confirmed channel set** — The definitive list of channels to include in the grouping: paid search, paid social, display, email, and affiliate — the same set every week, all reported in USD with no further per-channel calculation or transformation. Source: Product owner decision (BR-2). Needed so FR-005 and FR-007 produce a complete, stable set of rows every week.
 - **Reporting period** — The week each summary covers (start and end boundaries). Source: System-derived from the delivery schedule. Needed so each email clearly states its coverage (FR-011) and so idempotency can key on the period (FR-003).
 - **Delivery schedule** — The fixed recurring day and time the summary is generated and sent: every Monday at 8:00 AM Eastern Time. Source: Product owner decision (BR-1). Drives the trigger in FR-001.
-- **Recipient list** — The Meridian Travel marketing team members who receive the email. Source: Product owner decision / customer (BR-4). Drives delivery in FR-012.
+- **Recipient list** — The Meridian Travel marketing team's distribution list — the members who receive the email. Membership is owned by the marketing ops lead and must be editable without engineering involvement. Source: marketing ops lead / customer (BR-4). Drives delivery in FR-012 and FR-012a.
 - **Report content & format profile** — Whether the summary is totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns. Source: Product owner decision (BR-5). Shapes composition in FR-011.
 - **Data completeness status** — Per-run indication of whether spend data was complete, partial, delayed, or missing, per channel. Source: System-derived during retrieval (FR-008). Drives partial-data handling and notification (FR-010).
 - **Partial-data policy** — The configured business behavior when data is incomplete (send partial, delay, or alert). Source: Product owner decision (BR-6). Governs FR-008 and FR-010.
@@ -239,7 +246,7 @@ The system must track the following business information to support the function
 
 - **NFR-006 — Server-side eligibility enforcement.** Access to this feature (including any configuration surface, if one is in scope) is gated to Meridian Travel and authorized marketing-team roles, enforced server-side on every request. A direct request from an ineligible account or role is rejected (typically 403) regardless of any UI state. Eligibility is re-derived from the authoritative account/entitlement source on each request and never trusted from a client-supplied claim.
 - **NFR-007 — No sensitive data in logs.** Operational logs and the audit trail must never contain credentials, secrets, tokens, or recipient PII in raw form. The summary email's spend figures are business data delivered only to the confirmed recipient list; they must not be written into general-purpose application logs.
-- **NFR-008 — Delivery confined to confirmed recipients.** The weekly summary is delivered only to the confirmed Meridian Travel recipient list (BR-4). No broadcast or default-to-all-account-users behavior is permitted; an unresolved or empty recipient list halts delivery and raises an alert rather than sending to an unintended audience.
+- **NFR-008 — Delivery confined to confirmed recipients.** The weekly summary is delivered only to the Meridian Travel marketing distribution list (BR-4). No broadcast or default-to-all-account-users behavior is permitted; an unresolved or empty recipient list halts delivery and raises an alert rather than sending to an unintended audience.
 
 ### Audit & Traceability
 
@@ -270,7 +277,7 @@ The following are explicitly **NOT** in Phase 1, to prevent scope creep:
 | Interactive email elements (drill-down links into channel detail) | Out of scope (future phase) | Open discovery question; a static summary table satisfies the core "no manual pull" goal. [DECISION REQUIRED: DEC-007] |
 | Per-campaign breakdowns within each channel | Out of scope unless confirmed under BR-5 | Phase 1 default is channel-level totals; deeper breakdown pending the content/format decision (BR-5). |
 | Prior-week / budget comparison figures | Out of scope unless confirmed under BR-5 | Not required for the core replacement of the manual pull; governed by the content/format decision (BR-5). |
-| User-facing configuration UI (recipients, day/time self-service) | Out of scope (future phase) | The feature can launch with a fixed internal configuration for Meridian Travel; any console/MCP config surface is deferred. |
+| Self-service UI for day/time send-schedule configuration | Out of scope (future phase) | The schedule can launch fixed (BR-1); any console/MCP schedule-config surface is deferred. Recipient-list membership is NOT deferred — it must be editable by the marketing ops lead without engineering (BR-4, FR-012a), though the mechanism (managed distribution list, config entry, or UI) is for eng-plan to determine. |
 | Self-service onboarding for other customers / other products | Out of scope | Phase 1 targets Meridian Travel on K4A only. |
 | Approval/review step before each send | Out of scope | Phase 1 is fully automated once validated; a human review gate contradicts the "no manual intervention" objective. Governed by the partial-data policy (BR-6) for the exception case only. |
 | Additional report channels beyond email (e.g. Slack, in-app) | Out of scope | Request specifies email delivery only. |
@@ -303,8 +310,11 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Resolved BR-1 cadence to every Monday 8:00 AM Eastern and removed the DEC-001 tag.
-- Stated the confirmed Monday 8:00 AM Eastern schedule in the Delivery schedule information requirement.
+- Resolved BR-4: recipients are the marketing distribution list, membership owned by marketing ops lead and configurable without a developer.
+- Updated FR-012 to the distribution list and added FR-012a requiring recipient membership changes without engineering involvement.
+- Updated Recipient list information requirement to reflect marketing-ops-owned, developer-free-editable distribution list.
+- Updated NFR-008 to reference the marketing distribution list rather than an undefined recipient list.
+- Split the config-UI out-of-scope row to keep schedule config deferred while noting recipient-list editability is in scope per BR-4/FR-012a.
 
 
 ---
@@ -331,7 +341,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-004**: Who are the recipients, and does the recipient list / send schedule need to be configurable by the marketing team (which would pull in a client/config and possibly UI surface), or is a fixed internal job acceptable?
 - **OQ-005**: When upstream spend data is missing, delayed, or incomplete, should the email still send with partial data, delay delivery, or send an alert instead?
 - **OQ-006**: What level of detail should the numbers show — totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns within each channel?
 - **OQ-007**: Does the email need interactive/drill-down links, or is a static summary table sufficient?
@@ -343,6 +352,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: OQ-001 resolved: the authoritative source is the performance reporter — specifically the channel spend totals the analyst pulls by hand from the performance reporter every Monday, and the automated numbers must reconcile against those figures.
 - **OQ-002**: Resolved OQ-002/DEC-002: the weekly summary includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate — all reported in USD, with no other special calculation or transformation required.
 - **OQ-003**: Resolved DEC-001/OQ-003 — the weekly email is sent every Monday at 8:00 AM Eastern Time.
+- **OQ-004**: OQ-004 resolved: recipients are the marketing team's distribution list, with the marketing ops lead deciding membership, and the list must be configurable (add/remove people) without developer involvement.
 
 ---
 > **Classification:** Type A
