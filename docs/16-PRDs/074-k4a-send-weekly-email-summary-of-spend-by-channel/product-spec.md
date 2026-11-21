@@ -311,23 +311,20 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | What day of the week and what time should the weekly spend summary email be sent to the marketing team? | Product owner (with Meridian Travel marketing team) | Send every Monday at 08:00 in the marketing team's local timezone, matching their existing Monday manual-pull habit. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
 
 ### Decisions Resolved
 
+- **DEC-001**: Resolved DEC-001 — weekly spend summary email is sent Monday at 8:00 AM Eastern (already reflected in BR-1 and Section 4 configuration).
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
 - **DEC-003**: Resolved OQ-004 (and the duplicate DEC-001 and DEC-003): the email goes out Monday at 8:00 AM Eastern to marketing-team@meridiantravel.example.
 - **DEC-005**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
 - **DEC-007**: DEC-007 resolved: for Phase 1 the schedule, recipients, and channels are set as fixed defaults during design, with no self-service configuration UI.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-001**: OQ-001 remains open and is handed to engineering to decide: engineering owns selecting both the scheduling service (reporting-dispatcher vs sam-report-scheduler vs reporting-subscriptions-worker) and the email-sending service (k4a-mcp-server vs notifications-api), to be confirmed against the actual code before scoping.
-
 ### Questions Resolved
 
+- **OQ-001**: Engineering decides: Which service actually owns scheduling the weekly job and which owns sending the email? The codebase graph names competing candidates (reporting-dispatcher vs sam-report-scheduler vs reporting-subscriptions-worker for scheduling; k4a-mcp-server vs notifications-api for delivery) and can't resolve it — we need to confirm the intended pipeline before scoping.
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
 - **OQ-004**: Resolved OQ-004 (and the duplicate DEC-001 and DEC-003): the email goes out Monday at 8:00 AM Eastern to marketing-team@meridiantravel.example.
