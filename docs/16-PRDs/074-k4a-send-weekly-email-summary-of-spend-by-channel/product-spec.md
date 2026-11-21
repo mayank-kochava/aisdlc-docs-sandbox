@@ -21,7 +21,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 - **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient address or distribution list is a product decision not yet settled. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
 - **BR-6 — Channels displayed:** Meridian Travel tracks four channels — email, paid search, paid social, and display. All four run through K4A today, so all have spend data available within the product; none require manual aggregation from external sources (per the requester, answering OQ-003/DEC-004).
-- **BR-7 — Zero / missing data handling:** How the email treats a channel with zero spend or missing data for the reporting week (omit the line, or show the channel with a zero/placeholder value) is a product decision not yet settled. [DECISION REQUIRED: DEC-005]
+- **BR-7 — Zero / missing data handling:** A channel with zero spend or no spend data for the reporting week still appears in the email, shown with a zero value — the channel line is never omitted (per the requester, answering DEC-005/OQ-006).
 - **BR-8 — Delivery failure notification:** If weekly generation or delivery fails, the team must not be left silently without their expected email. The system retries the failed run once; if the retry also fails, it records the failure and sends an alert email to the marketing ops owner so a human is aware the email did not go out (per the requester, answering OQ-008; see Section 5).
 
 ### Knowledge-Graph Cross-Check Note
@@ -116,10 +116,10 @@ And each channel's total equals the sum of its spend records for that reporting 
 ```gherkin
 Given the reporting week has a channel with zero spend or no spend data available
 When the system aggregates total spend per channel
-Then it applies the configured zero/missing-data handling rule for that channel
+Then it includes that channel in the summary with a total spend of zero
 And it applies that rule consistently for every channel in the same state
 ```
-> Note: The specific handling rule (omit the channel line versus show the channel with a zero or placeholder value) is a product decision not yet settled; see BR-7 in Section 1.
+> Note: A channel with zero spend or no available data is still shown, with a zero value — the line is never omitted; see BR-7 in Section 1.
 
 **FR-009 — Spend data retrieval failure stops the run safely**
 ```gherkin
@@ -199,7 +199,7 @@ The system must track the following business information to support the function
 
 - **Reporting-week identity** — The specific reporting week each run covers (start, end, timezone). *Source: System-Derived.* *Why it matters: FR-003, FR-005 (idempotency key), FR-011 (shown in email).*
 
-- **Zero / missing-data state per channel** — Whether a channel had zero spend or no available data for the reporting week. *Source: System-Derived.* *Why it matters: FR-008 applies the configured handling rule; BR-7.*
+- **Zero / missing-data state per channel** — Whether a channel had zero spend or no available data for the reporting week. *Source: System-Derived.* *Why it matters: FR-008 includes such a channel in the summary with a zero value; BR-7.*
 
 - **Run / delivery status and failure reason** — The outcome of each weekly run (generated, sent, retried, failed) with a distinct, named failure reason (data-retrieval failure vs. delivery failure), including whether the single permitted retry was used. *Source: System-Derived.* *Why it matters: FR-009, FR-013, FR-014, BR-8, and the failure alert email to the marketing ops owner in Section 5.*
 
@@ -297,7 +297,9 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved DEC-007 in the scope table: fixed defaults for Phase 1, no self-service UI.
+- Resolved BR-7 to show a zero value for channels with zero/missing spend, removing the DEC-005 tag.
+- Updated FR-008 and its note to show channels with zero spend as a zero value rather than an undecided rule.
+- Updated the zero/missing-data Information Requirement to reflect the zero-value handling rule.
 
 
 ---
@@ -314,11 +316,11 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-001** | What day of the week and what time should the weekly spend summary email be sent to the marketing team? | Product owner (with Meridian Travel marketing team) | Send every Monday at 08:00 in the marketing team's local timezone, matching their existing Monday manual-pull habit. |
 | **DEC-003** | What is the exact recipient address or distribution list for the Meridian Travel marketing team? | Product owner (with Meridian Travel) | Send to a single Meridian Travel marketing distribution list address supplied during onboarding, configurable per account rather than hard-coded to individuals. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
-| **DEC-005** | For a week where a channel has zero spend or missing data, should that channel still appear in the email, and if so what value should it show? | Product owner (with Meridian Travel marketing team) | Show every tracked channel every week for consistency, displaying a zero-spend channel as 0 in the account's currency so the team can see the full channel set at a glance. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
+- **DEC-005**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
 - **DEC-007**: DEC-007 resolved: for Phase 1 the schedule, recipients, and channels are set as fixed defaults during design, with no self-service configuration UI.
 
@@ -326,13 +328,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
-- **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
 
 ### Questions Resolved
 
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
 - **OQ-005**: Resolved OQ-005 — totals-only (total spend per channel) is locked as the version-one scope; no comparison metrics (week-over-week, budget variance, performance).
+- **OQ-006**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **OQ-007**: OQ-007 resolved — requester confirmed a plain one-line-per-channel layout is acceptable with no branding/template requirements.
 - **OQ-008**: OQ-008 resolved — on a weekly data-pull or send failure, the system retries once, then emails the marketing ops owner.
 
