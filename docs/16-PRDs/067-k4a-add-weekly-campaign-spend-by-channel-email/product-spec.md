@@ -19,7 +19,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 
 - **BR-1 — Cadence:** The spend summary is generated and delivered weekly, every Monday at 8am.
 - **BR-2 — Content:** Each summary breaks down campaign spend by marketing channel.
-- **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the marketing team distribution list, and their marketing ops lead controls who is on that list. Whether access to the data should additionally be limited by role or permission remains an open business decision. [DECISION REQUIRED: DEC-002]
+- **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the whole Meridian Travel marketing team distribution list, and their marketing ops lead controls who is on that list. Access to the data is not additionally limited by role or permission — there are no extra access controls beyond membership of that distribution list.
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. The standard plan already includes automated/scheduled recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 - **BR-5 — Dual surface:** The spend-by-channel summary is delivered as an email, and that email includes a link to the existing K4A dashboard where the underlying spend data already lives. No new on-screen view or UI build is created in K4A for this feature.
 - **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
@@ -276,7 +276,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 | Filtering/segmentation of the summary (by campaign, region, product line, intra-week period) | Resolved (OQ-007): the summary is one flat weekly total per channel for the last completed week, with no filtering/segmentation; any future filtering is out of scope | Future |
 | Self-service scheduling/subscription management UI (users configuring cadence or recipients themselves) | Cadence and recipients are fixed configuration in Phase 1; self-service management is net-new UX, and Phase 1 adds no new K4A screen at all (the email simply links to the existing dashboard) | Future |
 | Rollout to customers beyond Meridian Travel / plans beyond standard | Requirement is scoped to one customer on the standard plan | Future |
-| Configurable per-recipient or role-based access controls over who gets the data | Raised as an open question; Phase 1 delivers to the configured marketing-team recipients | Future |
+| Configurable per-recipient or role-based access controls over who gets the data | Resolved (DEC-002): Phase 1 delivers to the whole Meridian Travel marketing team distribution list with no extra role/permission access controls; any future configurable access controls are out of scope | Future |
 | Secure time-limited download/export of the summary | Not requested; email + on-screen view satisfy the stated objective | Future |
 | Staged percentage-based rollout tooling | Single-customer Phase 1 does not require staged rollout; kill-switch (NFR-011) covers incident response | Future |
 
@@ -315,8 +315,8 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Resolved BR-1 cadence to every Monday at 8am, removing the DEC-001 tag.
-- Set NFR-003 weekly trigger to Monday 8am and split out the remaining delivery-window target as a new decision.
+- Resolved BR-3: recipient is the whole marketing team distribution list with no extra role/permission access controls, removing the DEC-002 tag.
+- Updated Section 6 out-of-scope row to reflect DEC-002 resolution: no extra access controls in Phase 1.
 
 
 ---
@@ -330,12 +330,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | Who exactly on the Meridian Travel marketing team should receive the email, and should access to the data be limited by role or permission? | Product owner (with Meridian Travel account contact) | Deliver to a customer-managed marketing distribution list configured per account, and restrict the on-screen view to users with a marketing or reporting role on the account; the account admin maintains the recipient list. |
 | **DEC-004** | Which marketing channels should the spend breakdown include, and is that channel list the same every week or can it change by campaign? | Product owner (with Meridian Travel marketing team) | Include the customer's active channels, defaulting to paid search, social media, email, display, and affiliate, derived dynamically each week from the channels that have campaign activity. |
 
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
+- **DEC-002**: DEC-002: The whole Meridian Travel marketing team distribution list should receive the email. No extra access controls — access to the data is not limited by role or permission.
 - **DEC-003**: Duplicate of OQ-004; same answer settles it — standard plan already includes scheduled email reports with no extra entitlement work.
 - **DEC-005**: DEC-005 is a duplicate of OQ-002 and is settled by the same answer: total spend per channel plus optional prior-week comparison, no impressions or conversions.
 - **DEC-006**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
