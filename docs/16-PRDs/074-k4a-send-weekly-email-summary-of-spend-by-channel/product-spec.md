@@ -15,10 +15,10 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 
 ### Business Rules
 
-- **BR-1 — Cadence:** The summary is generated and sent on a weekly cadence. The exact day and time of delivery is a product decision not yet settled. [DECISION REQUIRED: DEC-001]
+- **BR-1 — Cadence:** The summary is generated and sent on a weekly cadence — Monday at 8:00 AM Eastern (per the requester, answering DEC-001).
 - **BR-2 — Content scope:** The email contains total spend per channel for the reporting week, rendered as one line per channel. Per the requester (Mayank Ukey), total spend per channel is sufficient — this is exactly what the team copies into a spreadsheet today. Totals-only is locked as the version-one scope (resolving OQ-005); comparison metrics (week-over-week change, budget variance, performance indicators) are explicitly out of scope for Phase 1.
 - **BR-3 — Reporting week:** Each email covers one reporting week. The reporting week runs Monday through Sunday, bounded in Eastern time (per the requester, answering DEC-002).
-- **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient address or distribution list is a product decision not yet settled. [DECISION REQUIRED: DEC-003]
+- **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team at marketing-team@meridiantravel.example (per the requester, answering DEC-003).
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
 - **BR-6 — Channels displayed:** Meridian Travel tracks four channels — email, paid search, paid social, and display. All four run through K4A today, so all have spend data available within the product; none require manual aggregation from external sources (per the requester, answering OQ-003/DEC-004).
 - **BR-7 — Zero / missing data handling:** A channel with zero spend or no spend data for the reporting week still appears in the email, shown with a zero value — the channel line is never omitted (per the requester, answering DEC-005/OQ-006).
@@ -185,9 +185,9 @@ The system must track the following business information to support the function
 
 - **Account eligibility / plan state** — Whether a K4A account (e.g. Meridian Travel) is on a plan tier that qualifies for the weekly summary, and whether the account is subscribed to receive it. *Source: System-Derived (from account/plan records).* *Why it matters: BR-5 and FR-001 gate the feature on standard-plan eligibility.*
 
-- **Weekly summary configuration** — The per-account setup for the summary: send day, send time, reporting-week boundary definition (Monday–Sunday), and timezone used to bound the week (Eastern time). *Source: System-Derived / configured (defaults set during design per BR-1 and BR-3).* *Why it matters: drives FR-001, FR-002, and FR-003.*
+- **Weekly summary configuration** — The per-account setup for the summary: send day (Monday), send time (8:00 AM Eastern), reporting-week boundary definition (Monday–Sunday), and timezone used to bound the week (Eastern time). *Source: System-Derived / configured (defaults set during design per BR-1 and BR-3).* *Why it matters: drives FR-001, FR-002, and FR-003.*
 
-- **Recipient list** — The address or distribution list for the Meridian Travel marketing team that should receive the email. *Source: User-Entered / configured.* *Why it matters: FR-012 delivers to configured recipients; BR-4.*
+- **Recipient list** — The address or distribution list for the Meridian Travel marketing team that should receive the email (marketing-team@meridiantravel.example). *Source: User-Entered / configured.* *Why it matters: FR-012 delivers to configured recipients; BR-4.*
 
 - **Marketing ops owner (failure-alert recipient)** — The address of the marketing ops owner who receives the failure alert email when a run fails after its single retry. *Source: User-Entered / configured.* *Why it matters: BR-8, FR-009, FR-013, FR-014 send the failure alert to this owner.*
 
@@ -297,9 +297,10 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved BR-7 to show a zero value for channels with zero/missing spend, removing the DEC-005 tag.
-- Updated FR-008 and its note to show channels with zero spend as a zero value rather than an undecided rule.
-- Updated the zero/missing-data Information Requirement to reflect the zero-value handling rule.
+- Resolved BR-1 cadence to Monday 8:00 AM Eastern and removed the DEC-001 tag.
+- Resolved BR-4 recipient to marketing-team@meridiantravel.example and removed the DEC-003 tag.
+- Specified send day/time (Monday, 8:00 AM Eastern) in the weekly summary configuration information requirement.
+- Specified the recipient address (marketing-team@meridiantravel.example) in the recipient-list information requirement.
 
 
 ---
@@ -314,12 +315,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What day of the week and what time should the weekly spend summary email be sent to the marketing team? | Product owner (with Meridian Travel marketing team) | Send every Monday at 08:00 in the marketing team's local timezone, matching their existing Monday manual-pull habit. |
-| **DEC-003** | What is the exact recipient address or distribution list for the Meridian Travel marketing team? | Product owner (with Meridian Travel) | Send to a single Meridian Travel marketing distribution list address supplied during onboarding, configurable per account rather than hard-coded to individuals. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
+- **DEC-003**: Resolved OQ-004 (and the duplicate DEC-001 and DEC-003): the email goes out Monday at 8:00 AM Eastern to marketing-team@meridiantravel.example.
 - **DEC-005**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
 - **DEC-007**: DEC-007 resolved: for Phase 1 the schedule, recipients, and channels are set as fixed defaults during design, with no self-service configuration UI.
@@ -327,12 +328,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
-- **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
 
 ### Questions Resolved
 
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
+- **OQ-004**: Resolved OQ-004 (and the duplicate DEC-001 and DEC-003): the email goes out Monday at 8:00 AM Eastern to marketing-team@meridiantravel.example.
 - **OQ-005**: Resolved OQ-005 — totals-only (total spend per channel) is locked as the version-one scope; no comparison metrics (week-over-week, budget variance, performance).
 - **OQ-006**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **OQ-007**: OQ-007 resolved — requester confirmed a plain one-line-per-channel layout is acceptable with no branding/template requirements.
