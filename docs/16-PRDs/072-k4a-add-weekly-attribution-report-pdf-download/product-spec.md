@@ -28,7 +28,7 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 
 ### Content of the report
 
-The specific attribution metrics, data points, and visual layout/template the report must contain are not specified in the input. [DECISION REQUIRED: DEC-006]
+The report must contain total attributed revenue and conversions by channel, plus the change from the prior week. A single simple table layout is sufficient.
 
 ### Service-map note (from independent KG cross-check)
 
@@ -57,7 +57,7 @@ flowchart TD
 
 ## 3. Functional Requirements
 
-> Grouped by feature area. Several requirements below depend on product decisions flagged in Section 1 (cadence target day, delivery mechanism, access scope, reporting-window semantics, retention, report content). Where a requirement names a default, it is a working default engineering can build against until the corresponding decision lands.
+> Grouped by feature area. Several requirements below depend on product decisions flagged in Section 1 (cadence target day, delivery mechanism, access scope, reporting-window semantics, retention). Where a requirement names a default, it is a working default engineering can build against until the corresponding decision lands.
 
 ### 3.1 Report Generation
 
@@ -111,6 +111,7 @@ Given the system is generating a report for the last-quarter window
 When it assembles the report contents
 Then it reads attribution data scoped to that window from the authoritative attribution data source
 And it does not modify the source attribution data
+And the assembled report presents total attributed revenue and conversions by channel, plus the change from the prior week, in a single table
 ```
 
 **FR-007 — Downstream dependency failure handling**
@@ -235,7 +236,7 @@ The system must track the following business information to support the function
 - **Reporting window** — the last-quarter date range a given report covers. System-derived from the generation date and the BR-3 window semantics. Needed to scope report contents (FR-003) and to key a report instance uniquely per account+window (FR-004).
 - **Generation run status** — the outcome of each weekly generation attempt, including the distinct named failure conditions (timeout, dependency-unavailable, rate-limited, no-data). System-derived. Needed for FR-007, FR-008, FR-014, and for operational alerting.
 - **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to flag incomplete data on the report (FR-013).
-- **Attribution data for the window** — the source metrics/data points the report renders. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006; the specific metrics and layout are an unsettled product decision (see Section 1, report content).
+- **Attribution data for the window** — the source metrics/data points the report renders: total attributed revenue and conversions by channel, plus the change from the prior week, presented in a single simple table. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006.
 - **Account / plan eligibility** — whether a requesting account is in scope for this feature. System-derived from the authoritative account source on each request. Needed for eligibility gating (FR-016); the scope itself is governed by BR-4.
 - **User download authorization** — whether a requesting user may download reports for the account. System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is governed by BR-5.
 - **Secure download link** — a time-limited reference used to serve a PDF. System-derived at download time. Needed for FR-015.
@@ -280,7 +281,7 @@ The system must track the following business information to support the function
 
 Explicit treatment of each risk from the Context Seed:
 
-- **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (report content, delivery mechanism, reporting-window semantics, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
+- **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (delivery mechanism, reporting-window semantics, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
 - **Multi-service blast radius (6 services, with disagreement across KG passes).** Mitigated by (a) reconciling the actual service map during `eng-context`/`eng-plan` before scope is locked — see the Section 1 service-map note — and (b) the kill-switch (NFR-015) so the feature can be pulled without a deploy if any participating service misbehaves.
 - **Unconfirmed UX scope (single download button vs. full report-management interface).** Mitigated by constraining Phase 1 to the minimum viable surface (see Section 6): a download action plus a basic availability/"no report" state, with any richer management interface explicitly deferred.
 - **Attribution data incompleteness / mid-processing reads.** Mitigated by FR-013/FR-014 and the BR-7 default posture (generate against final data, flag incomplete, never block), and by NFR-006 bounded retries against the source.
@@ -314,7 +315,7 @@ Explicit treatment of each risk from the Context Seed:
 | Rollout to all standard-plan accounts or all K4A accounts | Phase 1 scoped to Brightway Retail (BR-4); broader eligibility is a later expansion | Future, pending decision |
 | Reports for windows other than the last quarter (e.g. arbitrary date ranges, full-year) | Context Seed scopes this to last quarter only | Future |
 | Long-term report archival / retention tooling beyond basic availability | Retention policy unsettled (BR-8) | Future, pending decision |
-| Configurable report content/templates chosen by the customer | Report content not yet specified; Phase 1 ships one defined report | Future |
+| Configurable report content/templates chosen by the customer | Phase 1 ships one defined report (revenue + conversions by channel with week-over-week change, single table); customer-configurable content is deferred | Future |
 | Non-PDF export formats (CSV, XLSX, etc.) | Context Seed specifies PDF only | Future |
 
 ## Appendix: Engineering Reference
@@ -334,6 +335,18 @@ Per the Context Seed's technical analysis, the following services are named as a
 - **aaas-reporting** (backend) — attribution-as-a-service reporting backend (appeared in the independent cross-check only, low confidence — reconcile against reporting-api).
 - **summary-report-cloud** (backend) — produces summary attribution report data (appeared in the independent cross-check only, low confidence — reconcile against reporting-api).
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved report content (DEC-006/OQ-001): revenue and conversions by channel plus week-over-week change in one simple table.
+- Added report-content detail (revenue/conversions by channel + prior-week change in a single table) to FR-006.
+- Updated Attribution-data Information Requirement to name the settled metrics and remove the unsettled-decision note.
+- Removed resolved "report content" from the list of unsettled decisions gating the deadline risk.
+- Removed resolved "report content" from the Section 3 dependency note.
+- Updated phasing rationale to reflect the now-defined Phase 1 report content.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -350,13 +363,15 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-003** | Which users within the Brightway Retail account are allowed to download these reports, or can any user on the account download them? | Product owner (with Brightway Retail finance team) | Any user with access to the Brightway Retail K4A account may download, enforced server-side. |
 | **DEC-004** | Should the finance team get the report by manually triggering it each week, by automated email delivery, or simply by it being continuously available for download in the K4A console? | Product owner (with Brightway Retail finance team) | Reports are continuously available for download in the K4A console, no email delivery in this phase. |
 | **DEC-005** | How long should historical weekly reports stay downloadable before they are archived or removed? | Product owner (with Compliance input) | Keep weekly reports downloadable for 12 months, then archive. |
-| **DEC-006** | What attribution metrics and data points must the report contain, and does the finance team expect a specific layout or template? | Product owner (with Brightway Retail finance team) | Include the core attribution metrics already shown in the existing K4A attribution views for the quarter, laid out as a simple titled PDF with the account name, reporting window, and generation date in a header. |
 | **DEC-007** | Does the report PDF contain any contractually or legally restricted customer data that must be kept in a separate store and masked, rather than handled like ordinary account reporting data? | Compliance/Security + Product owner | Treat report content as ordinary single-account business data (no separate restricted store, no masking) until Compliance confirms otherwise. |
 | **DEC-008** | How long must the audit trail of who generated and downloaded these reports be retained, given this supports a customer's financial year-end close? | Compliance/Security | Retain audit records for a minimum of 24 months to cover a full financial year-end cycle plus a prior-year comparison. |
 
+### Decisions Resolved
+
+- **DEC-006**: Resolved — the report must contain total attributed revenue and conversions by channel, plus the change from last week, presented as one simple table. Same answer as OQ-001.
+
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: What specific attribution metrics and data points must the weekly report contain, and is there a preferred layout or template the finance team expects?
 - **OQ-002**: Is the UI just a download button, or a full report management/listing interface? This is the single biggest scope driver and no design exists yet.
 - **OQ-003**: How should the report be delivered: manually triggered by finance, automatically emailed weekly, or always available for download in the K4A console?
 - **OQ-004**: Does 'last quarter only' mean the most recent completed quarter recalculated each week, or a fixed quarter (e.g. Q4) regardless of generation date?
@@ -364,6 +379,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-006**: Are access controls needed (e.g. finance-only), or can any user on the Brightway Retail account download these reports?
 - **OQ-007**: Should historical weekly reports stay downloadable indefinitely, or is there a retention/archival policy?
 - **OQ-008**: Is this a one-off for Brightway Retail (standard plan) or expected to become a general capability for other customers/plans? This affects whether we build account-specific or generalized.
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001 and DEC-006: the weekly report must contain total attributed revenue and conversions by channel, plus the change from last week, in a single simple table layout.
 
 ---
 > **Classification:** Type A
