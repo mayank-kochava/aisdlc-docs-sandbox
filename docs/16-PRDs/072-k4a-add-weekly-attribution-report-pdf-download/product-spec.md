@@ -13,7 +13,7 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 
 - The finance team can self-serve a weekly attribution report as a downloadable PDF, removing manual pull requests and ad-hoc data exports.
 - The report is available in time for Brightway Retail's year-end close — the primary success condition for this work.
-- Delivers a repeatable weekly reporting capability in K4A that can be extended to other customers and plans later.
+- Delivers a repeatable weekly reporting capability in K4A. For now this is built account-specific to Brightway Retail (standard plan) and is not a generalized multi-customer capability; generalization to other customers and plans is a possible later extension, not in scope now (resolves OQ-008).
 
 ### Business Rules
 
@@ -347,9 +347,7 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Resolved BR-8 to state the 2-year retention period for historical weekly reports.
-- Updated Report retention record to reflect the confirmed 2-year retention policy.
-- Updated Section 6 archival row to reflect the now-settled 2-year retention and reframe the deferred item.
+- Updated Value bullet to record OQ-008 resolution: build account-specific for Brightway Retail now, not generalized.
 
 
 ---
@@ -375,10 +373,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-001**: Duplicate of OQ-004; settled by the same answer — report covers the most recent completed quarter, recalculated each week.
 - **DEC-006**: Resolved — the report must contain total attributed revenue and conversions by channel, plus the change from last week, presented as one simple table. Same answer as OQ-001.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-008**: Is this a one-off for Brightway Retail (standard plan) or expected to become a general capability for other customers/plans? This affects whether we build account-specific or generalized.
-
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 and DEC-006: the weekly report must contain total attributed revenue and conversions by channel, plus the change from last week, in a single simple table layout.
@@ -388,6 +382,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-005**: Resolved OQ-005: when attribution data is still processing or incomplete, the report is generated anyway but marked as partial data (confirming the existing BR-7/FR-013 posture).
 - **OQ-006**: Resolved OQ-006 — access controls are needed: only the finance team (finance-only) may download these reports, not any user on the Brightway Retail account.
 - **OQ-007**: Resolved OQ-007 (and DEC-005/BR-8): historical weekly reports are retained and downloadable for two years.
+- **OQ-008**: Resolved OQ-008: this is a one-off for Brightway Retail (standard plan) for now, not a generalized capability — build account-specific rather than generalized.
 
 ---
 > **Classification:** Type A
