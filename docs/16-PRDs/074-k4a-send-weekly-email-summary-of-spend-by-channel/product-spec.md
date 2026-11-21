@@ -261,7 +261,7 @@ The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadlin
 |------|-----------|
 | Week-over-week change, budget variance, or performance indicators in the email | Requester confirmed total spend per channel alone is sufficient (BR-2); comparison metrics are a future enhancement. |
 | Customizable channel names, ordering, email branding, or template design | Not required for the Phase 1 "one line per channel" summary; the requester confirmed a plain one-line-per-channel layout with no branding is acceptable (resolving OQ-007), so customization is deferred to a later phase. |
-| Self-service UI for configuring the summary (schedule, recipients, channels) | UI/frontend impact is unconfirmed in the Context Seed; Phase 1 can rely on configured defaults set during design. [DECISION REQUIRED: DEC-007] |
+| Self-service UI for configuring the summary (schedule, recipients, channels) | The requester confirmed fixed defaults for Phase 1 with no UI (resolving DEC-007); the schedule, recipients, and channels are set as fixed defaults during design, and self-service configuration is deferred to a later phase. |
 | Manual aggregation of spend from external sources not available in-product | Meridian Travel's four channels (email, paid search, paid social, display) all run through K4A today (BR-6), so no external-source aggregation is needed for Phase 1. |
 | On-demand / ad-hoc generation of the summary outside the weekly cadence | The requirement is a weekly scheduled email; ad-hoc runs are not part of Phase 1. |
 | Recipient-managed subscription / unsubscribe self-service | Phase 1 delivers to a configured recipient list; subscription management is a future enhancement. |
@@ -297,7 +297,7 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved DEC-006 in NFR-011: go-live set to one week before the summer launch (~4 weeks out), removing the decision tag.
+- Resolved DEC-007 in the scope table: fixed defaults for Phase 1, no self-service UI.
 
 
 ---
@@ -315,12 +315,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-003** | What is the exact recipient address or distribution list for the Meridian Travel marketing team? | Product owner (with Meridian Travel) | Send to a single Meridian Travel marketing distribution list address supplied during onboarding, configurable per account rather than hard-coded to individuals. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
 | **DEC-005** | For a week where a channel has zero spend or missing data, should that channel still appear in the email, and if so what value should it show? | Product owner (with Meridian Travel marketing team) | Show every tracked channel every week for consistency, displaying a zero-spend channel as 0 in the account's currency so the team can see the full channel set at a glance. |
-| **DEC-007** | For Phase 1, should the marketing team be able to configure the summary themselves through a UI, or is it acceptable to set the schedule, recipients, and channels as fixed defaults during design? | Product owner | No self-service UI in Phase 1; configure schedule, recipients, and channels as account-level defaults set during design, with changes made by request. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
 - **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
+- **DEC-007**: DEC-007 resolved: for Phase 1 the schedule, recipients, and channels are set as fixed defaults during design, with no self-service configuration UI.
 
 ### Open Questions (evidence gaps — needs more input)
 
