@@ -27,7 +27,7 @@ Brightway Retail's finance team currently has no self-service way to obtain attr
 - **Download consistency:** If the report is downloaded more than once within the same week, every download returns identical data — the week's report is a frozen weekly snapshot, not refreshed to the most current available data on each download. This is a working assumption, not a confirmed decision — the reviewer declined to decide it (see DEC-003).
 - **Access control:** All finance-team members on the account may obtain the report. Access is not narrowed to specific roles or a single designated finance manager, and it does not tie into any existing subscription concept.
 - **Attribution content:** The report contains total attributed revenue and total conversions, broken out by channel, presented as one simple table. A static report of this content satisfies finance's need — no filtering or drill-down is required.
-- **Retention / compliance:** Whether these weekly PDFs must be archived, timestamped, or retained for an audit period is a compliance rule the business must set. [DECISION REQUIRED: DEC-006]
+- **Retention / compliance:** The weekly PDFs are retained for two years for audit purposes (DEC-006 resolved).
 
 ## Note on affected-services evidence
 
@@ -237,8 +237,8 @@ Then an append-only audit record is written capturing actor identity (user and a
 And the audit record cannot be edited or deleted by any role or code path
 And the audit write occurs without blocking the user's download
 And a failure to write the audit record fires an operational alert rather than failing silently
-# Minimum retention period for these audit records and for the weekly PDFs themselves is a
-# compliance rule — see the retention decision referenced in Section 1.
+# Weekly PDFs are retained for two years for audit (DEC-006 resolved; see Section 1).
+# Minimum retention for the audit records themselves follows the same audit-retention basis.
 ```
 
 ### FR-018 — No PII in logs
@@ -258,7 +258,7 @@ And a failure to write the audit record fires an operational alert rather than f
 - **Secure link and its validity window:** For any report delivered outside an authenticated in-session download, the time-limited link and its expiry — the link stays valid for seven days (DEC-007 resolved). System-derived. Matters because secure delivery (FR-008, FR-009) depends on it.
 - **Generation outcome / failure reason:** The result of each weekly generation attempt, including a named failure reason on failure. System-derived. Matters because failure recording and alerting (FR-003) depend on it.
 - **Audit record of report access:** Append-only record of who obtained or was denied the report, when, and with what outcome. System-derived. Matters because access to the report is a traceable, access-controlled operation (FR-017).
-- **Retention configuration:** The minimum period for which weekly PDFs and audit records are retained — a compliance rule (see the retention decision in Section 1). Matters because it governs how long reports and audit records must remain available.
+- **Retention configuration:** Weekly PDFs are retained for two years for audit (DEC-006 resolved; see Section 1). Matters because it governs how long reports and audit records must remain available.
 
 ## 5. Non-Functional Requirements & Guardrails
 
@@ -282,7 +282,7 @@ And a failure to write the audit record fires an operational alert rather than f
 - **NFR-010 — Secure, time-limited delivery:** Any report delivered outside an authenticated in-session download is delivered via a time-limited secure link, never a raw attachment; the link stays valid for seven days and an expired link does not return the report (ties to FR-008, FR-009).
 - **NFR-011 — No PII or secrets in logs:** Raw PII, credentials, secrets, and tokens are never written to application logs. Where an identifier must appear for troubleshooting, it is minimized to what is operationally necessary (ties to FR-018).
 - **NFR-012 — Immutable audit trail:** Report-access audit records are append-only and immutable — no edit or delete via any role or code path — and are written asynchronously so they never block the download, while an audit-write failure fires an operational alert rather than failing silently (ties to FR-017).
-- **NFR-013 — Audit and report retention:** Weekly PDFs and audit records are retained for a stated minimum period. Working default pending the retention decision in Section 1: audit records retained for 12 months minimum; a shorter or longer period for the PDFs themselves depends on whether finance has an archival/compliance obligation for them.
+- **NFR-013 — Audit and report retention:** Weekly PDFs are retained for two years for audit (DEC-006 resolved; see Section 1). Audit records are retained for at least this same two-year audit period.
 
 ### Operability & Rollout
 
@@ -310,7 +310,7 @@ The following are explicitly **not** included in Phase 1. Any item here must not
 | Plans other than standard | Out of scope (Phase 1) | The feature is gated to the standard plan. Extension to other plan tiers is a future consideration. |
 | Accounts/customers beyond Brightway Retail finance | Out of scope (Phase 1) | Phase 1 targets Brightway Retail's finance team. General availability to other accounts is a future phase. |
 | Self-serve subscription management (recipients choosing their own schedule) | Out of scope (Phase 1) | Managing subscriptions/recipients as a user-facing feature is not in Phase 1. |
-| Long-term PDF archival/signing/timestamping as a product feature | Out of scope (Phase 1) | Beyond the stated retention minimum, archival/signing as a customer-facing capability is a future phase, pending the retention decision. |
+| Long-term PDF archival/signing/timestamping as a product feature | Out of scope (Phase 1) | Beyond the two-year audit retention (DEC-006 resolved), archival/signing as a customer-facing capability is a future phase. |
 
 ## Appendix: Engineering Reference
 
@@ -329,8 +329,11 @@ Additional services surfaced at lower confidence during an independent knowledge
 
 _Applied reviewer's request._
 
-- Reframed the download-consistency business rule as a working assumption pending DEC-003.
-- Reframed FR-005's download-consistency note as a working assumption pending DEC-003.
+- Resolved DEC-006 in Section 1 business rules: weekly PDFs retained two years for audit.
+- Updated FR-017 comment to state the two-year PDF retention (DEC-006 resolved).
+- Updated retention configuration info requirement to state two-year PDF retention (DEC-006 resolved).
+- Updated NFR-013 to state two-year PDF retention and align audit-record retention (DEC-006 resolved).
+- Updated Section 6 out-of-scope note to reflect resolved two-year retention (DEC-006).
 
 
 ---
@@ -345,7 +348,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | Should the weekly report always show the same rolling ninety days of data, or should it show a fixed calendar quarter that only resets on quarter boundaries? | Product owner (with finance stakeholder at Brightway Retail) | Fixed calendar quarter: the report covers the most recently completed calendar quarter and stays fixed until the next quarter boundary. |
-| **DEC-006** | Do these weekly report PDFs need to be archived, timestamped, or retained for a set audit period to meet any compliance requirement? | Compliance/Security (with Product owner) | Retain each weekly PDF and its access audit records for twelve months as a baseline, timestamped at generation; adjust to any specific finance or contractual audit requirement once confirmed. |
 
 ### Decisions Resolved
 
@@ -353,13 +355,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-003**: Assumed: Fixed weekly snapshot: every download within the same week returns identical data for that week.
 - **DEC-004**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
 - **DEC-005**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
+- **DEC-006**: DEC-006 / OQ-007 resolved: weekly report PDFs are retained for two years for audit.
 - **DEC-007**: DEC-007 resolved — the secure download link for reports delivered outside an in-app download stays valid for seven days before expiring.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: For 'last quarter only,' should the report always show a rolling 90 days, or snap to fixed calendar-quarter boundaries that reset on specific dates? This changes the data-scoping logic.
 - **OQ-006**: Does the report need in-PDF filtering, date-range customization, or drill-down, or is a static pre-formatted PDF sufficient?
-- **OQ-007**: Are there compliance, audit, or retention requirements for the weekly PDFs (archival, timestamping, signing)?
 
 ### Questions Resolved
 
@@ -367,6 +369,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003 resolved: a given week's report is a frozen weekly snapshot — every download within the same week returns identical data, not the most current numbers.
 - **OQ-004**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
 - **OQ-005**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
+- **OQ-007**: DEC-006 / OQ-007 resolved: weekly report PDFs are retained for two years for audit.
 - **OQ-008**: Resolved OQ-008 — report content is produced by reusing the existing summary-report component (summary-report-cloud) if one exists, rather than assembling it in the main reporting path.
 
 ---
