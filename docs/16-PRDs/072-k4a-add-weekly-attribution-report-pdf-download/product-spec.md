@@ -283,7 +283,7 @@ Explicit treatment of each risk from the Context Seed:
 
 - **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (delivery mechanism, reporting-window semantics, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
 - **Multi-service blast radius (6 services, with disagreement across KG passes).** Mitigated by (a) reconciling the actual service map during `eng-context`/`eng-plan` before scope is locked — see the Section 1 service-map note — and (b) the kill-switch (NFR-015) so the feature can be pulled without a deploy if any participating service misbehaves.
-- **Unconfirmed UX scope (single download button vs. full report-management interface).** Mitigated by constraining Phase 1 to the minimum viable surface (see Section 6): a download action plus a basic availability/"no report" state, with any richer management interface explicitly deferred.
+- **UX scope (confirmed: simple download button).** The PM has confirmed finance wants only a simple download button, not a full report management/listing interface. Phase 1 is therefore constrained to the minimum viable surface (see Section 6): a download action plus a basic availability/"no report" state, with any richer management interface explicitly deferred.
 - **Attribution data incompleteness / mid-processing reads.** Mitigated by FR-013/FR-014 and the BR-7 default posture (generate against final data, flag incomplete, never block), and by NFR-006 bounded retries against the source.
 
 ### Rollback
@@ -309,7 +309,7 @@ Explicit treatment of each risk from the Context Seed:
 
 | Item | Rationale | Phase |
 |------|-----------|-------|
-| Full "report management interface" (rich listing, filtering, search, bulk actions) | UX scope unconfirmed; Phase 1 constrained to minimum viable download surface | Future |
+| Full "report management interface" (rich listing, filtering, search, bulk actions) | PM confirmed finance wants only a simple download button; Phase 1 constrained to minimum viable download surface | Future |
 | Automated email delivery of the weekly report | Delivery mechanism unsettled (BR-6); console download is the working default | Future, pending decision |
 | Manual on-demand report triggering by the finance team | Delivery mechanism unsettled (BR-6); weekly scheduled generation is the Phase 1 path | Future, pending decision |
 | Rollout to all standard-plan accounts or all K4A accounts | Phase 1 scoped to Brightway Retail (BR-4); broader eligibility is a later expansion | Future, pending decision |
@@ -339,12 +339,8 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Resolved report content (DEC-006/OQ-001): revenue and conversions by channel plus week-over-week change in one simple table.
-- Added report-content detail (revenue/conversions by channel + prior-week change in a single table) to FR-006.
-- Updated Attribution-data Information Requirement to name the settled metrics and remove the unsettled-decision note.
-- Removed resolved "report content" from the list of unsettled decisions gating the deadline risk.
-- Removed resolved "report content" from the Section 3 dependency note.
-- Updated phasing rationale to reflect the now-defined Phase 1 report content.
+- Updated the UX-scope risk bullet to reflect the PM's confirmation that the UI is just a download button.
+- Updated the out-of-scope rationale for the report management interface to reflect the confirmed download-button-only decision.
 
 
 ---
@@ -372,7 +368,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: Is the UI just a download button, or a full report management/listing interface? This is the single biggest scope driver and no design exists yet.
 - **OQ-003**: How should the report be delivered: manually triggered by finance, automatically emailed weekly, or always available for download in the K4A console?
 - **OQ-004**: Does 'last quarter only' mean the most recent completed quarter recalculated each week, or a fixed quarter (e.g. Q4) regardless of generation date?
 - **OQ-005**: How should the report handle weeks where attribution data is still processing or incomplete, generate anyway, or block/delay until finalized?
@@ -383,6 +378,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 and DEC-006: the weekly report must contain total attributed revenue and conversions by channel, plus the change from last week, in a single simple table layout.
+- **OQ-002**: Resolved OQ-002 — PM confirmed the UI is just a simple download button, not a full report management/listing interface.
 
 ---
 > **Classification:** Type A
