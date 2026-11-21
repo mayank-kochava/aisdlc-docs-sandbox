@@ -388,4 +388,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-008**: Resolved OQ-008: this is a one-off for Brightway Retail (standard plan) for now, not a generalized capability — build account-specific rather than generalized.
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
