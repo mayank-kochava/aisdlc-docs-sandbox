@@ -25,7 +25,7 @@ Automatically generate a weekly summary of campaign spend grouped by channel for
 - **BR-2 — Grouping:** Spend is grouped by channel. The channel set is fixed: paid search, paid social, display, email, and affiliate — the same set every week. All channels are reported in USD; no other per-channel calculation or transformation is required before display.
 - **BR-3 — Accuracy (business-critical):** The automated numbers must reconcile against the figures the analyst currently produces by hand before launch. Accuracy is the core success criterion — a wrong number in the automated email is worse than the manual process it replaces.
 - **BR-4 — Scope of recipients:** The summary is delivered to the Meridian Travel marketing team's distribution list. The marketing ops lead owns membership of this list; adding or removing recipients must be possible without engineering involvement (i.e. the recipient list is configurable by the marketing team, not hard-coded in a developer-owned job).
-- **BR-5 — Report content & format:** Whether the email contains totals only, totals with prior-week or budget comparisons, or per-campaign breakdowns within each channel must be confirmed. [DECISION REQUIRED: DEC-004]
+- **BR-5 — Report content & format:** The email shows total spend per channel. A prior-week comparison is included if it is straightforward to add; per-campaign breakdowns within each channel are not included, and no impressions or conversions are shown.
 - **BR-6 — Partial / missing data handling:** When upstream spend data is missing, delayed, or incomplete at send time, the email is still sent on schedule with the channels that are available; it must not be held back or delayed. The email explicitly notes which channel(s) are missing so partial data is never mistaken for a complete summary.
 - **BR-7 — Customer tier:** Meridian Travel is a Standard plan customer; the feature must operate within whatever entitlements that tier allows.
 
@@ -218,7 +218,7 @@ The system must track the following business information to support the function
 - **Reporting period** — The week each summary covers (start and end boundaries). Source: System-derived from the delivery schedule. Needed so each email clearly states its coverage (FR-011) and so idempotency can key on the period (FR-003).
 - **Delivery schedule** — The fixed recurring day and time the summary is generated and sent: every Monday at 8:00 AM Eastern Time. Source: Product owner decision (BR-1). Drives the trigger in FR-001.
 - **Recipient list** — The Meridian Travel marketing team's distribution list — the members who receive the email. Membership is owned by the marketing ops lead and must be editable without engineering involvement. Source: marketing ops lead / customer (BR-4). Drives delivery in FR-012 and FR-012a.
-- **Report content & format profile** — Whether the summary is totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns. Source: Product owner decision (BR-5). Shapes composition in FR-011.
+- **Report content & format profile** — Total spend per channel, plus a prior-week comparison if it is straightforward to add; no per-campaign breakdowns and no impressions or conversions. Source: Product owner decision (BR-5). Shapes composition in FR-011.
 - **Data completeness status** — Per-run indication of whether spend data was complete, partial, delayed, or missing, per channel. Source: System-derived during retrieval (FR-008). Drives partial-data handling and notification (FR-010).
 - **Partial-data policy** — The confirmed business behavior when data is incomplete: send the email on schedule with the channels that are available and note which channel(s) are missing; never delay or hold back delivery (BR-6). Source: Product owner decision (BR-6). Governs FR-008 and FR-010.
 - **Reconciliation result** — The comparison between automated per-channel totals and the analyst's manual figures during pre-launch validation, including any discrepancies flagged. Source: System-derived during validation (FR-006). Gates launch readiness.
@@ -275,8 +275,8 @@ The following are explicitly **NOT** in Phase 1, to prevent scope creep:
 | Item | Status | Rationale |
 |------|--------|-----------|
 | Interactive email elements (drill-down links into channel detail) | Out of scope (future phase) | Open discovery question; a static summary table satisfies the core "no manual pull" goal. [DECISION REQUIRED: DEC-007] |
-| Per-campaign breakdowns within each channel | Out of scope unless confirmed under BR-5 | Phase 1 default is channel-level totals; deeper breakdown pending the content/format decision (BR-5). |
-| Prior-week / budget comparison figures | Out of scope unless confirmed under BR-5 | Not required for the core replacement of the manual pull; governed by the content/format decision (BR-5). |
+| Per-campaign breakdowns within each channel | Out of scope | Confirmed under BR-5: Phase 1 shows channel-level totals only; per-campaign breakdowns are not included. |
+| Budget comparison figures, impressions, or conversions | Out of scope | Confirmed under BR-5: the summary shows total spend per channel (plus a prior-week comparison if easy to add); no budget comparisons, impressions, or conversions. |
 | Self-service UI for day/time send-schedule configuration | Out of scope (future phase) | The schedule can launch fixed (BR-1); any console/MCP schedule-config surface is deferred. Recipient-list membership is NOT deferred — it must be editable by the marketing ops lead without engineering (BR-4, FR-012a), though the mechanism (managed distribution list, config entry, or UI) is for eng-plan to determine. |
 | Self-service onboarding for other customers / other products | Out of scope | Phase 1 targets Meridian Travel on K4A only. |
 | Approval/review step before each send | Out of scope | Phase 1 is fully automated once validated; a human review gate contradicts the "no manual intervention" objective. Governed by the partial-data policy (BR-6) for the exception case only. |
@@ -310,13 +310,9 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Resolved BR-6: send email with available channels on schedule and note missing channels, replacing the DEC-005 tag.
-- Updated the flow diagram's partial-data branch to send with available channels and note missing ones, flowing into email composition.
-- Updated FR-008 to send available channels and note missing ones instead of referencing an unconfirmed policy.
-- Updated FR-010 to note missing channels within the sent email rather than describing a conditional alert policy.
-- Updated the Partial-data policy info requirement to the confirmed send-with-available-channels behavior.
-- Updated NFR-005 to describe the confirmed partial-data behavior explicitly instead of deferring to a pending decision.
-- Updated the data-accuracy risk mitigation to reflect the confirmed partial-data behavior.
+- Resolved BR-5 to total spend per channel plus optional prior-week comparison, no per-campaign breakdown, no impressions/conversions.
+- Updated the Information Requirements content/format profile to match the confirmed BR-5 detail level.
+- Updated Section 6 rows to reflect BR-5 resolution: per-campaign breakdowns out, prior-week comparison conditionally in, impressions/conversions out.
 
 
 ---
@@ -332,13 +328,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What day and time each week should the spend summary email be sent? | Product owner (Mayank Ukey / Meridian Travel marketing) | Monday 08:00 in the marketing team's local timezone, matching the existing manual Monday pull it replaces. |
 | **DEC-003** | Who exactly should receive the weekly summary email? | Product owner (Meridian Travel marketing) | The same marketing team distribution list or individuals who receive the manual Monday report today; a single team distribution address if one exists. |
-| **DEC-004** | What level of detail should the spend numbers show: totals only, totals with prior-week or budget comparisons, or a breakdown by campaign within each channel? | Product owner (Meridian Travel marketing) | Per-channel spend totals for the week as a static summary table, matching the current manual report's content, with prior-week comparison added only if the manual report already includes it. |
 | **DEC-006** | Before we switch off the manual Monday report, how long should the automated email run side by side with the manual one, and how close do the numbers need to match before we trust the automation and stop the manual pull? | Product owner (Mayank Ukey) with marketing analyst input | Run in parallel for 3 consecutive weeks; retire the manual pull once automated per-channel totals match the manual figures exactly (zero variance) for all 3 weeks. |
 | **DEC-007** | For the first version, is a simple static table of spend by channel in the email enough, or does the marketing team need clickable links to drill into each channel's detail? | Product owner with Meridian Travel marketing team | Static summary table only for Phase 1; drill-down links deferred to a future phase. |
 
 ### Decisions Resolved
 
 - **DEC-002**: Resolved — channels to include are paid search, paid social, display, email and affiliate, the same set every week, all reported in USD with no special per-channel calculation or transformation required.
+- **DEC-004**: Resolved DEC-004/OQ-006: the email shows total spend per channel, plus a prior-week comparison if it is straightforward to add; no per-campaign breakdowns, impressions, or conversions.
 - **DEC-005**: Duplicate of OQ-005; settled by the same answer — send with available channels and note the missing one, do not hold it back.
 
 ### Open Questions (evidence gaps — needs more input)
