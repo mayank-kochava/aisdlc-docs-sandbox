@@ -36,7 +36,7 @@ The Context Seed does not resolve who within the finance team may view or downlo
 
 ### Report Content & Layout
 
-The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not resolved in the Context Seed. The working assumption is the **standard K4A attribution report metric set**; any Brightway-specific layout requirement is an open business decision. [DECISION REQUIRED]
+The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not resolved in the Context Seed. The working assumption is the **standard K4A attribution report metric set**; any Brightway-specific layout requirement is an open business decision. [DECISION REQUIRED] Finance has confirmed one concrete layout requirement: the PDF must display the **Brightway Retail logo** (see FR-003a).
 
 ### Historical Retention
 
@@ -104,6 +104,15 @@ Then the report contains the standard K4A attribution report metric set
 And the metric set and layout remain consistent from week to week
 ```
 > Note: The exact metric set and layout are subject to the Report Content & Layout decision in Section 1; until resolved, engineering builds against the standard K4A attribution report metric set.
+
+#### FR-003a — Report PDF displays the Brightway Retail logo
+```gherkin
+Given a weekly attribution report PDF is being generated for Brightway Retail
+When the system renders the report
+Then the generated PDF displays the Brightway Retail logo
+And the logo appears consistently on each weekly report
+```
+> Note: Added per finance's request. The source/placement of the Brightway Retail logo asset (e.g. account branding record vs. a supplied asset) is an engineering detail to settle during design; the exact layout remains subject to the Report Content & Layout decision in Section 1.
 
 #### FR-004 — Generation failure is recorded and does not silently skip
 ```gherkin
@@ -216,7 +225,8 @@ The system must track the following business information to support the Function
 - **Report Availability Status** — whether a given week's report is available, failed, or not-yet-generated. *System-derived.* Needed by FR-004, FR-008, FR-009, and FR-010 to drive what the download interface shows and permits.
 - **Report Failure Reason** — the distinct cause when a week's report fails (attribution-data-unavailable vs. PDF-render-failure). *System-derived.* Needed by FR-004 and FR-005 to drive distinct operational alerts.
 - **Attribution Data (last quarter)** — the standard K4A attribution metric set that populates the report body. *System-derived* from the attribution data source (unresolved between the two KG candidate sources — see Section 1). Needed by FR-002 and FR-003 as the report's content.
-- **Report Content Definition** — the standard K4A attribution metric set and layout applied to each weekly report. *System-derived* (standard K4A definition), pending the Report Content & Layout decision in Section 1. Needed by FR-003 for week-to-week consistency.
+- **Report Content Definition** — the standard K4A attribution metric set and layout applied to each weekly report, including the Brightway Retail logo displayed on the PDF. *System-derived* (standard K4A definition), pending the Report Content & Layout decision in Section 1. Needed by FR-003 for week-to-week consistency and FR-003a for the logo.
+- **Brightway Retail Logo Asset** — the Brightway Retail logo image rendered on each weekly report PDF per finance's request. *System-derived* from account branding / supplied asset (source to be settled in engineering design). Needed by FR-003a.
 - **Account & Plan Eligibility** — which account the report belongs to and that it is on the standard plan. *System-derived* from account records. Needed by FR-001 to determine eligibility for generation.
 - **Report Access Entitlement** — which users/roles may view and download a given account's report. *System-derived* from the authoritative authorization source, re-derived per request. Needed by FR-008, FR-011, and FR-012 to gate access server-side. The exact entitled roles are pending the Access Scope decision in Section 1.
 - **Secure Download Link / Validity Window** — the time-limited means by which a PDF is delivered. *System-derived.* Needed by FR-009 and FR-013 to deliver content securely and expire access.
@@ -295,12 +305,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved OQ-003 in the Data scope business rule: last quarter = most recent completed quarter, recalculated weekly.
-- Updated flow diagram node to reference the most recent completed quarter instead of generic "last quarter".
-- Updated flow diagram generation node to reflect the recalculated most-recent-completed-quarter window.
-- Rewrote FR-002 to define scope as the most recent completed quarter, recalculated each weekly run.
-- Updated Report Covered Period information requirement to the most-recent-completed-quarter window re-derived weekly.
-- Updated the out-of-scope date-ranges row to reference the most recent completed quarter.
+- Added FR-003a requiring the weekly attribution report PDF to display the Brightway Retail logo.
+- Noted the confirmed Brightway logo requirement in the Report Content & Layout section.
+- Added the Brightway Retail Logo Asset to Information Requirements and referenced it in Report Content Definition.
 
 
 ---
@@ -321,6 +328,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-005** | How long should audit records of who viewed or downloaded these finance reports be retained? | Compliance/Security (with Product owner) | Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. |
 | **DEC-006** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-008** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Open Questions (evidence gaps — needs more input)
 
