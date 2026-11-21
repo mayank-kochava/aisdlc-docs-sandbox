@@ -87,6 +87,14 @@ And data outside the last-quarter window is excluded from the report
 ```
 > Per BR-3 (see Section 1), "last quarter" is the most recent completed quarter relative to the generation date, recalculated every week.
 
+**FR-019 — Brightway logo on the report PDF**
+```gherkin
+Given a weekly attribution report is being generated for the Brightway Retail account
+When the system produces the PDF
+Then the generated report PDF includes the Brightway logo
+```
+> Finance requested the Brightway logo on the report PDF. The source, placement, and resolution of the logo asset are an engineering/design default to set during `eng-plan`.
+
 **FR-004 — Single report per cycle (idempotency)**
 ```gherkin
 Given a weekly generation cycle has already produced a report for a given account and reporting window
@@ -339,11 +347,7 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Resolved BR-6: finance manually triggers the report from the K4A console; removed DEC-004 tag.
-- Resolved BR-3: "last quarter" is the most recent completed quarter recalculated weekly, removing the DEC-001 tag.
-- Updated FR-003 note to state the resolved reporting-window semantics rather than a working default.
-- Updated the Reporting window information requirement to reflect the resolved weekly most-recent-completed-quarter semantics.
-- Removed reporting-window semantics from the list of unsettled Section 1 decisions in the Risk Mitigation note, now that it is resolved.
+- Added FR-019: generated weekly attribution report PDF must include the Brightway logo.
 
 
 ---
