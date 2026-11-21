@@ -23,7 +23,7 @@ Brightway Retail's finance team currently has no self-service way to obtain attr
 - **Data scope:** The report contains last quarter data only. The precise semantics of "last quarter" — whether it is a fixed calendar quarter that resets on quarter boundaries, or a rolling 90-day window — is a product rule that materially changes the numbers finance sees. [DECISION REQUIRED: DEC-001]
 - **Plan eligibility:** This capability is scoped to the standard plan (Brightway Retail is on the standard plan).
 - **Audience:** The intended consumers are the finance team at Brightway Retail.
-- **Delivery model:** Whether finance pulls the report on demand from K4A (self-service download) or the report is pushed to them on a schedule remains unconfirmed in the intake (the requester answered "for engineering to confirm"). This is a product-facing choice because it changes what the customer sees and does. [DECISION REQUIRED: DEC-002]
+- **Delivery model:** The report is pushed to the finance team on a weekly schedule — specifically, it is emailed to the finance team every Monday. Self-service on-demand download from K4A is not the delivery mechanism for Phase 1. Because the push model is chosen, the scheduled-distribution and subscription-worker roles are in scope.
 - **Download consistency:** If the report is downloaded more than once within the same week, every download returns identical data — the week's report is a frozen weekly snapshot, not refreshed to the most current available data on each download.
 - **Access control:** All finance-team members on the account may obtain the report. Access is not narrowed to specific roles or a single designated finance manager, and it does not tie into any existing subscription concept.
 - **Attribution content:** The report contains total attributed revenue and total conversions, broken out by channel, presented as one simple table. A static report of this content satisfies finance's need — no filtering or drill-down is required.
@@ -31,11 +31,11 @@ Brightway Retail's finance team currently has no self-service way to obtain attr
 
 ## Note on affected-services evidence
 
-An independent knowledge-graph cross-check against the originally identified backend and frontend services broadly re-found the core report-generation and download-interface roles, but surfaced lower confidence on the scheduled-distribution and subscription-worker roles, and additionally flagged two services not in the original list — one that may assemble report content and one that may supply the underlying attribution query data. These discrepancies are recorded here so engineering planning reconciles them during discovery rather than treating the original list as settled. The relevance of the scheduled-distribution and subscription services depends heavily on the unresolved pull-versus-push delivery model.
+An independent knowledge-graph cross-check against the originally identified backend and frontend services broadly re-found the core report-generation and download-interface roles, but surfaced lower confidence on the scheduled-distribution and subscription-worker roles, and additionally flagged two services not in the original list — one that may assemble report content and one that may supply the underlying attribution query data. These discrepancies are recorded here so engineering planning reconciles them during discovery rather than treating the original list as settled. Because the push (scheduled weekly email) delivery model is now the chosen one, the scheduled-distribution and subscription-worker services are in scope.
 
 # 2. User Flows (Visuals)
 
-The diagram below covers the self-service pull model as the primary happy path, the push/scheduled model as an alternative, and error states for access denial and report-unavailability. The chosen delivery model (see Section 1 delivery-model decision) determines which branch is built.
+The diagram below covers the chosen push/scheduled model as the primary happy path — the report is emailed to the finance team every Monday via a time-limited secure link — and error states for recipient authorization and generation failure. The self-service pull branch is not built for Phase 1 (see Section 1 delivery-model rule).
 
 ```mermaid
 flowchart TD
@@ -44,26 +44,17 @@ flowchart TD
     C -->|"no"| D["Record failure and alert operations"]
     C -->|"yes"| E["Store weekly PDF, marked available"]
 
-    E --> F{"Delivery model"}
-    F -->|"pull (self-service)"| G["Finance user opens report area in K4A"]
-    F -->|"push (scheduled)"| H["System delivers report to finance team via secure link"]
-
-    G --> I{"User authorized to download?"}
-    I -->|"no"| J["Deny access and show not-authorized message"]
-    I -->|"yes"| K{"Report available for the week?"}
-    K -->|"no"| L["Show report-not-available message"]
-    K -->|"yes"| M["User downloads PDF"]
-    M --> N["PDF opens with last-quarter attribution data"]
+    E --> H["System emails report to finance team every Monday via secure link"]
 
     H --> O{"Recipient authorized?"}
-    O -->|"no"| J
+    O -->|"no"| J["Deny access and show not-authorized message"]
     O -->|"yes"| P["Recipient retrieves PDF via secure link"]
-    P --> N
+    P --> N["PDF opens with last-quarter attribution data"]
 ```
 
 # 3. Functional Requirements
 
-> Scope note: Several requirements below reference business rules that are not yet settled (delivery model, last-quarter semantics, download consistency, access control, report content, retention). Each such requirement states a working provisional behavior so an implementation agent can proceed, and references the corresponding decision. These provisional values are defaults, not confirmations.
+> Scope note: Several requirements below reference business rules that are not yet settled (last-quarter semantics, retention). Each such requirement states a working provisional behavior so an implementation agent can proceed, and references the corresponding decision. These provisional values are defaults, not confirmations. The delivery model is settled: the report is pushed to finance via a weekly Monday email (see Section 1).
 
 ## 3.1 Report Generation
 
@@ -123,8 +114,8 @@ Given an authorized finance user is signed in to K4A on a standard-plan account
 And a weekly attribution report is available for that account
 When the user selects the download action for the report in K4A
 Then the current week's attribution report PDF is downloaded to the user
-# Provisional rule (pending the delivery-model decision): the pull/self-service download
-# model is the primary build target.
+# Delivery model resolved: the push model (weekly Monday email) is the build target, not
+# self-service pull. This self-service download requirement is out of scope for Phase 1.
 ```
 
 ### FR-007 — Report-not-available handling
@@ -137,15 +128,16 @@ And no download is initiated
 And the message is distinct from an access-denied message
 ```
 
-### FR-008 — Scheduled delivery (push model, conditional)
+### FR-008 — Scheduled delivery (push model)
 ```gherkin
 Given the push delivery model is the chosen delivery mechanism
 And a weekly attribution report has been generated and marked available
-When the weekly delivery runs
-Then the report is delivered to the authorized finance recipients
+When the weekly delivery runs every Monday
+Then the report is emailed to the authorized finance recipients
 And the report is delivered via a time-limited secure link rather than a raw attachment
-# Conditional on the delivery-model decision. If the pull model is chosen, this requirement
-# and the scheduled-distribution behavior are out of scope for Phase 1.
+# Delivery model resolved: the push model is chosen — the report is emailed to the finance
+# team every Monday via a secure link. This requirement and the scheduled-distribution
+# behavior are in scope for Phase 1.
 ```
 
 ### FR-009 — Secure, time-limited delivery for any pushed or linked report
@@ -261,7 +253,7 @@ And a failure to write the audit record fires an operational alert rather than f
 - **User and account identity:** Who is requesting the report and under which account. Sourced from the authenticated K4A session. Matters because access control (FR-010–FR-014) and audit records (FR-017) depend on it.
 - **User eligibility / role for this report:** Whether the requesting user is authorized to obtain the report — resolved as: all finance-team members on the account are authorized, with no narrower role restriction. System-derived on each request from the authoritative authorization source. Matters because it gates access server-side and determines UI affordance visibility.
 - **Account plan eligibility:** Whether the account is on an eligible (standard) plan. System-derived from account/plan data. Matters because the feature is plan-gated (FR-013).
-- **Delivery model configuration:** Whether the report is pulled (self-service) or pushed (scheduled) — see the delivery-model decision in Section 1. System/configuration-derived. Matters because it determines which delivery path (FR-006 vs. FR-008) is active.
+- **Delivery model configuration:** The report is pushed (scheduled) — emailed to finance every Monday (see the delivery-model rule in Section 1). System/configuration-derived. Matters because it activates the push delivery path (FR-008) and the recipient list for the weekly email.
 - **Secure link and its validity window:** For any report delivered outside an authenticated in-session download, the time-limited link and its expiry. System-derived. Matters because secure delivery (FR-008, FR-009) depends on it.
 - **Generation outcome / failure reason:** The result of each weekly generation attempt, including a named failure reason on failure. System-derived. Matters because failure recording and alerting (FR-003) depend on it.
 - **Audit record of report access:** Append-only record of who obtained or was denied the report, when, and with what outcome. System-derived. Matters because access to the report is a traceable, access-controlled operation (FR-017).
@@ -313,7 +305,7 @@ The following are explicitly **not** included in Phase 1. Any item here must not
 | Data scopes other than last quarter | Out of scope (Phase 1) | Phase 1 is strictly last-quarter data only. Other ranges (MTD, YTD, custom) are not included. |
 | Formats other than PDF | Out of scope (Phase 1) | PDF is the only delivery format for Phase 1. CSV/XLSX/other exports are not included. |
 | Cadences other than weekly | Out of scope (Phase 1) | Weekly is the only cadence. Daily/monthly/on-demand regeneration schedules are not included. |
-| The non-chosen delivery model (pull or push) | Out of scope (Phase 1) | Only the chosen delivery model is built (see the delivery-model decision in Section 1). The scheduled-distribution and subscription-worker roles are in scope only if the push model is chosen. |
+| Self-service pull / on-demand download from K4A | Out of scope (Phase 1) | The push model (weekly Monday email) is the chosen delivery model (see Section 1). The self-service pull path and its in-console download interface are not built for Phase 1. |
 | Plans other than standard | Out of scope (Phase 1) | The feature is gated to the standard plan. Extension to other plan tiers is a future consideration. |
 | Accounts/customers beyond Brightway Retail finance | Out of scope (Phase 1) | Phase 1 targets Brightway Retail's finance team. General availability to other accounts is a future phase. |
 | Self-serve subscription management (recipients choosing their own schedule) | Out of scope (Phase 1) | Managing subscriptions/recipients as a user-facing feature is not in Phase 1, even if a push model is chosen. |
@@ -336,8 +328,15 @@ Additional services surfaced at lower confidence during an independent knowledge
 
 _Applied reviewer's request._
 
-- Added FR-019: Brightway logo displayed on the weekly attribution report PDF.
-- Added Brightway logo as an information requirement for report content.
+- Resolved delivery-model rule to push (emailed weekly on Mondays), removing DEC-002 tag.
+- Updated affected-services note: push model chosen, so scheduled-distribution and subscription services are in scope.
+- Updated Section 2 flow intro to reflect push model as the built path, not pull.
+- Replaced the delivery-model branch in the flow diagram with the single push/email path, dropping the pull branches.
+- Updated FR scope note: delivery model now settled as push/weekly email.
+- Marked FR-006 self-service pull as out of scope now that push is chosen.
+- Updated FR-008 to the resolved push model (weekly Monday email), now in scope and no longer conditional.
+- Updated Information Requirements delivery-model entry to the resolved push model.
+- Updated out-of-scope row to name the pull model specifically as the non-built path.
 
 
 ---
@@ -364,7 +363,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Is this a pull or push model — should finance download the report on demand from K4A, or should it be generated and delivered to them on a weekly schedule? This single decision determines whether two backend services (scheduling/subscription workers) are even in scope, so it heavily affects effort and the 5-week deadline.
 - **OQ-002**: For 'last quarter only,' should the report always show a rolling 90 days, or snap to fixed calendar-quarter boundaries that reset on specific dates? This changes the data-scoping logic.
 - **OQ-006**: Does the report need in-PDF filtering, date-range customization, or drill-down, or is a static pre-formatted PDF sufficient?
 - **OQ-007**: Are there compliance, audit, or retention requirements for the weekly PDFs (archival, timestamping, signing)?
@@ -372,6 +370,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Questions Resolved
 
+- **OQ-001**: Resolved DEC-002/OQ-001: delivery model is push — the report is emailed to the finance team every Monday, not self-service download; scheduled-distribution and subscription-worker services are therefore in scope.
 - **OQ-003**: OQ-003 resolved: a given week's report is a frozen weekly snapshot — every download within the same week returns identical data, not the most current numbers.
 - **OQ-004**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
 - **OQ-005**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
