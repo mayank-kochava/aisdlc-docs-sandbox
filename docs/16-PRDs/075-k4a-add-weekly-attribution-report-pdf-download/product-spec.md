@@ -24,7 +24,7 @@ Brightway Retail's finance team currently has no self-service way to obtain attr
 - **Plan eligibility:** This capability is scoped to the standard plan (Brightway Retail is on the standard plan).
 - **Audience:** The intended consumers are the finance team at Brightway Retail.
 - **Delivery model:** The report is obtained by the finance team via self-service download from K4A — finance downloads the report themselves when they need it (DEC-002 resolved). A scheduled push/email of the report is not the delivery mechanism for Phase 1. Because the pull model is chosen, the scheduled-distribution and subscription-worker roles are not required for Phase 1 delivery.
-- **Download consistency:** If the report is downloaded more than once within the same week, every download returns identical data — the week's report is a frozen weekly snapshot, not refreshed to the most current available data on each download.
+- **Download consistency:** If the report is downloaded more than once within the same week, every download returns identical data — the week's report is a frozen weekly snapshot, not refreshed to the most current available data on each download. This is a working assumption, not a confirmed decision — the reviewer declined to decide it (see DEC-003).
 - **Access control:** All finance-team members on the account may obtain the report. Access is not narrowed to specific roles or a single designated finance manager, and it does not tie into any existing subscription concept.
 - **Attribution content:** The report contains total attributed revenue and total conversions, broken out by channel, presented as one simple table. A static report of this content satisfies finance's need — no filtering or drill-down is required.
 - **Retention / compliance:** Whether these weekly PDFs must be archived, timestamped, or retained for an audit period is a compliance rule the business must set. [DECISION REQUIRED: DEC-006]
@@ -104,8 +104,8 @@ And no duplicate report record is created for that account and week
 Given a weekly report for an account and week has been generated and marked available
 When an authorized user obtains that report more than once within the same week
 Then each retrieval returns the same report content for that week
-# Rule (download-consistency decision resolved): a given week's report is a fixed
-# snapshot — repeated downloads in the same week return identical data.
+# Working assumption (download-consistency decision NOT settled — see DEC-003): a given
+# week's report is a fixed snapshot — repeated downloads in the same week return identical data.
 ```
 
 ## 3.2 Delivery & Download
@@ -329,9 +329,8 @@ Additional services surfaced at lower confidence during an independent knowledge
 
 _Applied reviewer's request._
 
-- Set FR-009 secure-link validity window to seven days per DEC-007 resolution.
-- Resolved DEC-007 in NFR-010: secure link valid for seven days; removed the inline decision tag.
-- Recorded the seven-day secure-link validity window in the Information Requirements list.
+- Reframed the download-consistency business rule as a working assumption pending DEC-003.
+- Reframed FR-005's download-consistency note as a working assumption pending DEC-003.
 
 
 ---
@@ -346,12 +345,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | Should the weekly report always show the same rolling ninety days of data, or should it show a fixed calendar quarter that only resets on quarter boundaries? | Product owner (with finance stakeholder at Brightway Retail) | Fixed calendar quarter: the report covers the most recently completed calendar quarter and stays fixed until the next quarter boundary. |
-| **DEC-003** | If the finance team downloads the report more than once in the same week, should every download return exactly the same data, or should each download reflect the most current available numbers? | Product owner (with Brightway Retail finance team) | Fixed weekly snapshot: every download within the same week returns identical data for that week. |
 | **DEC-006** | Do these weekly report PDFs need to be archived, timestamped, or retained for a set audit period to meet any compliance requirement? | Compliance/Security (with Product owner) | Retain each weekly PDF and its access audit records for twelve months as a baseline, timestamped at generation; adjust to any specific finance or contractual audit requirement once confirmed. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: finance downloads the report themselves from K4A on demand (self-service pull), rather than the system pushing it on a weekly schedule.
+- **DEC-003**: Assumed: Fixed weekly snapshot: every download within the same week returns identical data for that week.
 - **DEC-004**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
 - **DEC-005**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
 - **DEC-007**: DEC-007 resolved — the secure download link for reports delivered outside an in-app download stays valid for seven days before expiring.
