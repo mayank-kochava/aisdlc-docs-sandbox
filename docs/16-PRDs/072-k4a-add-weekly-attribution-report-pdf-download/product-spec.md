@@ -24,7 +24,7 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 - **BR-5 — Access:** Access is restricted to the finance team: only finance-team users on the Brightway Retail account may download the report, not any user on the account (resolves OQ-006, DEC-003). The exact mechanism for identifying finance-team membership (role/group) is an engineering default to set during `eng-plan`.
 - **BR-6 — Delivery mechanism:** The finance team triggers the report themselves from the K4A console (manual on-demand trigger from the console). The report is not automatically emailed and is not generated without a user-initiated trigger in the console.
 - **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly mark the report as containing partial data (indicating that some data was incomplete at generation time), rather than blocking or delaying generation. Confirmed by the reviewer (resolves OQ-005) — see FR-013.
-- **BR-8 — Retention:** How long historical weekly reports remain downloadable is not settled by the input. [DECISION REQUIRED: DEC-005]
+- **BR-8 — Retention:** Historical weekly reports remain downloadable for two years, after which they may be archived or removed (resolves OQ-007, DEC-005).
 
 ### Content of the report
 
@@ -248,7 +248,7 @@ The system must track the following business information to support the function
 - **Account / plan eligibility** — whether a requesting account is in scope for this feature. System-derived from the authoritative account source on each request. Needed for eligibility gating (FR-016); the scope itself is governed by BR-4.
 - **User download authorization** — whether a requesting user may download reports for the account, i.e. whether the user is a finance-team member on the account (BR-5). System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is finance-team users only per BR-5.
 - **Secure download link** — a time-limited reference used to serve a PDF. System-derived at download time. Needed for FR-015.
-- **Report retention record** — how long a generated report remains available for download. System-derived once the retention policy is set; the policy itself is governed by BR-8.
+- **Report retention record** — how long a generated report remains available for download. System-derived; per BR-8, reports remain downloadable for two years before they may be archived or removed.
 - **Operational/audit trail of generation and download activity** — actor identity (user ID + account ID), the report/window identity, the action (generate / download), timestamp, and outcome/status. System-derived. Needed to trace who downloaded which report when, and to support the alerting and audit guardrails in Section 5.
 
 ## 5. Non-Functional Requirements & Guardrails
@@ -322,7 +322,7 @@ Explicit treatment of each risk from the Context Seed:
 | Manual on-demand report triggering by the finance team | Delivery mechanism unsettled (BR-6); weekly scheduled generation is the Phase 1 path | Future, pending decision |
 | Rollout to all standard-plan accounts or all K4A accounts | Phase 1 scoped to Brightway Retail (BR-4); broader eligibility is a later expansion | Future, pending decision |
 | Reports for windows other than the last quarter (e.g. arbitrary date ranges, full-year) | Context Seed scopes this to last quarter only | Future |
-| Long-term report archival / retention tooling beyond basic availability | Retention policy unsettled (BR-8) | Future, pending decision |
+| Long-term report archival / retention tooling beyond basic availability (archival/removal of reports older than the 2-year retention window per BR-8) | Reports stay downloadable for two years (BR-8); tooling to archive/remove reports past that window is deferred | Future |
 | Configurable report content/templates chosen by the customer | Phase 1 ships one defined report (revenue + conversions by channel with week-over-week change, single table); customer-configurable content is deferred | Future |
 | Non-PDF export formats (CSV, XLSX, etc.) | Context Seed specifies PDF only | Future |
 
@@ -347,10 +347,9 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Resolved BR-5 to finance-only access, removing the DEC-003 inline tag.
-- Updated FR-012 note from "any user" working default to finance-only per resolved BR-5.
-- Updated flow diagram authorization gate to reflect finance-only download access.
-- Updated Information Requirements download-authorization entry to reflect finance-only access.
+- Resolved BR-8 to state the 2-year retention period for historical weekly reports.
+- Updated Report retention record to reflect the confirmed 2-year retention policy.
+- Updated Section 6 archival row to reflect the now-settled 2-year retention and reframe the deferred item.
 
 
 ---
@@ -378,7 +377,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-007**: Should historical weekly reports stay downloadable indefinitely, or is there a retention/archival policy?
 - **OQ-008**: Is this a one-off for Brightway Retail (standard plan) or expected to become a general capability for other customers/plans? This affects whether we build account-specific or generalized.
 
 ### Questions Resolved
@@ -389,6 +387,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: Resolved OQ-004 (and DEC-001, the same question): "last quarter only" means the most recent completed quarter relative to the generation date, recalculated every week.
 - **OQ-005**: Resolved OQ-005: when attribution data is still processing or incomplete, the report is generated anyway but marked as partial data (confirming the existing BR-7/FR-013 posture).
 - **OQ-006**: Resolved OQ-006 — access controls are needed: only the finance team (finance-only) may download these reports, not any user on the Brightway Retail account.
+- **OQ-007**: Resolved OQ-007 (and DEC-005/BR-8): historical weekly reports are retained and downloadable for two years.
 
 ---
 > **Classification:** Type A
