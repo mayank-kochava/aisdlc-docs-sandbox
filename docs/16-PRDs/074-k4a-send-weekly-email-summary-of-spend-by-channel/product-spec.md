@@ -237,7 +237,7 @@ The system must track the following business information to support the function
 
 The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadline, multi-service blast radius, email-delivery dependencies). Each risk and its mitigation condition:
 
-- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. The requester has confirmed (resolving OQ-002) that an existing close-match spend report should be reused rather than built new — since only totals per channel are required, reusing k4a-sam-backend or sam-performance-reporter spend-summary logic (if confirmed close enough against the code) can materially reduce build scope and de-risk the estimate. Per the requester, the specific service assignment is an engineering call: scheduling should be owned by whichever service already schedules weekly/recurring reports today, rather than standing up a new scheduler (see OQ-001). The exact launch date is not stated in the input. [DECISION REQUIRED: DEC-006]
+- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. The requester has confirmed (resolving OQ-002) that an existing close-match spend report should be reused rather than built new — since only totals per channel are required, reusing k4a-sam-backend or sam-performance-reporter spend-summary logic (if confirmed close enough against the code) can materially reduce build scope and de-risk the estimate. Per the requester, the specific service assignment is an engineering call: scheduling should be owned by whichever service already schedules weekly/recurring reports today, rather than standing up a new scheduler (see OQ-001). The requester confirmed (resolving DEC-006) that Meridian Travel's summer campaign launches in approximately five weeks and that the weekly email must go live one week before that launch — i.e. approximately four weeks from now.
 
 - **NFR-012 — Multi-service blast radius / kill-switch:** Because this spans multiple backend services and is HIGH risk, delivery of the weekly email must be controllable by a config-based kill-switch that an on-call engineer can disable during an incident without a separate approval step, with no code deploy. *Mitigated when:* the switch exists, disables new weekly runs within 5 minutes of being flipped, and in-flight runs already started complete under prior behavior.
 
@@ -297,8 +297,7 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved BR-3: reporting week is Monday–Sunday in Eastern time, removing the DEC-002 tag.
-- Updated Section 4 weekly-summary-configuration item with the Monday–Sunday / Eastern-time reporting-week definition.
+- Resolved DEC-006 in NFR-011: go-live set to one week before the summer launch (~4 weeks out), removing the decision tag.
 
 
 ---
@@ -316,12 +315,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-003** | What is the exact recipient address or distribution list for the Meridian Travel marketing team? | Product owner (with Meridian Travel) | Send to a single Meridian Travel marketing distribution list address supplied during onboarding, configurable per account rather than hard-coded to individuals. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
 | **DEC-005** | For a week where a channel has zero spend or missing data, should that channel still appear in the email, and if so what value should it show? | Product owner (with Meridian Travel marketing team) | Show every tracked channel every week for consistency, displaying a zero-spend channel as 0 in the account's currency so the team can see the full channel set at a glance. |
-| **DEC-006** | Do we have a confirmed go-live date for Meridian Travel's summer campaign launch that this email must be live before? | Product owner (Mayank Ukey / Meridian Travel account) | Treat the deadline as ~5 weeks from gate approval; confirm the exact campaign launch date with Meridian Travel and lock scope to Phase 1 to protect it. |
 | **DEC-007** | For Phase 1, should the marketing team be able to configure the summary themselves through a UI, or is it acceptable to set the schedule, recipients, and channels as fixed defaults during design? | Product owner | No self-service UI in Phase 1; configure schedule, recipients, and channels as account-level defaults set during design, with changes made by request. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
+- **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
 
 ### Open Questions (evidence gaps — needs more input)
 
