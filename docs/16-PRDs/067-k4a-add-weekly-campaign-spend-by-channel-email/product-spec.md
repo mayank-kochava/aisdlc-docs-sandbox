@@ -345,4 +345,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-008**: Engineering decides: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
