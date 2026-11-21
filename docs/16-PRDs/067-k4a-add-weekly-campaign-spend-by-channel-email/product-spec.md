@@ -141,8 +141,9 @@ And if the prior-week comparison is not low-effort to add, it is omitted without
 Given one or more channels have missing or incomplete spend data for the covered week
 When the summary is generated
 Then the summary is still produced for the channels with available data
-And each channel with missing or incomplete data is explicitly marked as such rather than shown as zero spend
+And each channel with missing or incomplete data is handled per the engineering-chosen approach (deferred to engineering discretion)
 ```
+Note: The specific handling of a channel with missing or incomplete spend data (e.g. marking it versus another treatment) is deferred to engineering discretion per the resolution of OQ-006.
 
 #### FR-010 — Handle a week with no spend data at all
 ```gherkin
@@ -312,19 +313,7 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Rewrote the in-product surface value bullet to reflect that the email links to the existing K4A dashboard rather than a new on-screen view.
-- Updated BR-5 so the dual surface is email + a link to the existing K4A dashboard, not a new on-screen view.
-- Replaced the new on-screen K4A view subgraph in the flow diagram with the email linking to the existing K4A dashboard, keeping server-side authorization.
-- Reframed FR-004 to enforce entitlement when the email's link to the existing K4A dashboard is followed.
-- Replaced the on-screen-view feature area (FR-014/015/016) with requirements for an email link to the existing K4A dashboard and its server-side authorization.
-- Updated the summary information requirement to reference the email link to the existing K4A dashboard instead of an on-screen view.
-- Removed the FR-016 reference from the channel data-completeness state since FR-016 (on-screen missing-channel marking) no longer exists.
-- Repointed the covered-week summary-labeling reference from FR-014 to FR-008 since FR-014 is no longer an on-screen display.
-- Updated viewer authorization state to reference following the dashboard link and the corrected FR citations.
-- Reframed NFR-001 latency from a new on-screen view to the existing K4A dashboard reached via the email link.
-- Added FR-015 to the NFR-008 server-side enforcement cross-reference for the dashboard-link authorization gate.
-- Updated Phase 1 scope to deliver an email link to the existing K4A dashboard rather than a new on-screen display.
-- Clarified the self-service UI out-of-scope rationale to note Phase 1 adds no new K4A screen, only a link to the existing dashboard.
+- Updated FR-009 to defer missing/incomplete channel-data handling to engineering discretion per OQ-006 resolution.
 
 
 ---
@@ -351,7 +340,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-006**: How should the email behave when a channel's spend data is missing or incomplete for the week, and what data latency is acceptable before send?
 - **OQ-007**: Are there filtering/segmentation needs (by campaign, region, product line, or sub-period within the week), or is it one flat weekly total per channel?
 - **OQ-008**: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
 
@@ -362,6 +350,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003 answered: the 'marketing team' recipient resolves to the marketing team distribution list, with membership controlled by the customer's marketing ops lead.
 - **OQ-004**: Resolved OQ-004 (and DEC-003, which asks the same question): the standard plan tier already includes scheduled/automated recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 - **OQ-005**: Resolved OQ-005 — the customer sees nothing new on-screen; the weekly email includes a link to the existing K4A dashboard, and no new screen or UI build is needed in K4A.
+- **OQ-006**: Resolved OQ-006: when a channel's spend data is missing or incomplete for the week, handling is deferred to engineering discretion.
 
 ---
 > **Classification:** Type A
