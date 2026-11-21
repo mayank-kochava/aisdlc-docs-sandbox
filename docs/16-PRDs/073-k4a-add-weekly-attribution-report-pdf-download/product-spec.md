@@ -28,11 +28,11 @@ Brightway Retail's finance team needs attribution reporting data in a consumable
 
 ### Delivery Mechanism
 
-The Context Seed states a download capability is required but does not resolve whether the PDF should also be **automatically emailed** to the finance team each week or whether a **self-service download portal** alone is sufficient. [DECISION REQUIRED]
+**Working assumption (pending confirmation):** Self-service download in K4A is the primary mechanism for Phase 1; automatic weekly email is treated as additive and only built if confirmed needed before year-end close. This is a working assumption, not a confirmed decision.
 
 ### Access Scope
 
-The Context Seed does not resolve who within the finance team may view or download the report, or whether role-based restrictions apply. [DECISION REQUIRED]
+**Working assumption (pending confirmation):** Access is restricted to finance-team members of the owning Brightway Retail account, enforced server-side, until a specific role or named-user list is confirmed. This is a working assumption, not a confirmed decision.
 
 ### Report Content & Layout
 
@@ -40,7 +40,7 @@ The specific attribution metrics the PDF must contain and the layout Brightway R
 
 ### Historical Retention
 
-Historical weekly report PDFs are retained and remain downloadable for **two years** (per reviewer decision, resolving DEC-004 / OQ-007). The download interface lists every weekly report within this two-year window.
+**Working assumption (pending confirmation):** Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed. The download interface lists every weekly report within this last-quarter window. This is a working assumption, not a confirmed decision (see DEC-004).
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -186,7 +186,7 @@ Then the system rejects the request server-side with an access-denied response
 And the rejection occurs regardless of whether the UI would have shown the download control
 And authorization is re-derived from the authoritative source on each request rather than trusted from a client-supplied claim
 ```
-> Note: The precise set of roles permitted to download is subject to the Access Scope decision in Section 1; until resolved, engineering gates download to finance-team members of the owning account and enforces it server-side.
+> Note: Per the Access Scope working assumption in Section 1, access is restricted to finance-team members of the owning Brightway Retail account, enforced server-side, until a specific role or named-user list is confirmed.
 
 #### FR-012 — Access check fails closed when the authorization source is unreachable
 ```gherkin
@@ -229,11 +229,11 @@ The system must track the following business information to support the Function
 - **Report Content Definition** — the standard K4A attribution metric set and layout applied to each weekly report, including the Brightway Retail logo displayed on the PDF. *System-derived* (standard K4A definition); per reviewer decision the report is generated with this set and marked as partial data until the full metric/layout specification is confirmed. Needed by FR-003 for week-to-week consistency and FR-003a for the logo.
 - **Brightway Retail Logo Asset** — the Brightway Retail logo image rendered on each weekly report PDF per finance's request. *System-derived* from account branding / supplied asset (source to be settled in engineering design). Needed by FR-003a.
 - **Account & Plan Eligibility** — which account the report belongs to and that it is on the standard plan. *System-derived* from account records. Needed by FR-001 to determine eligibility for generation.
-- **Report Access Entitlement** — which users/roles may view and download a given account's report. *System-derived* from the authoritative authorization source, re-derived per request. Needed by FR-008, FR-011, and FR-012 to gate access server-side. The exact entitled roles are pending the Access Scope decision in Section 1.
+- **Report Access Entitlement** — which users/roles may view and download a given account's report. *System-derived* from the authoritative authorization source, re-derived per request. Needed by FR-008, FR-011, and FR-012 to gate access server-side. Per the Access Scope working assumption in Section 1, access is restricted to finance-team members of the owning Brightway Retail account until a specific role or named-user list is confirmed.
 - **Secure Download Link / Validity Window** — the time-limited means by which a PDF is delivered. *System-derived.* Needed by FR-009 and FR-013 to deliver content securely and expire access.
 - **Email Delivery Recipient List (conditional)** — the designated finance-team recipients, if automatic weekly email delivery is in scope. *User-/product-configured.* Needed by FR-014; conditional on the Delivery Mechanism decision in Section 1.
 - **Audit Record of Report Access/Download** — actor identity (user + account), report identity (account + covered week), action (list/download), timestamp, and outcome. *System-derived.* Needed by NFR-009 given the finance-facing, year-end-close sensitivity of this data.
-- **Report Retention Horizon** — how many prior weekly reports remain listed and downloadable: a **two-year** window per reviewer decision (see Section 1). *Product-configured.* Needed by FR-008 to determine what the interface lists.
+- **Report Retention Horizon** — how many prior weekly reports remain listed and downloadable: working assumption is the **full last quarter** of weekly reports, aligning with the last-quarter data scope, until a specific retention period is confirmed (see Section 1, DEC-004). *Product-configured.* Needed by FR-008 to determine what the interface lists.
 
 ---
 
@@ -255,7 +255,7 @@ The system must track the following business information to support the Function
 ### Security & Access Control
 
 - **NFR-008 — Server-side access enforcement.** Access to list and download reports is enforced server-side on every request, re-derived from the authoritative authorization source, and fails closed if that source is unreachable (FR-011, FR-012). UI-hiding is never the sole gate; a direct API call from an ineligible caller is rejected (typically 403).
-- **NFR-009 — Audit logging of report access.** Every list and download of a report is recorded to an immutable, append-only audit log capturing actor identity (user ID + account ID), report identity (account + covered week), action, timestamp, and outcome. Audit writes are asynchronous and must not block the primary operation; an audit-write failure fires an immediate operational alert rather than failing silently. Minimum retention: 12 months. [DECISION REQUIRED]
+- **NFR-009 — Audit logging of report access.** Every list and download of a report is recorded to an immutable, append-only audit log capturing actor identity (user ID + account ID), report identity (account + covered week), action, timestamp, and outcome. Audit writes are asynchronous and must not block the primary operation; an audit-write failure fires an immediate operational alert rather than failing silently. **Working assumption (pending confirmation):** Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. This is a working assumption, not a confirmed decision.
 - **NFR-010 — Financial data handling.** Raw PII, credentials, secrets, and tokens are never written to logs. The report PDF is finance-restricted content and is delivered only via a time-limited secure link (FR-013), never as an unsecured public URL or persistent open attachment.
 - **NFR-011 — Financial correctness integrity.** Because the report feeds a year-end close, the attribution figures in the PDF must exactly match the values computed by the confirmed attribution data source for the covered quarter. No rounding, truncation, or aggregation transformation is introduced in the PDF layer beyond what the standard K4A attribution report defines.
 
@@ -279,7 +279,7 @@ The following are explicitly **NOT** included in Phase 1 to prevent scope creep.
 | In-browser PDF preview | Out of scope (Phase 1) — confirmed | Resolved (reviewer): in-browser PDF preview is not required. Delivery is a plain download button only, with no in-browser preview, to avoid increasing frontend scope on the tight deadline. |
 | Report content/metric customization per customer | Out of scope (Phase 1) | Phase 1 generates the report using the standard K4A attribution metric set and marks it as partial data until the full metric/layout specification is confirmed. Brightway-specific layouts/metrics are not a Phase 1 commitment. |
 | Automatic weekly email delivery | Conditional / deferred | Pending the Delivery Mechanism decision (Section 1). Self-service download is the Phase 1 primary path; email is additive (FR-014) and built only if confirmed in scope. |
-| Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is confirmed at two years (Section 1); Phase 1 serves weekly reports for the two-year window, not an open-ended archive. |
+| Historical report archive beyond the assumed retention horizon | Out of scope (Phase 1) | Working assumption is a full-last-quarter retention horizon (Section 1, DEC-004); Phase 1 serves weekly reports for the last-quarter window, not an open-ended archive. |
 | Reports for products other than K4A | Out of scope (Phase 1) | This work item is scoped to K4A only. |
 | Plans other than standard | Out of scope (Phase 1) | Brightway Retail is on the standard plan; cross-plan eligibility is not in scope. |
 | Date ranges other than the most recent completed quarter (e.g. custom ranges, full year) | Out of scope (Phase 1) | Each report is scoped to the most recent completed quarter, recalculated weekly. |
@@ -306,9 +306,14 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved Historical Retention in Section 1 to a two-year retention/downloadability window per reviewer decision.
-- Updated Report Retention Horizon in Information Requirements to the confirmed two-year window.
-- Updated Out-of-Scope rationale for historical archive to reflect the confirmed two-year retention horizon.
+- Resolved DEC-001 in the Delivery Mechanism section with the self-service-download-primary working assumption, removing the [DECISION REQUIRED] tag.
+- Resolved DEC-002 in the Access Scope section with the stated working assumption, replacing the bare [DECISION REQUIRED] tag.
+- Updated FR-011 note to reflect the Access Scope working assumption instead of an unresolved decision.
+- Updated the Report Access Entitlement information requirement to reflect the Access Scope working assumption.
+- Resolved DEC-004 retention horizon to a working assumption of the full last quarter of weekly reports in Section 1.
+- Updated the Report Retention Horizon information item to the last-quarter working assumption resolving DEC-004.
+- Updated the Out-of-Scope retention row from the two-year figure to the last-quarter working assumption.
+- Resolved DEC-005 in NFR-009: set audit-record retention to 12 months as a working assumption, removing the bare [DECISION REQUIRED] tag.
 
 
 ---
@@ -322,17 +327,17 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Should the weekly attribution report be automatically emailed to the finance team each week, or is a self-service download in K4A enough to meet their year-end close deadline? | Product owner (with Brightway Retail finance stakeholder) | Self-service download in K4A is the primary mechanism for Phase 1; automatic weekly email is treated as additive and only built if confirmed needed before year-end close. |
-| **DEC-002** | Who in Brightway Retail's finance team is allowed to view and download this report, and are there role-based restrictions on access? | Product owner with Compliance/Security | Restrict access to finance-team members of the owning Brightway Retail account, enforced server-side, until a specific role or named-user list is confirmed. |
-| **DEC-004** | How far back should past weekly reports stay downloadable - current week only, the full quarter, or a rolling twelve months? | Product owner (with Brightway Retail finance stakeholder) | Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed. |
-| **DEC-005** | How long should audit records of who viewed or downloaded these finance reports be retained? | Compliance/Security (with Product owner) | Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. |
 | **DEC-006** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
+- **DEC-001**: Self-service download in K4A is the primary mechanism for Phase 1; automatic weekly email is treated as additive and only built if confirmed needed before year-end close.
+- **DEC-002**: Restrict access to finance-team members of the owning Brightway Retail account, enforced server-side, until a specific role or named-user list is confirmed.
 - **DEC-003**: Resolved DEC-003/OQ-005 (same question on required PDF attribution metrics and layout): generate the report anyway using the standard K4A attribution report metric set but mark it as partial data until the full metric/layout specification is confirmed.
+- **DEC-004**: Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed.
+- **DEC-005**: Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists.
 
 ### Open Questions (evidence gaps — needs more input)
 
