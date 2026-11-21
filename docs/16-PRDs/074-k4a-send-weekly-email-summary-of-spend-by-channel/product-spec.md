@@ -305,19 +305,12 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
-
 ### Decisions Resolved
 
 - **DEC-001**: Resolved DEC-001 — weekly spend summary email is sent Monday at 8:00 AM Eastern (already reflected in BR-1 and Section 4 configuration).
 - **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
 - **DEC-003**: Resolved OQ-004 (and the duplicate DEC-001 and DEC-003): the email goes out Monday at 8:00 AM Eastern to marketing-team@meridiantravel.example.
+- **DEC-004**: DEC-004 resolved — Meridian Travel tracks four channels (email, paid search, paid social, display), all available in-product via K4A with none requiring external aggregation; already reflected in BR-6, the Channel set information requirement, and the Out-of-Scope table.
 - **DEC-005**: Resolved DEC-005/OQ-006 — channels with zero spend or missing data still appear in the email, shown with a zero value; the line is never omitted.
 - **DEC-006**: DEC-006 resolved: the summer campaign launch is ~5 weeks out, and this email must go live one week before it (~4 weeks out); the DECISION REQUIRED tag in NFR-011 is removed and the go-live target folded into the prose as a stated fact.
 - **DEC-007**: DEC-007 resolved: for Phase 1 the schedule, recipients, and channels are set as fixed defaults during design, with no self-service configuration UI.
