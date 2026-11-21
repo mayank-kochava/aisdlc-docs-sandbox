@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
+- **Critical Issues:** 2
 - **High Issues:** 6
 - **Medium Issues:** 7
-- **Blocking:** No
+- **Blocking:** Yes
 
 ---
 
@@ -17,11 +17,8 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-005 triggers generation "for an entitled customer," but the entitlement check (FR-001/FR-002) and the scheduling trigger (FR-005) have no defined ordering guarantee against a mid-week plan downgrade. If entitlement is checked at trigger time but the plan changes before delivery (FR-011), it is undefined whether a summary already built for a now-ineligible customer is still delivered. | High | 3 (FR-001/005/011) | Add an FR requiring entitlement to be re-verified immediately before delivery, not only before generation, and define behavior if it changed between the two points. |
-| CG-002 | The flowchart branches `G -> L` (render on-screen) with no entitlement/authorization gate on the write of the on-screen artifact; authorization (FR-004) only gates the *read*. If a summary is generated for a customer who loses entitlement, FR-015's "not yet available" state vs. a stale rendered summary is undefined. | High | 2, 3 (FR-004/014/015) | Define whether on-screen rendering is suppressed/invalidated when entitlement is revoked after generation. |
-| CG-003 | FR-003 fails closed when the account source is unreachable at *generation*, but FR-004 fail-closed behavior for the *on-screen read* when the auth source is unreachable is only asserted in NFR-008, not in any FR with Given/When/Then. The on-screen read path has no testable fail-closed requirement. | High | 3 (FR-004), 5 (NFR-008) | Add an FR: "Given the auth/account source is unreachable, When a user requests the on-screen view, Then the request is rejected server-side (fail closed)." |
-
-No issue rises to the Critical threshold (data loss / security breach / implementation-blocking) given the fail-closed posture and the explicit DECISION REQUIRED markers. The entitlement-timing and on-screen-revocation gaps are serious and should be closed before engineering, but each has a safe default and does not block starting.
+| CG-001 | The spec mandates building against a confirmed service topology (NFR-013) and states "No build work should proceed against an unconfirmed service map" — but the entire spec is written atop an *unresolved* two-cluster ambiguity. Every FR depends on services (aggregation, scheduler, notification, entitlement) whose real repositories are unknown. The fresh independent KG cross-check re-confirms ONLY the SAM-oriented cluster (k4a-sam-backend, sam-report-scheduler, sam-performance-reporter, sam-api, sam-campaign-data-sync/k4a-sam-campaign-data-sync, reporting-subscriptions-worker, notifications-api) — it did NOT re-find the reporting-api / reporting-dispatcher / accounts-api / frontend-mos / k4a-mcp-server cluster at all. This widens, rather than resolves, the Section 1 ambiguity: the only service appearing in all three lookups is notifications-api. Engineering cannot start; FR-001 (entitlement via "authoritative account source") in particular has NO confirmed backing service — accounts-api was named by only one of three lookups. | Critical | 1 / NFR-013 / Appendix | Resolve the topology per NFR-013 before engineering sign-off. Explicitly note in Section 1 that a third independent lookup failed to re-find the reporting/accounts cluster and re-confirmed only the SAM cluster + notifications-api, so the entitlement-source service (FR-001/FR-003) is currently ungrounded. |
+| CG-002 | FR-004 and FR-015 enforce authorization "when the dashboard link is followed" and assume the K4A dashboard already implements server-side viewer-authorization re-derivation. The spec asserts "no new UI build" and treats the dashboard as a pre-existing, already-secured surface — but provides no requirement confirming the existing dashboard actually enforces per-request entitlement today. If it does not, FR-004/FR-015 are net-new work falsely scoped as free, and a 403 path that doesn't exist is a security gap. BR-3 further states "no extra access controls beyond membership of that distribution list," which directly contradicts FR-004/FR-015/NFR-008 requiring per-request 403 authorization. | Critical | 3 (FR-004/FR-015) / 1 (BR-3) / 5 (NFR-008) | Add an FR asserting/verifying the existing dashboard's current authorization behavior. Reconcile BR-3 ("no extra access controls") against FR-004/FR-015 ("reject ineligible viewer with 403") — these cannot both be true as written. |
 
 ---
 
@@ -31,13 +28,13 @@ No issue rises to the Critical threshold (data loss / security breach / implemen
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-001 | "must return within a p95 latency target ... (e.g. N concurrent requests, p95 ≤ X ms)" | Placeholder targets `N` and `X` are not testable; no automated test can assert against unbound variables. | Given N=200 concurrent on-screen requests, When the summary view is requested, Then p95 response time ≤ 800ms. (Fill real numbers in eng-plan and bind them here.) |
-| NFR-002 | "must have their own separate rate caps ... Concrete caps are an engineering decision" | No numeric cap = nothing to test. | Given the batch path exceeds its cap of C_batch queries/sec, When another batch query is issued, Then it is throttled; same for C_read on the read path. |
-| NFR-003 | "generated and delivered within a bounded window after its weekly trigger time" | "Bounded window" is undefined; DEC-006 open. | Given the weekly trigger fires at T, When generation+delivery runs, Then delivery completes within W minutes of T (define W). |
-| FR-007 | "produces the same end state for that week" | "Same end state" is not directly observable/assertable without defining the comparable artifact. | Add: Then the stored summary for (customer, covered week) is byte-identical to / supersedes the prior artifact, and the generation-run count for that key increments without creating a second summary row. |
-| FR-012 | "exponential backoff up to 3 attempts" | Backoff base/interval unspecified — two implementations both "pass." | Given attempt N fails, When retrying, Then the delay follows base*2^(N-1) with base = B seconds (define B), for N ≤ 3. |
+| FR-008a | "a prior-week comparison can be derived **at low implementation cost**" / "if the prior-week comparison is **not low-effort** to add, it is omitted" | "Low-effort" / "low implementation cost" is a developer-time judgment, not a runtime condition. It cannot be tested by QA; the same input can pass or fail depending on a human's estimate. A conditional-on-effort requirement is untestable and should be a planning decision, not an FR branch. | `Given the prior week's summary exists for the customer` `When the current week's summary is generated` `Then the summary includes, per channel, the prior-week spend value and the current-vs-prior delta` — and move the "include it or not" decision to eng-plan as a binary scope decision, removing the effort-based branch from the FR. |
+| FR-009 | "handled **per the engineering-chosen approach (deferred to engineering discretion)**" | A functional requirement that defers the actual observable behavior to engineering is not a requirement and not testable. QA cannot write an assertion against "engineering's choice." | `Given a channel has missing or incomplete spend data for the covered week` `When the summary is generated` `Then that channel is displayed with an explicit "data unavailable" marker distinct from a zero-spend value` (pick a concrete, assertable behavior). |
+| NFR-001 | "must return within a **p95 latency target** ... (e.g. N concurrent requests, p95 ≤ X ms)" | Placeholder symbols N and X. Nothing testable until values are set. | `Given 50 concurrent dashboard requests` `When the spend-by-channel view is requested` `Then p95 response time ≤ 800ms` (fill real numbers in eng-plan and treat as blocking for NFR sign-off). |
+| NFR-003 | "generated and delivered within a **bounded window**" / "exact bounded delivery-window target ... is an engineering decision" (DEC-006) | "Bounded window" is undefined; the core value prop ("predictable cadence") has no measurable SLA. | `Given the Monday 08:00 trigger fires for an entitled customer` `When generation and delivery run` `Then the email is delivered by 08:30 local time` (set the concrete minute target). |
+| NFR-010 | "Minimum retention: 12 months. [DECISION REQUIRED: DEC-007]" | Retention stated but flagged as still an open decision — contradictory (is it 12 months or TBD?). | Resolve DEC-007; if 12 months is final, remove the DECISION REQUIRED tag. |
 
-All 16 FRs are written in valid Gherkin — no prose FRs found (see Section 5).
+Note: All FRs are in Gherkin form (FR-009 has a trailing prose note, which is acceptable as an annotation, not the requirement body). The untestability above is about *content* (vague/deferred conditions), not format.
 
 ---
 
@@ -45,28 +42,32 @@ All 16 FRs are written in valid Gherkin — no prose FRs found (see Section 5).
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Multi-service blast radius | Yes — NFR-011 kill-switch (config, no deploy, 5-min propagation) | PASS | Well specified, including in-flight run behavior. |
-| Customer-facing email reliability | Yes — FR-011–013, NFR-004, NFR-005 | PASS | Named failure conditions + Retry-After honored + alerting. Strong. |
-| Service-topology ambiguity (KG lookups disagree) | Partial — NFR-013 requires engineer confirmation before build | PARTIAL | The risk is *gated*, not *mitigated*. "No build work should proceed against an unconfirmed service map" is a process guard, not a design mitigation. Acceptable, but ensure the pipeline enforces the gate. |
-| Hard 5-week deadline | Partial — NFR-014 ties to resolving open decisions + Section 6 phasing | PARTIAL | Mitigation is conditional on 7 unresolved DECISION REQUIRED items being closed "early." No owner or date assigned to those decisions. |
-| New UI/UX (on-screen view) | Weak | FAIL | HIGH-risk tier explicitly cites "new UI/UX," but there is no NFR addressing front-end-specific risk (accessibility, loading/error states beyond empty-state, cross-browser). FR-015 covers empty state only. Add a UI-robustness guardrail or explicitly scope it out. |
-| Legacy/upstream data-freshness (sam-campaign-data-sync) | No | FAIL | KG cross-check surfaces a campaign-data-sync service as an upstream data-freshness dependency. FR-009 handles missing data, but nothing requires detecting/handling *stale-but-present* data (sync lag producing last-week's numbers labeled as this week's). See Section 4. |
+| Multi-service blast radius | Yes — NFR-011 kill-switch (config-disable, 5-min propagation) | PASS | Well-specified, including in-flight-run behavior. |
+| Customer-facing email reliability | Yes — FR-011–FR-013, NFR-004, NFR-005 | PASS | Bounded retry, named failure statuses, 1%/5min alerting. Solid. |
+| Service-topology ambiguity / unclear technical design | Partially — NFR-013 says "confirm before building" | FAIL | A "don't build until someone confirms" mitigation is a gate, not a mitigation of the underlying design risk. The fresh KG cross-check makes this worse (only notifications-api common to all three lookups). No fallback or decision owner/date is named. This is the CG-001 blocker. |
+| Hard 5-week deadline | Partially — NFR-014 defers scope | FAIL | NFR-014 claims deadline is mitigated "only if remaining open scope decisions (recipient resolution, cadence) are resolved early" — yet BR-1 fixes cadence (Monday 8am) and BR-3 resolves recipient. So NFR-014 references decisions already resolved elsewhere, while NFR-003/DEC-006 (delivery window) and DEC-007 (retention) remain OPEN. The mitigation points at the wrong open items. Reconcile. |
+| Rollback safety | Yes — NFR-015 | PASS | Clear: disables future runs, does not revert delivered emails. |
+| Entitlement source unreachable (fail-closed) | Yes — FR-003, NFR-008 | PASS | Fail-closed + alert is specified. |
+| Backward compatibility with existing reporting/notification consumers | Partially — NFR-016 | FAIL (weak) | NFR-016 says existing consumers "must remain unchanged" but given the unconfirmed topology (CG-001) there is no way to enumerate existing consumers, so the requirement is unverifiable today. Depends on NFR-013 resolution. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Stale upstream sync (data-freshness):** Both the Context Seed and the independent KG cross-check name a `sam-campaign-data-sync` / `k4a-sam-campaign-data-sync` service as the upstream that feeds spend data. FR-009/FR-010 handle *missing* data, but nothing handles data that is *present but stale* — e.g., the sync last ran before the covered week closed. The summary would show complete-looking but wrong figures. No requirement asserts a freshness/as-of check against the sync service.
-2. **Entitlement revoked between generation and delivery:** Covered in CG-001 — timing window undefined.
-3. **Entitlement revoked after on-screen render:** Covered in CG-002.
-4. **Partial-week trigger / timezone boundary:** "Covered week" is "system-derived from the generation trigger." The customer's billing/campaign timezone vs. the system timezone is undefined; a Monday-00:00-UTC trigger may slice a channel's spend day differently than marketing expects. No FR pins the week boundary definition.
-5. **Recipient list empty or all-invalid:** FR-011 delivers to "configured marketing-team recipients," but DEC-002 leaves recipient resolution open. No FR covers the case where the resolved recipient list is empty or every address bounces hard (vs. a transient failure in FR-012).
-6. **On-screen view during an in-progress generation:** FR-014 shows "the latest" summary; FR-015 shows empty state when none exists. The state where a run is *in progress* (FR-006) and a prior week's summary exists is undefined — does the user see last week's, or an "updating" state?
-7. **Idempotency across a kill-switch flip mid-run:** NFR-011 says an in-flight run completes under prior behavior, but FR-007 idempotency + a re-trigger after the switch is re-enabled isn't reconciled. Could a completed-under-prior-behavior run plus a re-run double-count?
-8. **Audit write failure during the audited action:** NFR-010 says audit writes are async and a failure alerts — but does the generate/deliver action succeed or get held if its audit record never lands? Compliance-relevant; undefined.
-9. **Rate-limit (429) with no Retry-After header:** FR-013 honors Retry-After, but the downstream may return 429 *without* that header. Fallback backoff for that sub-case is unspecified.
-10. **Channel set changes between weeks:** BR-6/DEC-004 leaves the channel set open. If a channel is added/removed between weeks, week-over-week comparability (and FR-007 idempotency if the set changes on re-run) is undefined.
-11. **Multiple on-screen viewers / caching:** No requirement on whether the on-screen view is cached and how cache invalidation interacts with a fresh generation — a viewer could see a stale cached summary just after regeneration.
+1. **Data freshness / upstream sync lag:** The SAM-cluster KG evidence names `sam-campaign-data-sync` / `k4a-sam-campaign-data-sync` as "a potential upstream data-freshness dependency." No FR addresses the case where the weekly aggregation runs *before* the upstream spend sync has completed for the covered week — this would produce a plausible-looking but silently stale/incomplete summary that FR-009/FR-010 would not catch (data looks "present," just old). This is a correctness risk, not just completeness.
+2. **Partial-week / late-arriving spend after summary sent:** Spend data for the covered week arriving after Monday 8am generation. Idempotency (FR-007) overwrites to the same end state, but there's no rule for whether a corrected restated summary is re-sent or the stale email stands.
+3. **Distribution-list membership changes mid-run:** FR-011 resolves the recipient to a list controlled by the marketing ops lead. If membership changes between generation and delivery, which snapshot governs? Also: empty distribution list (zero recipients) — is that a delivery success, a skip, or an alert?
+4. **Partial email delivery (some recipients bounce, some succeed):** FR-012/FR-013 treat delivery as a single success/fail. A distribution list where 3 of 10 addresses hard-bounce is undefined — is the run "delivered" or "failed"? NFR-004 alerts on "customer's summary fails to deliver after all retries" but doesn't define per-recipient failure.
+5. **Timezone of "Monday 8am":** BR-1/NFR-003 say "Monday at 8am" with no timezone. Meridian Travel's local time vs. system UTC changes the covered-week boundary and delivery expectation. DST transitions unhandled.
+6. **"Last completed week" boundary ambiguity:** "Covered week" = "last completed week" but no definition of week start (Sun vs Mon) or how it interacts with the Monday 8am trigger (does Monday's run cover the prior Mon–Sun, or Sun–Sat?).
+7. **Kill-switch flipped mid-generation but pre-delivery:** NFR-011 says an in-flight run "completes under prior behavior." Does "complete" include *delivering* the email? A disabled feature still sending an email during an incident may be exactly what the on-call wanted to stop.
+8. **Entitlement changes between generation and delivery:** FR-001 checks entitlement at generation; the customer could be downgraded before the email sends. No re-check at delivery time is specified.
+9. **Currency / multi-currency spend:** "Per-channel spend figure" has no currency handling. If channels report in different currencies, summing/comparing is wrong. (Attribute types deferred to eng-plan, but the *existence* of a currency dimension is a business question.)
+10. **Prior-week comparison when prior week had missing data:** FR-008a assumes a clean prior-week figure. If the prior week's channel data was incomplete (FR-009), the comparison baseline is distorted — undefined behavior.
+11. **Idempotency key collision across customers:** FR-007/NFR-006 key on (customer + covered week). No handling specified for a customer whose account identity itself changes/merges.
+12. **Audit write failure during a successful delivery:** NFR-010 says audit writes are async and a failure fires an alert — but does a persistent audit-write outage block/halt generation, or do emails keep sending unaudited indefinitely? For a HIGH-risk, compliance-relevant feature this needs a decision.
+13. **Dashboard link longevity / staleness:** The email links to the existing K4A dashboard showing "spend-by-channel data." If a recipient opens last month's email, does the link show *that* week's data or current data? No deep-link-to-covered-week requirement.
+14. **Retry-After honored but exceeds delivery window:** FR-013/NFR-005 honor Retry-After on a 429; if the provider's Retry-After pushes delivery past NFR-003's bounded window, which requirement wins? Conflict undefined.
 
 ---
 
@@ -74,29 +75,18 @@ All 16 FRs are written in valid Gherkin — no prose FRs found (see Section 5).
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-016 are all in valid gherkin fenced blocks. No prose FRs. |
-| Document contains only Sections 0–6 | FAIL | The document ends with an **"## Appendix: Engineering Reference"** containing a multi-paragraph narrative service-map analysis with its own per-service findings and a "Reconciliation" recommendation paragraph. This is exactly the kind of stray multi-paragraph narrative appendix the format rule is meant to catch — it is **not** a sanctioned Revision Summary nor a short one-line `> **Label:**` metadata trailer. It should be removed from the spec proper (moved to eng-plan or a linked reference doc). |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 contains only bullet-list items with prose descriptions; no attribute tables or type declarations. |
-
----
-
-## KG Cross-Check Finding (reconciliation against independent lookup)
-
-The spec is commendably honest about the topology ambiguity: Section 1's Reconciliation Note and NFR-013 both flag that two KG lookups disagree and that no service map is settled. My independent fresh lookup re-found the **SAM-oriented cluster** (k4a-sam-backend, sam-report-scheduler, sam-performance-reporter, sam-campaign-data-sync, k4a-sam-campaign-data-sync, sam-api, notifications-api, reporting-subscriptions-worker) and did **not** re-find the reporting/notifications cluster (reporting-api, reporting-dispatcher, accounts-api, k4a-mcp-server, frontend-mos) except for the shared notifications-api.
-
-- **No contradiction of a concrete implementation claim:** The spec makes no claims about specific endpoints, tables, joins, or config that the evidence refutes — it deliberately keeps everything role-level. So there is nothing to flag as a factual conflict.
-- **Discrepancy worth surfacing (already surfaced):** The spec attributes entitlement verification to `accounts-api` (Lookup 1 only). My fresh lookup did not re-find `accounts-api`; in the SAM cluster, entitlement verification has no clear owner. The spec already handles this correctly by treating the account source abstractly ("authoritative account source") in FR-001/003, so no FR needs rework — but the engineering gate in NFR-013 must specifically confirm *which* service owns entitlement before FR-001 can be implemented.
-
-This finding is consistent with the spec's own posture; no new Critical/High issue is raised by the cross-check beyond the data-freshness gap already logged as Missed Edge Case #1.
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-015 (incl. FR-008a) are all in Gherkin. FR-009's trailing prose is an annotation note, not the requirement body — acceptable. |
+| Document contains only Sections 0–6 | FAIL | The document contains a full "## Appendix: Engineering Reference" — a multi-paragraph narrative service-map analysis with two lookup clusters, a Reconciliation prose paragraph, and implementation-direction findings. This is exactly the stray multi-paragraph KG cross-check analysis appendix that the format rule is written to catch; it is NOT a one-line labeled metadata trailer and NOT the sanctioned Revision Summary. The trailing "## Revision Summary" section itself is EXPECTED and correctly present (not flagged). The Appendix preceding it is the violation. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is entirely bullet-list prose with no attribute tables or type declarations; types are explicitly deferred to eng-plan. |
 
 ---
 
 ## 6. Recommendations
 
-1. **Close the entitlement-timing gaps (CG-001, CG-002, CG-003):** Add FRs for re-verifying entitlement before delivery, suppressing/invalidating the on-screen artifact on revocation, and failing closed on the on-screen read path.
-2. **Add a data-freshness requirement (Edge Case #1):** Require an as-of / sync-recency check against the upstream campaign-data-sync service so stale-but-present data cannot masquerade as the covered week's spend.
-3. **Move the Engineering Reference appendix out of the spec** to restore Sections 0–6 format compliance (the only FAIL row).
-4. **Bind the placeholder NFR targets** (NFR-001 N/X, NFR-002 caps, NFR-003 window W, FR-012 backoff base) to concrete, testable numbers — or explicitly state they are carried to eng-plan with a named owner/date.
-5. **Add a UI-robustness guardrail** addressing the HIGH-tier "new UI/UX" risk (loading/in-progress state, error state, accessibility) or explicitly scope it out.
-6. **Resolve the remaining edge cases** (timezone/week boundary, empty recipient list, in-progress on-screen state, 429-without-Retry-After, channel-set changes, audit-write-failure disposition, caching/invalidation) before or in parallel with engineering per severity.
-7. **Enforce the NFR-013 build gate operationally** — ensure the pipeline actually blocks implementation until the service map (especially the entitlement owner) is confirmed.
+1. **Resolve the service-topology blocker (CG-001 / NFR-013) before any engineering start.** A third independent KG lookup re-confirmed only the SAM cluster + notifications-api and did not re-find the reporting/accounts cluster at all. Have an engineer who knows K4A/SAM confirm the real repositories, *and critically* name the actual entitlement-source service backing FR-001/FR-003, which is currently ungrounded. Update Section 1 to record the three-way discrepancy.
+2. **Reconcile the BR-3 vs FR-004/FR-015/NFR-008 contradiction (CG-002).** Decide whether per-request 403 viewer-authorization is in scope. If yes, add an FR confirming the existing dashboard already enforces it (or scope the new enforcement work honestly). If BR-3's "no extra access controls" is authoritative, remove the 403 viewer-authorization requirements.
+3. **Remove effort-conditional and discretion-deferred logic from FRs.** Rewrite FR-008a (drop the "low-effort" runtime branch) and FR-009 (specify the concrete missing-data display behavior) so QA can write deterministic tests.
+4. **Set concrete values for NFR-001 (N, X), NFR-003/DEC-006 (delivery window), and resolve DEC-007 (retention).** Treat these as blocking for NFR sign-off, not post-hoc eng decisions, since they define the feature's core SLA.
+5. **Fix NFR-014's deadline mitigation** to reference the *actually* open decisions (DEC-006, DEC-007) rather than cadence/recipient, which are already resolved by BR-1/BR-3.
+6. **Add FRs for the high-severity missed edge cases**, prioritizing: upstream data-freshness/staleness (Edge 1), partial/per-recipient email delivery (Edge 4), timezone + covered-week boundary definition (Edges 5–6), and entitlement re-check at delivery (Edge 8).
+7. **Move the Engineering Reference appendix** out of the product-spec body into a separate engineering planning artifact to satisfy the Sections 0–6 structure, keeping only the Revision Summary as the trailing section.
