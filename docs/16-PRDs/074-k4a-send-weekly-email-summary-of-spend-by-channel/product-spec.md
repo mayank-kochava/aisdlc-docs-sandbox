@@ -16,7 +16,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 ### Business Rules
 
 - **BR-1 — Cadence:** The summary is generated and sent on a weekly cadence. The exact day and time of delivery is a product decision not yet settled. [DECISION REQUIRED: DEC-001]
-- **BR-2 — Content scope:** The email contains total spend per channel for the reporting week, rendered as one line per channel. Per the requester (Mayank Ukey), total spend per channel is sufficient — this is exactly what the team copies into a spreadsheet today. Comparison metrics (week-over-week change, budget variance, performance indicators) are explicitly out of scope for Phase 1.
+- **BR-2 — Content scope:** The email contains total spend per channel for the reporting week, rendered as one line per channel. Per the requester (Mayank Ukey), total spend per channel is sufficient — this is exactly what the team copies into a spreadsheet today. Totals-only is locked as the version-one scope (resolving OQ-005); comparison metrics (week-over-week change, budget variance, performance indicators) are explicitly out of scope for Phase 1.
 - **BR-3 — Reporting week:** Each email covers one reporting week. The precise boundaries of the reporting week (which day it starts and ends on, and the timezone used to bound it) are a product decision not yet settled. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient address or distribution list is a product decision not yet settled. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
@@ -291,9 +291,7 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved BR-6: Meridian's four channels (email, paid search, paid social, display) all run through K4A; no external aggregation needed.
-- Updated Section 4 Channel set info requirement to name the four confirmed in-product channels.
-- Updated Section 6 external-aggregation row to reflect that all four channels are in-product, so no external aggregation is needed.
+- Updated BR-2 to state totals-only is locked as v1 scope, resolving OQ-005.
 
 
 ---
@@ -319,7 +317,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
-- **OQ-005**: Should the email be total-spend-per-channel only, or also include comparisons (week-over-week, budget variance, performance)? Intake answer says totals-only is enough — can we lock that as the v1 scope?
 - **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
 - **OQ-007**: Are there branding/template requirements (channel names, ordering, formatting) for the email, or is a plain one-line-per-channel layout acceptable?
 - **OQ-008**: If the weekly data pull or send fails, what should happen — silent skip, retry, or an alert to someone? There's no evidence of existing failure handling and the deadline is hard, so this needs a decision.
@@ -328,6 +325,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
+- **OQ-005**: Resolved OQ-005 — totals-only (total spend per channel) is locked as the version-one scope; no comparison metrics (week-over-week, budget variance, performance).
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The desired behavior is clearly specified (weekly email with one-line-per-channel spend totals, confirmed by requester), and the remaining open questions are routine design details (send time, recipient list, zero-spend handling) rather than genuine product ambiguity; the work is multi-service backend integration across query/scheduler/dispatch/data services, which is engineering-led design, not discovery.
