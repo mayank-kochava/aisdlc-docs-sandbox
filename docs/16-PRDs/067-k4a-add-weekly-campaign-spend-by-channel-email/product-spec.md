@@ -20,7 +20,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-1 — Cadence:** The spend summary is generated and delivered on a weekly cadence. [DECISION REQUIRED: DEC-001]
 - **BR-2 — Content:** Each summary breaks down campaign spend by marketing channel.
 - **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the marketing team distribution list, and their marketing ops lead controls who is on that list. Whether access to the data should additionally be limited by role or permission remains an open business decision. [DECISION REQUIRED: DEC-002]
-- **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. Whether the standard plan already includes automated recurring email reports, or whether this is a new entitlement, must be confirmed. [DECISION REQUIRED: DEC-003]
+- **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. The standard plan already includes automated/scheduled recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 - **BR-5 — Dual surface:** The same spend-by-channel summary is available both as a delivered email and as an on-screen view in the K4A console.
 - **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
 - **BR-7 — Detail level:** The summary content shows total spend per channel. A prior-week comparison is included if it is low-effort to add; impressions and conversions are explicitly excluded. (Resolves DEC-005 / OQ-002.)
@@ -223,7 +223,7 @@ The system must track the following business information to support the Function
 - **Channel set** — the fixed list of marketing channels included in the breakdown: paid search, paid social, display, email, and affiliate (see Section 1, BR-6). The same five channels appear every week and the set does not vary by campaign. Determines which channels appear in every summary.
 - **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009, FR-010, and FR-016.
 - **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-014) and to key idempotent re-runs (FR-007).
-- **Customer plan entitlement** — whether the customer's plan permits the weekly summary feature. External, verified against the authoritative account source. Gates generation and the on-screen view (FR-001–FR-004).
+- **Customer plan entitlement** — whether the customer's plan permits the weekly summary feature. External, verified against the authoritative account source. The standard plan already includes automated/scheduled recurring email reports, so no new entitlement is required for this feature. Gates generation and the on-screen view (FR-001–FR-004).
 - **Marketing-team recipient list** — the marketing team distribution list the email is delivered to for a customer, with membership controlled by the customer's marketing ops lead (see Section 1, BR-3). Used in FR-011.
 - **Viewer authorization state** — whether a given user requesting the on-screen view is authorized to see the summary. External/system-derived from the authoritative auth source on each request. Gates FR-004 and FR-014/FR-015.
 - **Generation run status** — per customer and covered week, the outcome of a generation run (succeeded, skipped/blocked, entitlement-unverifiable, failed). System-derived. Supports FR-002, FR-003, and operational visibility.
@@ -260,7 +260,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 - **NFR-011 — Kill-switch for the feature:** Because this is HIGH risk and spans multiple services, the weekly summary feature (generation + delivery) must be disableable via configuration without a code deploy. An on-call engineer must be able to disable it during an incident without separate approval. New-request propagation target: 5 minutes; a run already in flight at the time of the flip completes under prior behavior. *Mitigates: multi-service blast radius / customer-facing reliability.*
 - **NFR-012 — Email reliability mitigation:** Mitigated when FR-011–FR-013, NFR-004, and NFR-005 are all in place: delivery is retried with bounded backoff, each named failure condition is distinctly recorded, and sustained failure triggers an alert. *Mitigates: customer-facing email reliability.*
 - **NFR-013 — Service-topology mitigation:** The two knowledge-graph lookups disagree on the real service map (see Section 1 reconciliation note). This risk is mitigated only when an engineer who knows the K4A/SAM topology confirms the actual repositories before implementation begins. No build work should proceed against an unconfirmed service map. *Mitigates: multi-service blast radius / unclear technical design.*
-- **NFR-014 — Deadline mitigation:** The hard 5-week deadline (before the summer campaign launch) is mitigated only if the remaining open scope decisions in Section 1 (recipient resolution, detail level, plan entitlement, cadence) are resolved early, since each materially affects scope. The out-of-scope phasing in Section 6 protects the deadline by deferring non-critical-path content.
+- **NFR-014 — Deadline mitigation:** The hard 5-week deadline (before the summer campaign launch) is mitigated only if the remaining open scope decisions in Section 1 (recipient resolution, cadence) are resolved early, since each materially affects scope. Plan entitlement is now resolved — the standard plan already includes scheduled recurring email reports (DEC-003/OQ-004) — and detail level is resolved per BR-7. The out-of-scope phasing in Section 6 protects the deadline by deferring non-critical-path content.
 - **NFR-015 — Rollback:** On a decision to roll back, the feature owner (Product owner, operationally the on-call engineer during an incident) triggers the kill-switch in NFR-011. Rollback disables future generation and delivery only; already-delivered emails and already-generated on-screen summaries are not retroactively reverted. Timing target follows the 5-minute kill-switch propagation.
 
 ### Backward Compatibility
@@ -326,9 +326,9 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Updated BR-3 to state the recipient resolves to the marketing team distribution list controlled by the marketing ops lead (OQ-003).
-- Updated the Information Requirements recipient-list entry to reflect the resolved distribution-list answer controlled by the marketing ops lead.
-- Updated FR-011 to deliver to the marketing team distribution list rather than generic "configured recipients".
+- Resolved DEC-003/OQ-004 in BR-4: standard plan already includes scheduled recurring email reports, no new entitlement work needed.
+- Noted in the Customer plan entitlement info requirement that the standard plan already includes scheduled recurring email reports (resolves DEC-003/OQ-004).
+- Updated NFR-014 to drop plan entitlement (and detail level) from the open scope decisions, noting both are now resolved.
 
 
 ---
@@ -344,18 +344,17 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What day and time each week should the spend summary be generated and delivered? | Product owner (with Meridian Travel marketing team) | Generate and deliver every Monday morning in the customer's local time zone, since the team currently pulls this data manually every Monday. |
 | **DEC-002** | Who exactly on the Meridian Travel marketing team should receive the email, and should access to the data be limited by role or permission? | Product owner (with Meridian Travel account contact) | Deliver to a customer-managed marketing distribution list configured per account, and restrict the on-screen view to users with a marketing or reporting role on the account; the account admin maintains the recipient list. |
-| **DEC-003** | Does the standard plan already include automated recurring email reports, or does this feature need to be added to what the standard plan offers? | Product owner (with Commercial/Pricing) | Treat automated recurring spend-by-channel email as included in the standard plan for this customer, and gate it behind a standard-plan entitlement check so it can be adjusted later if pricing decides otherwise. |
 | **DEC-004** | Which marketing channels should the spend breakdown include, and is that channel list the same every week or can it change by campaign? | Product owner (with Meridian Travel marketing team) | Include the customer's active channels, defaulting to paid search, social media, email, display, and affiliate, derived dynamically each week from the channels that have campaign activity. |
 | **DEC-006** | What day and time should the weekly summary be sent, and how soon after that trigger must it arrive? | Product owner (Mayank Ukey) with Meridian Travel marketing team | Generate and deliver every Monday at 08:00 in the customer's local timezone, delivered within 2 hours of the trigger, since the manual pull it replaces is done every Monday. |
 | **DEC-007** | How long must we retain the audit records of when each weekly summary was generated and delivered? | Compliance/Security with Product owner | Retain generation and delivery audit records for a minimum of 12 months, matching Kochava's standard platform audit retention, unless a Meridian Travel agreement requires longer. |
 
 ### Decisions Resolved
 
+- **DEC-003**: Duplicate of OQ-004; same answer settles it — standard plan already includes scheduled email reports with no extra entitlement work.
 - **DEC-005**: DEC-005 is a duplicate of OQ-002 and is settled by the same answer: total spend per channel plus optional prior-week comparison, no impressions or conversions.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-004**: Does the standard plan tier already permit automated recurring email reports, or does enabling scheduled delivery for this customer require new entitlement/feature work?
 - **OQ-005**: On-screen in K4A, what exactly is the customer seeing — a preview of the email, a screen to manage/subscribe to the weekly schedule, or a live spend-by-channel dashboard? These are very different UI builds.
 - **OQ-006**: How should the email behave when a channel's spend data is missing or incomplete for the week, and what data latency is acceptable before send?
 - **OQ-007**: Are there filtering/segmentation needs (by campaign, region, product line, or sub-period within the week), or is it one flat weekly total per channel?
@@ -366,6 +365,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: Resolved OQ-001/DEC-004 (BR-6): the spend breakdown includes a fixed weekly set of five channels — paid search, paid social, display, email, and affiliate — the same every week, not varying by campaign.
 - **OQ-002**: Each email needs total spend per channel only, plus a prior-week comparison if it's easy to add; no impressions or conversions. This answer also settles DEC-005, which asks the same question in other words.
 - **OQ-003**: OQ-003 answered: the 'marketing team' recipient resolves to the marketing team distribution list, with membership controlled by the customer's marketing ops lead.
+- **OQ-004**: Resolved OQ-004 (and DEC-003, which asks the same question): the standard plan tier already includes scheduled/automated recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 
 ---
 > **Classification:** Type A
