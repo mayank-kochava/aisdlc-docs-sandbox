@@ -23,7 +23,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. Whether the standard plan already includes automated recurring email reports, or whether this is a new entitlement, must be confirmed. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Dual surface:** The same spend-by-channel summary is available both as a delivered email and as an on-screen view in the K4A console.
 - **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
-- **BR-7 — Detail level:** The summary content shows, at minimum, spend per channel. Any additional dimensions (impressions, conversions, budget comparison, prior-week comparison) are a content-scope decision. [DECISION REQUIRED: DEC-005]
+- **BR-7 — Detail level:** The summary content shows total spend per channel. A prior-week comparison is included if it is low-effort to add; impressions and conversions are explicitly excluded. (Resolves DEC-005 / OQ-002.)
 
 ### Knowledge-Graph Reconciliation Note
 
@@ -132,6 +132,15 @@ Given spend data exists for a customer for the covered week
 When the summary is generated
 Then the summary presents campaign spend aggregated and broken down by each channel in the defined channel set
 And a per-channel spend value is shown for each channel in that set
+And the summary does not include impressions or conversions
+```
+
+#### FR-008a — Include a prior-week spend comparison when low-effort
+```gherkin
+Given a prior week's spend-by-channel summary exists for the customer
+When the current week's summary is generated and a prior-week comparison can be derived at low implementation cost
+Then the summary includes, per channel, a comparison of current-week spend to the prior week's spend
+And if the prior-week comparison is not low-effort to add, it is omitted without blocking the rest of the summary
 ```
 
 #### FR-009 — Handle a channel with missing or incomplete data
@@ -210,6 +219,7 @@ The system must track the following business information to support the Function
 
 - **Weekly spend-by-channel summary** — the generated artifact for a given customer and covered week, containing per-channel spend. System-derived, built by aggregating spend data. This is the core content delivered by email (FR-008, FR-011) and shown on-screen (FR-014).
 - **Per-channel spend figure** — the spend amount attributed to each channel in the defined channel set for the covered week. System-derived from the underlying campaign spend data. Drives the breakdown in FR-008.
+- **Prior-week per-channel spend comparison** — per channel, the prior week's spend figure used to compute a current-vs-prior comparison when low-effort to derive. System-derived from the prior covered week's summary. Supports FR-008a.
 - **Channel set** — the fixed list of marketing channels included in the breakdown: paid search, paid social, display, email, and affiliate (see Section 1, BR-6). The same five channels appear every week and the set does not vary by campaign. Determines which channels appear in every summary.
 - **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009, FR-010, and FR-016.
 - **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-014) and to key idempotent re-runs (FR-007).
@@ -273,7 +283,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 
 | Item | Rationale | Phase |
 |------|-----------|-------|
-| Additional content dimensions (impressions, conversions, budget comparison, prior-week comparison) | Not required for the core spend-by-channel objective; a content-scope decision (BR-7) | Future |
+| Additional content dimensions: impressions, conversions, budget comparison | Not required for the core spend-by-channel objective; explicitly excluded per BR-7 (DEC-005/OQ-002). Prior-week comparison is in scope for Phase 1 only if low-effort (FR-008a) | Future |
 | Filtering/segmentation of the summary (by campaign, region, product line, intra-week period) | Named as an open question, not critical path to the weekly spend-by-channel objective | Future |
 | Self-service scheduling/subscription management UI (users configuring cadence or recipients themselves) | Cadence and recipients are fixed configuration in Phase 1; self-service management is net-new UX beyond the confirmed display surface | Future |
 | Rollout to customers beyond Meridian Travel / plans beyond standard | Requirement is scoped to one customer on the standard plan | Future |
@@ -316,9 +326,10 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Resolved BR-6: channel set is the fixed weekly set of paid search, paid social, display, email, and affiliate.
-- Updated Section 4 Channel set info requirement to the resolved fixed five-channel set.
-- Removed channel set from NFR-014's list of open scope decisions now that it is resolved.
+- Resolved BR-7 to total spend per channel plus optional prior-week comparison, excluding impressions/conversions, removing the DEC-005 tag.
+- Excluded impressions/conversions from FR-008 and added FR-008a for the optional low-effort prior-week comparison.
+- Updated out-of-scope row to exclude impressions/conversions/budget comparison and note prior-week comparison is conditionally in Phase 1.
+- Added a Prior-week per-channel spend comparison information item supporting FR-008a.
 
 
 ---
@@ -336,13 +347,15 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-002** | Who exactly on the Meridian Travel marketing team should receive the email, and should access to the data be limited by role or permission? | Product owner (with Meridian Travel account contact) | Deliver to a customer-managed marketing distribution list configured per account, and restrict the on-screen view to users with a marketing or reporting role on the account; the account admin maintains the recipient list. |
 | **DEC-003** | Does the standard plan already include automated recurring email reports, or does this feature need to be added to what the standard plan offers? | Product owner (with Commercial/Pricing) | Treat automated recurring spend-by-channel email as included in the standard plan for this customer, and gate it behind a standard-plan entitlement check so it can be adjusted later if pricing decides otherwise. |
 | **DEC-004** | Which marketing channels should the spend breakdown include, and is that channel list the same every week or can it change by campaign? | Product owner (with Meridian Travel marketing team) | Include the customer's active channels, defaulting to paid search, social media, email, display, and affiliate, derived dynamically each week from the channels that have campaign activity. |
-| **DEC-005** | What level of detail should the summary show beyond spend per channel, such as impressions, conversions, budget comparison, or a comparison to the prior week? | Product owner (with Meridian Travel marketing team) | Ship the first version with spend per channel plus a total, and a week-over-week change versus the prior week's spend; defer impressions and conversions to a later phase. |
 | **DEC-006** | What day and time should the weekly summary be sent, and how soon after that trigger must it arrive? | Product owner (Mayank Ukey) with Meridian Travel marketing team | Generate and deliver every Monday at 08:00 in the customer's local timezone, delivered within 2 hours of the trigger, since the manual pull it replaces is done every Monday. |
 | **DEC-007** | How long must we retain the audit records of when each weekly summary was generated and delivered? | Compliance/Security with Product owner | Retain generation and delivery audit records for a minimum of 12 months, matching Kochava's standard platform audit retention, unless a Meridian Travel agreement requires longer. |
 
+### Decisions Resolved
+
+- **DEC-005**: DEC-005 is a duplicate of OQ-002 and is settled by the same answer: total spend per channel plus optional prior-week comparison, no impressions or conversions.
+
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: What level of detail does each email need — total spend only, or spend plus impressions/conversions/budget/prior-week comparison?
 - **OQ-003**: Does the 'marketing team' recipient resolve to specific named addresses, a distribution list, or a role/permission group — and who controls who's on it?
 - **OQ-004**: Does the standard plan tier already permit automated recurring email reports, or does enabling scheduled delivery for this customer require new entitlement/feature work?
 - **OQ-005**: On-screen in K4A, what exactly is the customer seeing — a preview of the email, a screen to manage/subscribe to the weekly schedule, or a live spend-by-channel dashboard? These are very different UI builds.
@@ -353,6 +366,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001/DEC-004 (BR-6): the spend breakdown includes a fixed weekly set of five channels — paid search, paid social, display, email, and affiliate — the same every week, not varying by campaign.
+- **OQ-002**: Each email needs total spend per channel only, plus a prior-week comparison if it's easy to add; no impressions or conversions. This answer also settles DEC-005, which asks the same question in other words.
 
 ---
 > **Classification:** Type A
