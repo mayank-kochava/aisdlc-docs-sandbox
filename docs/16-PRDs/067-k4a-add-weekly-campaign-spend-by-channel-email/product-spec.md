@@ -17,7 +17,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 
 ### Business Rules
 
-- **BR-1 — Cadence:** The spend summary is generated and delivered on a weekly cadence. [DECISION REQUIRED: DEC-001]
+- **BR-1 — Cadence:** The spend summary is generated and delivered weekly, every Monday at 8am.
 - **BR-2 — Content:** Each summary breaks down campaign spend by marketing channel.
 - **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the marketing team distribution list, and their marketing ops lead controls who is on that list. Whether access to the data should additionally be limited by role or permission remains an open business decision. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. The standard plan already includes automated/scheduled recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
@@ -227,7 +227,7 @@ The system must track the following business information to support the Function
 
 - **NFR-001 — Dashboard view latency:** When a recipient follows the email link, the existing K4A dashboard's spend-by-channel view must return within a p95 latency target measured under representative concurrent load (e.g. N concurrent requests, p95 ≤ X ms). The concrete p95 target and concurrency level are an engineering decision to be set in eng-plan based on the chosen aggregation path.
 - **NFR-002 — Spend-query rate cap:** The spend-by-channel aggregation runs against a shared data/query resource. Both the generation (batch) query path and the on-screen (read) query path must have their own separate rate caps rather than a single shared value, to protect the shared resource. Concrete caps are an engineering decision for eng-plan.
-- **NFR-003 — Weekly delivery timeliness:** Each entitled customer's weekly summary must be generated and delivered within a bounded window after its weekly trigger time, so the marketing team receives it on a predictable cadence replacing the Monday manual pull. The exact delivery-window target and the day/time of the weekly trigger are a product decision. [DECISION REQUIRED: DEC-006]
+- **NFR-003 — Weekly delivery timeliness:** Each entitled customer's weekly summary must be generated and delivered within a bounded window after its weekly trigger time of every Monday at 8am, so the marketing team receives it on a predictable cadence replacing the Monday manual pull. The weekly trigger day/time is fixed at Monday 8am; the exact bounded delivery-window target (how soon after the 8am trigger the email must arrive) is an engineering decision for eng-plan. [DECISION REQUIRED: DEC-006]
 - **NFR-004 — Generation & delivery monitoring:** The system must alert when the generation-failure rate or delivery-failure rate exceeds 1% for 5 minutes, sustained, and when any single customer's weekly summary fails to deliver after all retries. This directly protects the customer-facing email reliability called out in the HIGH risk tier.
 
 ### Reliability & Idempotency
@@ -315,11 +315,8 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Updated out-of-scope rationale for filtering/segmentation to reflect OQ-007 resolution (one flat weekly total per channel, no filtering).
-- Added BR-8 fixing granularity as one flat weekly total per channel for the last completed week with no filtering (resolves OQ-007).
-- Added an FR-008 criterion requiring a single flat weekly total per channel with no filtering/segmentation (OQ-007).
-- Defined 'Covered week' as the last completed week and noted the flat weekly total with no sub-period breakdown (OQ-007).
-- Clarified the per-channel spend figure is a single flat weekly total with no filtering/segmentation (OQ-007).
+- Resolved BR-1 cadence to every Monday at 8am, removing the DEC-001 tag.
+- Set NFR-003 weekly trigger to Monday 8am and split out the remaining delivery-window target as a new decision.
 
 
 ---
@@ -333,20 +330,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | What day and time each week should the spend summary be generated and delivered? | Product owner (with Meridian Travel marketing team) | Generate and deliver every Monday morning in the customer's local time zone, since the team currently pulls this data manually every Monday. |
 | **DEC-002** | Who exactly on the Meridian Travel marketing team should receive the email, and should access to the data be limited by role or permission? | Product owner (with Meridian Travel account contact) | Deliver to a customer-managed marketing distribution list configured per account, and restrict the on-screen view to users with a marketing or reporting role on the account; the account admin maintains the recipient list. |
 | **DEC-004** | Which marketing channels should the spend breakdown include, and is that channel list the same every week or can it change by campaign? | Product owner (with Meridian Travel marketing team) | Include the customer's active channels, defaulting to paid search, social media, email, display, and affiliate, derived dynamically each week from the channels that have campaign activity. |
-| **DEC-006** | What day and time should the weekly summary be sent, and how soon after that trigger must it arrive? | Product owner (Mayank Ukey) with Meridian Travel marketing team | Generate and deliver every Monday at 08:00 in the customer's local timezone, delivered within 2 hours of the trigger, since the manual pull it replaces is done every Monday. |
-| **DEC-007** | How long must we retain the audit records of when each weekly summary was generated and delivered? | Compliance/Security with Product owner | Retain generation and delivery audit records for a minimum of 12 months, matching Kochava's standard platform audit retention, unless a Meridian Travel agreement requires longer. |
 
 ### Decisions Resolved
 
+- **DEC-001**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
 - **DEC-003**: Duplicate of OQ-004; same answer settles it — standard plan already includes scheduled email reports with no extra entitlement work.
 - **DEC-005**: DEC-005 is a duplicate of OQ-002 and is settled by the same answer: total spend per channel plus optional prior-week comparison, no impressions or conversions.
-
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-008**: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
+- **DEC-006**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
+- **DEC-007**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
 
 ### Questions Resolved
 
@@ -357,6 +350,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-005**: Resolved OQ-005 — the customer sees nothing new on-screen; the weekly email includes a link to the existing K4A dashboard, and no new screen or UI build is needed in K4A.
 - **OQ-006**: Resolved OQ-006: when a channel's spend data is missing or incomplete for the week, handling is deferred to engineering discretion.
 - **OQ-007**: Resolved OQ-007: the summary is one flat weekly total per channel for the last completed week, with no filtering/segmentation by campaign, region, product line, or sub-period within the week.
+- **OQ-008**: Engineering decides: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
 
 ---
 > **Classification:** Type A
