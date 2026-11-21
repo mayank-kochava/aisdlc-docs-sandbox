@@ -28,19 +28,19 @@ Brightway Retail's finance team needs attribution reporting data in a consumable
 
 ### Delivery Mechanism
 
-The Context Seed states a download capability is required but does not resolve whether the PDF should also be **automatically emailed** to the finance team each week or whether a **self-service download portal** alone is sufficient. [DECISION REQUIRED: DEC-001]
+The Context Seed states a download capability is required but does not resolve whether the PDF should also be **automatically emailed** to the finance team each week or whether a **self-service download portal** alone is sufficient. [DECISION REQUIRED]
 
 ### Access Scope
 
-The Context Seed does not resolve who within the finance team may view or download the report, or whether role-based restrictions apply. [DECISION REQUIRED: DEC-002]
+The Context Seed does not resolve who within the finance team may view or download the report, or whether role-based restrictions apply. [DECISION REQUIRED]
 
 ### Report Content & Layout
 
-The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not resolved in the Context Seed. The working assumption is the **standard K4A attribution report metric set**; any Brightway-specific layout requirement is an open business decision. [DECISION REQUIRED: DEC-003]
+The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not resolved in the Context Seed. The working assumption is the **standard K4A attribution report metric set**; any Brightway-specific layout requirement is an open business decision. [DECISION REQUIRED]
 
 ### Historical Retention
 
-How many prior weekly reports remain downloadable (current week only, full quarter, rolling 12 months) is not resolved by the Context Seed and affects what the download interface must list. [DECISION REQUIRED: DEC-004]
+How many prior weekly reports remain downloadable (current week only, full quarter, rolling 12 months) is not resolved by the Context Seed and affects what the download interface must list. [DECISION REQUIRED]
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -243,7 +243,7 @@ The system must track the following business information to support the Function
 ### Security & Access Control
 
 - **NFR-008 — Server-side access enforcement.** Access to list and download reports is enforced server-side on every request, re-derived from the authoritative authorization source, and fails closed if that source is unreachable (FR-011, FR-012). UI-hiding is never the sole gate; a direct API call from an ineligible caller is rejected (typically 403).
-- **NFR-009 — Audit logging of report access.** Every list and download of a report is recorded to an immutable, append-only audit log capturing actor identity (user ID + account ID), report identity (account + covered week), action, timestamp, and outcome. Audit writes are asynchronous and must not block the primary operation; an audit-write failure fires an immediate operational alert rather than failing silently. Minimum retention: 12 months. [DECISION REQUIRED: DEC-005]
+- **NFR-009 — Audit logging of report access.** Every list and download of a report is recorded to an immutable, append-only audit log capturing actor identity (user ID + account ID), report identity (account + covered week), action, timestamp, and outcome. Audit writes are asynchronous and must not block the primary operation; an audit-write failure fires an immediate operational alert rather than failing silently. Minimum retention: 12 months. [DECISION REQUIRED]
 - **NFR-010 — Financial data handling.** Raw PII, credentials, secrets, and tokens are never written to logs. The report PDF is finance-restricted content and is delivered only via a time-limited secure link (FR-013), never as an unsecured public URL or persistent open attachment.
 - **NFR-011 — Financial correctness integrity.** Because the report feeds a year-end close, the attribution figures in the PDF must exactly match the values computed by the confirmed attribution data source for the covered quarter. No rounding, truncation, or aggregation transformation is introduced in the PDF layer beyond what the standard K4A attribution report defines.
 
@@ -264,7 +264,7 @@ The following are explicitly **NOT** included in Phase 1 to prevent scope creep.
 
 | Item | Status | Rationale |
 |------|--------|-----------|
-| In-browser PDF preview | Out of scope (Phase 1) | The KG role label implies possible preview, but the Context Seed only requires download. Preview is additive UI surface; defer unless product confirms it as required. |
+| In-browser PDF preview | Out of scope (Phase 1) — confirmed | Resolved (reviewer): in-browser PDF preview is not required. Delivery is a plain download button only, with no in-browser preview, to avoid increasing frontend scope on the tight deadline. |
 | Report content/metric customization per customer | Out of scope (Phase 1) | Phase 1 uses the standard K4A attribution metric set. Brightway-specific layouts/metrics are pending the Report Content & Layout decision and are not a Phase 1 commitment. |
 | Automatic weekly email delivery | Conditional / deferred | Pending the Delivery Mechanism decision (Section 1). Self-service download is the Phase 1 primary path; email is additive (FR-014) and built only if confirmed in scope. |
 | Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is an open decision (Section 1); Phase 1 serves at least the current week plus whatever horizon is confirmed, not an open-ended archive. |
@@ -284,11 +284,19 @@ _The sections below are derived automatically from the codebase knowledge graph,
 - **reporting-api** (backend): Attribution report generation and delivery API.
 - **reporting-dispatcher** (backend): Scheduled weekly report dispatch and PDF export.
 - **reporting-subscriptions-worker** (backend): Manages scheduled report subscriptions and delivery.
-- **frontend-mos** (frontend): K4A UI — report download, PDF preview, download interface.
+- **frontend-mos** (frontend): K4A UI — report download interface (plain download button; in-browser PDF preview is confirmed out of scope — see Section 6).
 - **pubsuite-attribution** (backend): Attribution data computation for weekly reports.
 - **sam-report-scheduler** (backend): Schedules and triggers weekly SAM/K4A report generation.
 
 > **Reconciliation note:** An independent KG cross-check did not re-find `pubsuite-attribution` or `sam-report-scheduler` and instead named `koch-query-api` and `aaas-reporting` as candidate attribution data sources. The authoritative attribution data source, and the scheduling ownership split across `reporting-dispatcher`, `reporting-subscriptions-worker`, and `sam-report-scheduler`, are unresolved and must be settled during engineering design review (see NFR-013). This appendix states grounded context only and is not an implementation direction.
+
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Marked in-browser PDF preview as confirmed out of scope per reviewer's OQ-001 resolution.
+- Updated frontend-mos appendix role to drop PDF preview, reflecting the confirmed download-only scope.
+
 
 ---
 ## Open Questions & Decisions Register
@@ -306,16 +314,20 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-003** | What specific attribution metrics must the PDF contain, and does Brightway Retail need a particular layout such as summary tables, per-channel breakdowns, or charts? | Product owner (with Brightway Retail finance stakeholder) | Use the standard K4A attribution report metric set, presented as a consistent summary layout, until Brightway Retail confirms a specific metric list or layout. |
 | **DEC-004** | How far back should past weekly reports stay downloadable - current week only, the full quarter, or a rolling twelve months? | Product owner (with Brightway Retail finance stakeholder) | Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed. |
 | **DEC-005** | How long should audit records of who viewed or downloaded these finance reports be retained? | Compliance/Security (with Product owner) | Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. |
+| **DEC-006** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Is in-browser PDF preview actually required, or is a plain download link sufficient? The engineering role labels mention 'PDF preview' but that materially increases frontend scope on a tight deadline.
 - **OQ-002**: Should delivery be a self-service download portal, an automatic weekly email of the PDF, or both? This decides which backend services (subscriptions/dispatch vs. just download endpoint) are actually in scope.
 - **OQ-003**: Does 'last quarter only' mean the trailing calendar quarter, the current quarter-to-date, or a rolling 3 months? Finance/year-end framing makes the exact window and reset timing matter.
 - **OQ-004**: Who on the finance team needs access, and does this report need role/permission gating distinct from existing K4A console access? There's no evidence of how report access is currently restricted.
 - **OQ-005**: What specific attribution metrics and layout must the PDF contain (tables, charts, channel breakdowns)? Needed before anyone can build the generation/export logic.
 - **OQ-006**: What should happen on a failed weekly generation — alert, auto-retry, or skip? This drives whether we build monitoring/retry into the scheduler and dispatcher.
 - **OQ-007**: Are there compliance, audit, or retention requirements for these financial reports, and how long must historical weekly PDFs remain downloadable (current week, full quarter, rolling 12 months)?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001: in-browser PDF preview is not required — delivery is a plain download button only, with no preview, to avoid increasing frontend scope on the tight deadline.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly PDF attribution report, last-quarter data, finance-team download) and the open questions are standard engineering/design decisions (metrics layout, retention, failure handling) rather than genuine product ambiguity — so this is engineering-led design across 6 backend+frontend services, not discovery.
