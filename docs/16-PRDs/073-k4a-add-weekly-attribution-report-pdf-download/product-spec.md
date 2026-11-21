@@ -36,7 +36,7 @@ The Context Seed does not resolve who within the finance team may view or downlo
 
 ### Report Content & Layout
 
-The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not resolved in the Context Seed. The working assumption is the **standard K4A attribution report metric set**; any Brightway-specific layout requirement is an open business decision. [DECISION REQUIRED] Finance has confirmed one concrete layout requirement: the PDF must display the **Brightway Retail logo** (see FR-003a).
+The specific attribution metrics the PDF must contain and the layout Brightway Retail expects (summary table, per-channel breakdowns, charts) are not fully resolved in the Context Seed. Per reviewer decision, the report is **generated anyway using the standard K4A attribution report metric set and marked as partial data** until the full metric/layout specification is confirmed, so finance is not blocked ahead of year-end close. Finance has confirmed one concrete layout requirement: the PDF must display the **Brightway Retail logo** (see FR-003a).
 
 ### Historical Retention
 
@@ -101,9 +101,10 @@ And data outside the most-recent-completed-quarter window is excluded from the r
 Given a weekly attribution report is being generated
 When the system assembles the report content
 Then the report contains the standard K4A attribution report metric set
+And the generated report is marked as partial data until the full metric/layout specification is confirmed
 And the metric set and layout remain consistent from week to week
 ```
-> Note: The exact metric set and layout are subject to the Report Content & Layout decision in Section 1; until resolved, engineering builds against the standard K4A attribution report metric set.
+> Note: Per reviewer decision, the report is generated using the standard K4A attribution report metric set and marked as partial data until the full metric/layout specification is confirmed; this does not block weekly generation.
 
 #### FR-003a — Report PDF displays the Brightway Retail logo
 ```gherkin
@@ -225,7 +226,7 @@ The system must track the following business information to support the Function
 - **Report Availability Status** — whether a given week's report is available, failed, or not-yet-generated. *System-derived.* Needed by FR-004, FR-008, FR-009, and FR-010 to drive what the download interface shows and permits.
 - **Report Failure Reason** — the distinct cause when a week's report fails (attribution-data-unavailable vs. PDF-render-failure). *System-derived.* Needed by FR-004 and FR-005 to drive distinct operational alerts.
 - **Attribution Data (last quarter)** — the standard K4A attribution metric set that populates the report body. *System-derived* from the attribution data source (unresolved between the two KG candidate sources — see Section 1). Needed by FR-002 and FR-003 as the report's content.
-- **Report Content Definition** — the standard K4A attribution metric set and layout applied to each weekly report, including the Brightway Retail logo displayed on the PDF. *System-derived* (standard K4A definition), pending the Report Content & Layout decision in Section 1. Needed by FR-003 for week-to-week consistency and FR-003a for the logo.
+- **Report Content Definition** — the standard K4A attribution metric set and layout applied to each weekly report, including the Brightway Retail logo displayed on the PDF. *System-derived* (standard K4A definition); per reviewer decision the report is generated with this set and marked as partial data until the full metric/layout specification is confirmed. Needed by FR-003 for week-to-week consistency and FR-003a for the logo.
 - **Brightway Retail Logo Asset** — the Brightway Retail logo image rendered on each weekly report PDF per finance's request. *System-derived* from account branding / supplied asset (source to be settled in engineering design). Needed by FR-003a.
 - **Account & Plan Eligibility** — which account the report belongs to and that it is on the standard plan. *System-derived* from account records. Needed by FR-001 to determine eligibility for generation.
 - **Report Access Entitlement** — which users/roles may view and download a given account's report. *System-derived* from the authoritative authorization source, re-derived per request. Needed by FR-008, FR-011, and FR-012 to gate access server-side. The exact entitled roles are pending the Access Scope decision in Section 1.
@@ -276,7 +277,7 @@ The following are explicitly **NOT** included in Phase 1 to prevent scope creep.
 | Item | Status | Rationale |
 |------|--------|-----------|
 | In-browser PDF preview | Out of scope (Phase 1) — confirmed | Resolved (reviewer): in-browser PDF preview is not required. Delivery is a plain download button only, with no in-browser preview, to avoid increasing frontend scope on the tight deadline. |
-| Report content/metric customization per customer | Out of scope (Phase 1) | Phase 1 uses the standard K4A attribution metric set. Brightway-specific layouts/metrics are pending the Report Content & Layout decision and are not a Phase 1 commitment. |
+| Report content/metric customization per customer | Out of scope (Phase 1) | Phase 1 generates the report using the standard K4A attribution metric set and marks it as partial data until the full metric/layout specification is confirmed. Brightway-specific layouts/metrics are not a Phase 1 commitment. |
 | Automatic weekly email delivery | Conditional / deferred | Pending the Delivery Mechanism decision (Section 1). Self-service download is the Phase 1 primary path; email is additive (FR-014) and built only if confirmed in scope. |
 | Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is an open decision (Section 1); Phase 1 serves at least the current week plus whatever horizon is confirmed, not an open-ended archive. |
 | Reports for products other than K4A | Out of scope (Phase 1) | This work item is scoped to K4A only. |
@@ -305,9 +306,10 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Added FR-003a requiring the weekly attribution report PDF to display the Brightway Retail logo.
-- Noted the confirmed Brightway logo requirement in the Report Content & Layout section.
-- Added the Brightway Retail Logo Asset to Information Requirements and referenced it in Report Content Definition.
+- Resolved Report Content & Layout: generate with standard metric set and mark as partial data; removed [DECISION REQUIRED] tag.
+- Updated FR-003 to generate with standard metrics and mark output as partial data, replacing the pending-decision note.
+- Updated Report Content Definition info requirement to reflect partial-data resolution instead of pending decision.
+- Updated Section 6 row to reflect partial-data generation resolution rather than a pending decision.
 
 
 ---
@@ -323,18 +325,20 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | Should the weekly attribution report be automatically emailed to the finance team each week, or is a self-service download in K4A enough to meet their year-end close deadline? | Product owner (with Brightway Retail finance stakeholder) | Self-service download in K4A is the primary mechanism for Phase 1; automatic weekly email is treated as additive and only built if confirmed needed before year-end close. |
 | **DEC-002** | Who in Brightway Retail's finance team is allowed to view and download this report, and are there role-based restrictions on access? | Product owner with Compliance/Security | Restrict access to finance-team members of the owning Brightway Retail account, enforced server-side, until a specific role or named-user list is confirmed. |
-| **DEC-003** | What specific attribution metrics must the PDF contain, and does Brightway Retail need a particular layout such as summary tables, per-channel breakdowns, or charts? | Product owner (with Brightway Retail finance stakeholder) | Use the standard K4A attribution report metric set, presented as a consistent summary layout, until Brightway Retail confirms a specific metric list or layout. |
 | **DEC-004** | How far back should past weekly reports stay downloadable - current week only, the full quarter, or a rolling twelve months? | Product owner (with Brightway Retail finance stakeholder) | Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed. |
 | **DEC-005** | How long should audit records of who viewed or downloaded these finance reports be retained? | Compliance/Security (with Product owner) | Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. |
 | **DEC-006** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 
+### Decisions Resolved
+
+- **DEC-003**: Resolved DEC-003/OQ-005 (same question on required PDF attribution metrics and layout): generate the report anyway using the standard K4A attribution report metric set but mark it as partial data until the full metric/layout specification is confirmed.
+
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Should delivery be a self-service download portal, an automatic weekly email of the PDF, or both? This decides which backend services (subscriptions/dispatch vs. just download endpoint) are actually in scope.
 - **OQ-004**: Who on the finance team needs access, and does this report need role/permission gating distinct from existing K4A console access? There's no evidence of how report access is currently restricted.
-- **OQ-005**: What specific attribution metrics and layout must the PDF contain (tables, charts, channel breakdowns)? Needed before anyone can build the generation/export logic.
 - **OQ-006**: What should happen on a failed weekly generation — alert, auto-retry, or skip? This drives whether we build monitoring/retry into the scheduler and dispatcher.
 - **OQ-007**: Are there compliance, audit, or retention requirements for these financial reports, and how long must historical weekly PDFs remain downloadable (current week, full quarter, rolling 12 months)?
 
@@ -342,6 +346,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved OQ-001: in-browser PDF preview is not required — delivery is a plain download button only, with no preview, to avoid increasing frontend scope on the tight deadline.
 - **OQ-003**: Resolved OQ-003: 'last quarter only' means the most recent completed quarter, recalculated every week.
+- **OQ-005**: Resolved OQ-005 (and its duplicate DEC-003): generate the report anyway using the standard K4A attribution metric set and mark it as partial data until the full metric/layout specification is confirmed.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly PDF attribution report, last-quarter data, finance-team download) and the open questions are standard engineering/design decisions (metrics layout, retention, failure handling) rather than genuine product ambiguity — so this is engineering-led design across 6 backend+frontend services, not discovery.
