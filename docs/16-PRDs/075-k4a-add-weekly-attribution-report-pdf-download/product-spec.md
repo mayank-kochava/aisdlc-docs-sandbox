@@ -363,4 +363,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-008**: Resolved OQ-008 — report content is produced by reusing the existing summary-report component (summary-report-cloud) if one exists, rather than assembling it in the main reporting path.
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
