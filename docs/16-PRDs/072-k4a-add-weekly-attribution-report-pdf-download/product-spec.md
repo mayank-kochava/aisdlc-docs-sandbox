@@ -21,7 +21,7 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 - **BR-2 — Format:** The report is delivered as a PDF.
 - **BR-3 — Reporting window:** The report covers the last quarter only, meaning the most recent completed quarter relative to the generation date, recalculated every week.
 - **BR-4 — Customer scope:** This capability applies to Brightway Retail, a standard-plan customer. Whether the feature is gated to Brightway Retail specifically, to all standard-plan accounts, or to all K4A accounts is not settled by the input. [DECISION REQUIRED: DEC-002]
-- **BR-5 — Access:** Who within the Brightway Retail account may download the report is not settled by the input. [DECISION REQUIRED: DEC-003]
+- **BR-5 — Access:** Access is restricted to the finance team: only finance-team users on the Brightway Retail account may download the report, not any user on the account (resolves OQ-006, DEC-003). The exact mechanism for identifying finance-team membership (role/group) is an engineering default to set during `eng-plan`.
 - **BR-6 — Delivery mechanism:** The finance team triggers the report themselves from the K4A console (manual on-demand trigger from the console). The report is not automatically emailed and is not generated without a user-initiated trigger in the console.
 - **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly mark the report as containing partial data (indicating that some data was incomplete at generation time), rather than blocking or delaying generation. Confirmed by the reviewer (resolves OQ-005) — see FR-013.
 - **BR-8 — Retention:** How long historical weekly reports remain downloadable is not settled by the input. [DECISION REQUIRED: DEC-005]
@@ -45,9 +45,9 @@ flowchart TD
     C --> F["Produce PDF and make it available for the account"]
     D --> F
     F --> G["Finance user opens K4A report area"]
-    G --> H{"User authorized to download for this account?"}
+    G --> H{"User a finance-team member authorized for this account?"}
     H -->|"yes"| I["User downloads PDF"]
-    H -->|"no"| J["Reject with authorization error (403)"]
+    H -->|"no (non-finance or ineligible)"| J["Reject with authorization error (403)"]
     I --> K["Download succeeds"]
     E --> L["No report available for that week; prior report still downloadable"]
     G --> M{"Report available for requested week?"}
@@ -204,7 +204,7 @@ Then the backend re-derives the user's eligibility from the authoritative source
 And a request from a user not authorized for that account is rejected with a 403
 And authorization is enforced server-side regardless of whether the UI showed or hid the download action
 ```
-> The exact set of authorized users/roles within the account is governed by BR-5 (Section 1). Working default until that decision lands: any user with access to the Brightway Retail K4A account may download, enforced server-side.
+> The authorized set is governed by BR-5 (Section 1): only finance-team users on the Brightway Retail account may download, enforced server-side. A request from a non-finance user on the account is rejected with a 403.
 
 **FR-016 — Account/plan eligibility gating**
 ```gherkin
@@ -246,7 +246,7 @@ The system must track the following business information to support the function
 - **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to mark the report as partial data when some data was incomplete at generation time (FR-013).
 - **Attribution data for the window** — the source metrics/data points the report renders: total attributed revenue and conversions by channel, plus the change from the prior week, presented in a single simple table. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006.
 - **Account / plan eligibility** — whether a requesting account is in scope for this feature. System-derived from the authoritative account source on each request. Needed for eligibility gating (FR-016); the scope itself is governed by BR-4.
-- **User download authorization** — whether a requesting user may download reports for the account. System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is governed by BR-5.
+- **User download authorization** — whether a requesting user may download reports for the account, i.e. whether the user is a finance-team member on the account (BR-5). System-derived from the authoritative auth source on each request, never cached client-side. Needed for FR-012; the authorized set is finance-team users only per BR-5.
 - **Secure download link** — a time-limited reference used to serve a PDF. System-derived at download time. Needed for FR-015.
 - **Report retention record** — how long a generated report remains available for download. System-derived once the retention policy is set; the policy itself is governed by BR-8.
 - **Operational/audit trail of generation and download activity** — actor identity (user ID + account ID), the report/window identity, the action (generate / download), timestamp, and outcome/status. System-derived. Needed to trace who downloaded which report when, and to support the alerting and audit guardrails in Section 5.
@@ -347,11 +347,10 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Updated BR-7 to state the generate-anyway-mark-partial posture as confirmed (resolves OQ-005).
-- Updated FR-013 to reflect confirmed partial-data marking and removed the reversal caveat (resolves OQ-005).
-- Updated the flow diagram's partial-data branch to say the report is marked as partial data.
-- Updated the data-completeness indicator information requirement to reference marking the report as partial.
-- Updated the Risk Mitigation entry to reflect confirmed BR-7 posture resolving OQ-005.
+- Resolved BR-5 to finance-only access, removing the DEC-003 inline tag.
+- Updated FR-012 note from "any user" working default to finance-only per resolved BR-5.
+- Updated flow diagram authorization gate to reflect finance-only download access.
+- Updated Information Requirements download-authorization entry to reflect finance-only access.
 
 
 ---
@@ -379,7 +378,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-006**: Are access controls needed (e.g. finance-only), or can any user on the Brightway Retail account download these reports?
 - **OQ-007**: Should historical weekly reports stay downloadable indefinitely, or is there a retention/archival policy?
 - **OQ-008**: Is this a one-off for Brightway Retail (standard plan) or expected to become a general capability for other customers/plans? This affects whether we build account-specific or generalized.
 
@@ -390,6 +388,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003 resolved: finance triggers the report themselves from the K4A console (manually triggered from the console).
 - **OQ-004**: Resolved OQ-004 (and DEC-001, the same question): "last quarter only" means the most recent completed quarter relative to the generation date, recalculated every week.
 - **OQ-005**: Resolved OQ-005: when attribution data is still processing or incomplete, the report is generated anyway but marked as partial data (confirming the existing BR-7/FR-013 posture).
+- **OQ-006**: Resolved OQ-006 — access controls are needed: only the finance team (finance-only) may download these reports, not any user on the Brightway Retail account.
 
 ---
 > **Classification:** Type A
