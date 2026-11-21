@@ -254,7 +254,7 @@ The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadlin
 | Item | Rationale |
 |------|-----------|
 | Week-over-week change, budget variance, or performance indicators in the email | Requester confirmed total spend per channel alone is sufficient (BR-2); comparison metrics are a future enhancement. |
-| Customizable channel names, ordering, email branding, or template design | Not required for the Phase 1 "one line per channel" summary; branding/template requirements are an open question deferred to a later phase. |
+| Customizable channel names, ordering, email branding, or template design | Not required for the Phase 1 "one line per channel" summary; the requester confirmed a plain one-line-per-channel layout with no branding is acceptable (resolving OQ-007), so customization is deferred to a later phase. |
 | Self-service UI for configuring the summary (schedule, recipients, channels) | UI/frontend impact is unconfirmed in the Context Seed; Phase 1 can rely on configured defaults set during design. [DECISION REQUIRED: DEC-007] |
 | Manual aggregation of spend from external sources not available in-product | Meridian Travel's four channels (email, paid search, paid social, display) all run through K4A today (BR-6), so no external-source aggregation is needed for Phase 1. |
 | On-demand / ad-hoc generation of the summary outside the weekly cadence | The requirement is a weekly scheduled email; ad-hoc runs are not part of Phase 1. |
@@ -291,7 +291,7 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Updated BR-2 to state totals-only is locked as v1 scope, resolving OQ-005.
+- Updated Section 6 out-of-scope rationale to record the requester's answer that plain one-line-per-channel with no branding is acceptable (resolves OQ-007).
 
 
 ---
@@ -318,7 +318,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
 - **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
-- **OQ-007**: Are there branding/template requirements (channel names, ordering, formatting) for the email, or is a plain one-line-per-channel layout acceptable?
 - **OQ-008**: If the weekly data pull or send fails, what should happen — silent skip, retry, or an alert to someone? There's no evidence of existing failure handling and the deadline is hard, so this needs a decision.
 
 ### Questions Resolved
@@ -326,6 +325,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 - **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
 - **OQ-005**: Resolved OQ-005 — totals-only (total spend per channel) is locked as the version-one scope; no comparison metrics (week-over-week, budget variance, performance).
+- **OQ-007**: OQ-007 resolved — requester confirmed a plain one-line-per-channel layout is acceptable with no branding/template requirements.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The desired behavior is clearly specified (weekly email with one-line-per-channel spend totals, confirmed by requester), and the remaining open questions are routine design details (send time, recipient list, zero-spend handling) rather than genuine product ambiguity; the work is multi-service backend integration across query/scheduler/dispatch/data services, which is engineering-led design, not discovery.
