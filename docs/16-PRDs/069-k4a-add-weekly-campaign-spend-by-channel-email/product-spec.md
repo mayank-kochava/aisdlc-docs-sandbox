@@ -274,7 +274,7 @@ The following are explicitly **NOT** in Phase 1, to prevent scope creep:
 
 | Item | Status | Rationale |
 |------|--------|-----------|
-| Interactive email elements (drill-down links into channel detail) | Out of scope (future phase) | Open discovery question; a static summary table satisfies the core "no manual pull" goal. [DECISION REQUIRED: DEC-007] |
+| Interactive email elements (drill-down links into channel detail) | Out of scope | Confirmed: no drill-down links are needed; a static summary table is sufficient and satisfies the core "no manual pull" goal. |
 | Per-campaign breakdowns within each channel | Out of scope | Confirmed under BR-5: Phase 1 shows channel-level totals only; per-campaign breakdowns are not included. |
 | Budget comparison figures, impressions, or conversions | Out of scope | Confirmed under BR-5: the summary shows total spend per channel (plus a prior-week comparison if easy to add); no budget comparisons, impressions, or conversions. |
 | Self-service UI for day/time send-schedule configuration | Out of scope (future phase) | The schedule can launch fixed (BR-1); any console/MCP schedule-config surface is deferred. Recipient-list membership is NOT deferred — it must be editable by the marketing ops lead without engineering (BR-4, FR-012a), though the mechanism (managed distribution list, config entry, or UI) is for eng-plan to determine. |
@@ -310,9 +310,7 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Resolved BR-5 to total spend per channel plus optional prior-week comparison, no per-campaign breakdown, no impressions/conversions.
-- Updated the Information Requirements content/format profile to match the confirmed BR-5 detail level.
-- Updated Section 6 rows to reflect BR-5 resolution: per-campaign breakdowns out, prior-week comparison conditionally in, impressions/conversions out.
+- Resolved DEC-007/OQ-007: marked interactive drill-down email elements out of scope, confirming a static table is sufficient and removing the DECISION REQUIRED tag.
 
 
 ---
@@ -340,7 +338,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-006**: What level of detail should the numbers show — totals only, totals with prior-week/budget comparisons, or per-campaign breakdowns within each channel?
-- **OQ-007**: Does the email need interactive/drill-down links, or is a static summary table sufficient?
 - **OQ-008**: Is any human review or approval required before each weekly send, or is it fully automated once deployed?
 - **OQ-009**: Is there an existing scheduled-report / email-subscription capability the team already uses that this should build on, rather than a net-new pipeline?
 
@@ -351,6 +348,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Resolved DEC-001/OQ-003 — the weekly email is sent every Monday at 8:00 AM Eastern Time.
 - **OQ-004**: OQ-004 resolved: recipients are the marketing team's distribution list, with the marketing ops lead deciding membership, and the list must be configurable (add/remove people) without developer involvement.
 - **OQ-005**: Resolved — when upstream spend data is missing, delayed, or incomplete, the email is still sent on schedule with the channels that are available, explicitly noting which channel(s) are missing; delivery is never held back or delayed. Settles both DEC-005 and OQ-005.
+- **OQ-007**: Resolved DEC-007/OQ-007: the email needs no interactive drill-down links; a static summary table is sufficient for Phase 1.
 
 ---
 > **Classification:** Type A
