@@ -17,7 +17,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 
 - **BR-1 — Cadence:** The summary is generated and sent on a weekly cadence. The exact day and time of delivery is a product decision not yet settled. [DECISION REQUIRED: DEC-001]
 - **BR-2 — Content scope:** The email contains total spend per channel for the reporting week, rendered as one line per channel. Per the requester (Mayank Ukey), total spend per channel is sufficient — this is exactly what the team copies into a spreadsheet today. Totals-only is locked as the version-one scope (resolving OQ-005); comparison metrics (week-over-week change, budget variance, performance indicators) are explicitly out of scope for Phase 1.
-- **BR-3 — Reporting week:** Each email covers one reporting week. The precise boundaries of the reporting week (which day it starts and ends on, and the timezone used to bound it) are a product decision not yet settled. [DECISION REQUIRED: DEC-002]
+- **BR-3 — Reporting week:** Each email covers one reporting week. The reporting week runs Monday through Sunday, bounded in Eastern time (per the requester, answering DEC-002).
 - **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient address or distribution list is a product decision not yet settled. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
 - **BR-6 — Channels displayed:** Meridian Travel tracks four channels — email, paid search, paid social, and display. All four run through K4A today, so all have spend data available within the product; none require manual aggregation from external sources (per the requester, answering OQ-003/DEC-004).
@@ -185,7 +185,7 @@ The system must track the following business information to support the function
 
 - **Account eligibility / plan state** — Whether a K4A account (e.g. Meridian Travel) is on a plan tier that qualifies for the weekly summary, and whether the account is subscribed to receive it. *Source: System-Derived (from account/plan records).* *Why it matters: BR-5 and FR-001 gate the feature on standard-plan eligibility.*
 
-- **Weekly summary configuration** — The per-account setup for the summary: send day, send time, reporting-week boundary definition, and timezone used to bound the week. *Source: System-Derived / configured (defaults set during design per BR-1 and BR-3).* *Why it matters: drives FR-001, FR-002, and FR-003.*
+- **Weekly summary configuration** — The per-account setup for the summary: send day, send time, reporting-week boundary definition (Monday–Sunday), and timezone used to bound the week (Eastern time). *Source: System-Derived / configured (defaults set during design per BR-1 and BR-3).* *Why it matters: drives FR-001, FR-002, and FR-003.*
 
 - **Recipient list** — The address or distribution list for the Meridian Travel marketing team that should receive the email. *Source: User-Entered / configured.* *Why it matters: FR-012 delivers to configured recipients; BR-4.*
 
@@ -297,16 +297,8 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Updated BR-8 to specify retry-once-then-email-marketing-ops-owner failure handling per OQ-008 resolution.
-- Updated flowchart to add a retry-once gate and change the failure node to email the marketing ops owner.
-- Updated FR-009 to retry once then email the marketing ops owner on data-retrieval failure.
-- Updated FR-013 to retry delivery once then email the marketing ops owner on delivery failure.
-- Updated FR-014 to a single retry then alert email to the marketing ops owner.
-- Updated NFR-004 retry count from default 3 attempts to exactly one retry per OQ-008.
-- Updated the run/delivery status information item to track the single retry and the marketing-ops-owner alert.
-- Added a Marketing ops owner information item as the failure-alert recipient per OQ-008.
-- Updated NFR-003 to send the per-account failure alert as an email to the marketing ops owner.
-- Updated NFR-014 mitigation to reference the single retry and the marketing-ops-owner alert email.
+- Resolved BR-3: reporting week is Monday–Sunday in Eastern time, removing the DEC-002 tag.
+- Updated Section 4 weekly-summary-configuration item with the Monday–Sunday / Eastern-time reporting-week definition.
 
 
 ---
@@ -321,12 +313,15 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What day of the week and what time should the weekly spend summary email be sent to the marketing team? | Product owner (with Meridian Travel marketing team) | Send every Monday at 08:00 in the marketing team's local timezone, matching their existing Monday manual-pull habit. |
-| **DEC-002** | Which day does the reporting week start and end on, and which timezone is used to bound it? | Product owner (with Meridian Travel marketing team) | Reporting week runs Monday 00:00 through Sunday 23:59 in the account's configured timezone, so the Monday email covers the week that just completed. |
 | **DEC-003** | What is the exact recipient address or distribution list for the Meridian Travel marketing team? | Product owner (with Meridian Travel) | Send to a single Meridian Travel marketing distribution list address supplied during onboarding, configurable per account rather than hard-coded to individuals. |
 | **DEC-004** | Which channels does Meridian Travel track spend across, and are all of them available in the product or do some require manual aggregation from external sources? | Product owner (with Meridian Travel) | Include only the channels for which spend data is already available in the product for the account; channels requiring external manual aggregation are excluded from Phase 1 and noted as a known limitation. |
 | **DEC-005** | For a week where a channel has zero spend or missing data, should that channel still appear in the email, and if so what value should it show? | Product owner (with Meridian Travel marketing team) | Show every tracked channel every week for consistency, displaying a zero-spend channel as 0 in the account's currency so the team can see the full channel set at a glance. |
 | **DEC-006** | Do we have a confirmed go-live date for Meridian Travel's summer campaign launch that this email must be live before? | Product owner (Mayank Ukey / Meridian Travel account) | Treat the deadline as ~5 weeks from gate approval; confirm the exact campaign launch date with Meridian Travel and lock scope to Phase 1 to protect it. |
 | **DEC-007** | For Phase 1, should the marketing team be able to configure the summary themselves through a UI, or is it acceptable to set the schedule, recipients, and channels as fixed defaults during design? | Product owner | No self-service UI in Phase 1; configure schedule, recipients, and channels as account-level defaults set during design, with changes made by request. |
+
+### Decisions Resolved
+
+- **DEC-002**: DEC-002 resolved: the reporting week runs Monday to Sunday, bounded in Eastern time.
 
 ### Open Questions (evidence gaps — needs more input)
 
