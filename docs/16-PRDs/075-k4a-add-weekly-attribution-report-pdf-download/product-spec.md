@@ -146,7 +146,7 @@ Then no scheduled push/email delivery is built
 Given a weekly report PDF is to be delivered outside an authenticated in-session download
 When the report is made available to a recipient
 Then it is delivered via a time-limited secure link
-And the link expires after its validity window
+And the link expires after its validity window of seven days
 And an expired link does not return the report
 ```
 
@@ -255,7 +255,7 @@ And a failure to write the audit record fires an operational alert rather than f
 - **User eligibility / role for this report:** Whether the requesting user is authorized to obtain the report — resolved as: all finance-team members on the account are authorized, with no narrower role restriction. System-derived on each request from the authoritative authorization source. Matters because it gates access server-side and determines UI affordance visibility.
 - **Account plan eligibility:** Whether the account is on an eligible (standard) plan. System-derived from account/plan data. Matters because the feature is plan-gated (FR-013).
 - **Delivery model configuration:** The report is obtained via self-service pull — finance downloads it from K4A on demand (DEC-002 resolved; see the delivery-model rule in Section 1). System/configuration-derived. Matters because it activates the self-service download path (FR-006) rather than any scheduled push/email path.
-- **Secure link and its validity window:** For any report delivered outside an authenticated in-session download, the time-limited link and its expiry. System-derived. Matters because secure delivery (FR-008, FR-009) depends on it.
+- **Secure link and its validity window:** For any report delivered outside an authenticated in-session download, the time-limited link and its expiry — the link stays valid for seven days (DEC-007 resolved). System-derived. Matters because secure delivery (FR-008, FR-009) depends on it.
 - **Generation outcome / failure reason:** The result of each weekly generation attempt, including a named failure reason on failure. System-derived. Matters because failure recording and alerting (FR-003) depend on it.
 - **Audit record of report access:** Append-only record of who obtained or was denied the report, when, and with what outcome. System-derived. Matters because access to the report is a traceable, access-controlled operation (FR-017).
 - **Retention configuration:** The minimum period for which weekly PDFs and audit records are retained — a compliance rule (see the retention decision in Section 1). Matters because it governs how long reports and audit records must remain available.
@@ -279,7 +279,7 @@ And a failure to write the audit record fires an operational alert rather than f
 ### Security & Access Control
 
 - **NFR-009 — Server-side enforcement:** All access, role/eligibility, and plan-gating decisions are enforced server-side and re-derived from the authoritative source on every request; a direct request from an ineligible or unauthorized party is rejected (typically 403) regardless of what the UI shows (ties to FR-011, FR-013). Eligibility is never cached client-side or trusted from a client-supplied claim.
-- **NFR-010 — Secure, time-limited delivery:** Any report delivered outside an authenticated in-session download is delivered via a time-limited secure link, never a raw attachment; an expired link does not return the report (ties to FR-008, FR-009). [DECISION REQUIRED: DEC-007]
+- **NFR-010 — Secure, time-limited delivery:** Any report delivered outside an authenticated in-session download is delivered via a time-limited secure link, never a raw attachment; the link stays valid for seven days and an expired link does not return the report (ties to FR-008, FR-009).
 - **NFR-011 — No PII or secrets in logs:** Raw PII, credentials, secrets, and tokens are never written to application logs. Where an identifier must appear for troubleshooting, it is minimized to what is operationally necessary (ties to FR-018).
 - **NFR-012 — Immutable audit trail:** Report-access audit records are append-only and immutable — no edit or delete via any role or code path — and are written asynchronously so they never block the download, while an audit-write failure fires an operational alert rather than failing silently (ties to FR-017).
 - **NFR-013 — Audit and report retention:** Weekly PDFs and audit records are retained for a stated minimum period. Working default pending the retention decision in Section 1: audit records retained for 12 months minimum; a shorter or longer period for the PDFs themselves depends on whether finance has an archival/compliance obligation for them.
@@ -329,16 +329,9 @@ Additional services surfaced at lower confidence during an independent knowledge
 
 _Applied reviewer's request._
 
-- Flipped the delivery-model business rule from push (weekly email) to self-service pull per DEC-002 resolution.
-- Updated affected-services evidence note to reflect pull model and that scheduled-distribution/subscription-worker are not required for Phase 1.
-- Updated Section 2 flow description from push/email happy path to self-service pull happy path.
-- Updated Section 2 mermaid diagram nodes from email-push delivery to self-service download.
-- Updated Section 3 scope note to state the pull delivery model is settled.
-- Flipped FR-006 note so self-service download is the in-scope build target.
-- Flipped FR-008 to mark scheduled push/email delivery out of scope per DEC-002.
-- Updated Section 4 delivery-model configuration item to reflect self-service pull.
-- Replaced the out-of-scope pull row with a scheduled-push out-of-scope row, reflecting the reversed delivery model.
-- Removed the now-moot "even if a push model is chosen" clause from the subscription-management out-of-scope note.
+- Set FR-009 secure-link validity window to seven days per DEC-007 resolution.
+- Resolved DEC-007 in NFR-010: secure link valid for seven days; removed the inline decision tag.
+- Recorded the seven-day secure-link validity window in the Information Requirements list.
 
 
 ---
@@ -355,13 +348,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-001** | Should the weekly report always show the same rolling ninety days of data, or should it show a fixed calendar quarter that only resets on quarter boundaries? | Product owner (with finance stakeholder at Brightway Retail) | Fixed calendar quarter: the report covers the most recently completed calendar quarter and stays fixed until the next quarter boundary. |
 | **DEC-003** | If the finance team downloads the report more than once in the same week, should every download return exactly the same data, or should each download reflect the most current available numbers? | Product owner (with Brightway Retail finance team) | Fixed weekly snapshot: every download within the same week returns identical data for that week. |
 | **DEC-006** | Do these weekly report PDFs need to be archived, timestamped, or retained for a set audit period to meet any compliance requirement? | Compliance/Security (with Product owner) | Retain each weekly PDF and its access audit records for twelve months as a baseline, timestamped at generation; adjust to any specific finance or contractual audit requirement once confirmed. |
-| **DEC-007** | For reports delivered to finance outside of an in-app download, how long should the secure download link stay valid before it expires? | Product owner / Compliance | Secure links expire 24 hours after issuance; an expired link returns no report and the recipient must obtain a fresh one. |
 
 ### Decisions Resolved
 
 - **DEC-002**: DEC-002 resolved: finance downloads the report themselves from K4A on demand (self-service pull), rather than the system pushing it on a weekly schedule.
 - **DEC-004**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
 - **DEC-005**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
+- **DEC-007**: DEC-007 resolved — the secure download link for reports delivered outside an in-app download stays valid for seven days before expiring.
 
 ### Open Questions (evidence gaps — needs more input)
 
