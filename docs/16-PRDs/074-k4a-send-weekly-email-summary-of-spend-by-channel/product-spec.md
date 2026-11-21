@@ -26,7 +26,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 
 ### Knowledge-Graph Cross-Check Note
 
-An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code (see OQ-001); it is not a product decision and does not change the behavior this spec requires. The requester has confirmed the service choice is an engineering call and advised that scheduling should be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the concrete service names still need engineering confirmation against the code. The grounding detail is attached as a separate appendix at the end of this document.
+An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code (see OQ-001); it is not a product decision and does not change the behavior this spec requires. Per the requester (answering OQ-002), engineering should reuse any existing spend report if one is close enough rather than building new — the team needs only total spend per channel, so a near-match can be extended rather than rebuilt. A fresh knowledge-graph cross-check continues to surface k4a-sam-backend (likely owns spend-summary logic) and sam-performance-reporter (generates SAM performance/spend reports) as the strongest reuse candidates; engineering should confirm against the code which, if either, is close enough before committing to the 5-week estimate. The requester has confirmed the service choice is an engineering call and advised that scheduling should be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the concrete service names still need engineering confirmation against the code. The grounding detail is attached as a separate appendix at the end of this document.
 
 ## 2. User Flows (Visuals)
 
@@ -231,7 +231,7 @@ The system must track the following business information to support the function
 
 The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadline, multi-service blast radius, email-delivery dependencies). Each risk and its mitigation condition:
 
-- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. Per the requester, the specific service assignment is an engineering call: scheduling should be owned by whichever service already schedules weekly/recurring reports today, rather than standing up a new scheduler (see OQ-001). The exact launch date is not stated in the input. [DECISION REQUIRED: DEC-006]
+- **NFR-011 — Hard deadline / schedule risk:** The feature must be live before Meridian Travel's summer campaign launch (~5 weeks). *Mitigated when:* the integration path (which service schedules, aggregates, renders, and sends — see the knowledge-graph cross-check note in Section 1) is resolved early in engineering planning, and scope stays locked to the Phase 1 definition in Section 6. The requester has confirmed (resolving OQ-002) that an existing close-match spend report should be reused rather than built new — since only totals per channel are required, reusing k4a-sam-backend or sam-performance-reporter spend-summary logic (if confirmed close enough against the code) can materially reduce build scope and de-risk the estimate. Per the requester, the specific service assignment is an engineering call: scheduling should be owned by whichever service already schedules weekly/recurring reports today, rather than standing up a new scheduler (see OQ-001). The exact launch date is not stated in the input. [DECISION REQUIRED: DEC-006]
 
 - **NFR-012 — Multi-service blast radius / kill-switch:** Because this spans multiple backend services and is HIGH risk, delivery of the weekly email must be controllable by a config-based kill-switch that an on-call engineer can disable during an incident without a separate approval step, with no code deploy. *Mitigated when:* the switch exists, disables new weekly runs within 5 minutes of being flipped, and in-flight runs already started complete under prior behavior.
 
@@ -291,8 +291,8 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Added requester guidance to NFR-011 that scheduling should reuse the existing weekly-report scheduler (OQ-001).
-- Noted in the Section 1 cross-check that the requester deferred service choice to engineering with a reuse-existing-scheduler steer (OQ-001).
+- Folded OQ-002 resolution into the Section 1 cross-check note: reuse an existing close-match spend report (totals per channel only).
+- Added OQ-002 reuse resolution to NFR-011 schedule-risk mitigation as a scope-reduction lever.
 
 
 ---
@@ -317,13 +317,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
-- **OQ-002**: Is there an existing spend-by-channel report we can reuse? Several services (k4a-sam-backend, sam-performance-reporter) already appear to generate spend summaries — if one is close enough, this could be a small extension rather than new build. Can eng confirm what already exists before we commit to the 5-week estimate?
 - **OQ-003**: What exactly counts as a 'channel' for Meridian Travel, and do all their channels have spend data flowing through K4A/SAM, or do some come from external sources that aren't in our systems today?
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
 - **OQ-005**: Should the email be total-spend-per-channel only, or also include comparisons (week-over-week, budget variance, performance)? Intake answer says totals-only is enough — can we lock that as the v1 scope?
 - **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
 - **OQ-007**: Are there branding/template requirements (channel names, ordering, formatting) for the email, or is a plain one-line-per-channel layout acceptable?
 - **OQ-008**: If the weekly data pull or send fails, what should happen — silent skip, retry, or an alert to someone? There's no evidence of existing failure handling and the deadline is hard, so this needs a decision.
+
+### Questions Resolved
+
+- **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The desired behavior is clearly specified (weekly email with one-line-per-channel spend totals, confirmed by requester), and the remaining open questions are routine design details (send time, recipient list, zero-spend handling) rather than genuine product ambiguity; the work is multi-service backend integration across query/scheduler/dispatch/data services, which is engineering-led design, not discovery.
