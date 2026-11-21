@@ -22,7 +22,7 @@ Automatically generate a weekly summary of campaign spend grouped by channel for
 ### Business Rules
 
 - **BR-1 — Cadence:** The summary is generated and delivered once per week on a fixed, recurring schedule. [DECISION REQUIRED: DEC-001]
-- **BR-2 — Grouping:** Spend is grouped by channel. The specific set of channels to include, and whether any channel requires special calculation or transformation before display, must be confirmed. [DECISION REQUIRED: DEC-002]
+- **BR-2 — Grouping:** Spend is grouped by channel. The channel set is fixed: paid search, paid social, display, email, and affiliate — the same set every week. All channels are reported in USD; no other per-channel calculation or transformation is required before display.
 - **BR-3 — Accuracy (business-critical):** The automated numbers must reconcile against the figures the analyst currently produces by hand before launch. Accuracy is the core success criterion — a wrong number in the automated email is worse than the manual process it replaces.
 - **BR-4 — Scope of recipients:** The summary is delivered to Meridian Travel's marketing team. The exact recipient list is not yet defined. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Report content & format:** Whether the email contains totals only, totals with prior-week or budget comparisons, or per-campaign breakdowns within each channel must be confirmed. [DECISION REQUIRED: DEC-004]
@@ -207,7 +207,7 @@ Now I'll report the decisions I flagged in Sections 0–3.
 The system must track the following business information to support the functional requirements above. These describe *what* is tracked and *why* — not storage structure, which belongs in eng-plan.
 
 - **Campaign spend by channel** — The per-channel spend figures attributable to Meridian Travel for the reporting period. Source: the performance reporter — the same channel spend totals the analyst currently pulls by hand from the performance reporter every Monday are the authoritative figures the automated numbers must match. This is the core payload of the summary and the subject of the accuracy reconciliation (FR-004, FR-005, FR-006).
-- **Confirmed channel set** — The definitive list of channels to include in the grouping, plus any per-channel calculation or transformation rules. Source: Product owner decision (BR-2). Needed so FR-005 and FR-007 produce a complete, stable set of rows every week.
+- **Confirmed channel set** — The definitive list of channels to include in the grouping: paid search, paid social, display, email, and affiliate — the same set every week, all reported in USD with no further per-channel calculation or transformation. Source: Product owner decision (BR-2). Needed so FR-005 and FR-007 produce a complete, stable set of rows every week.
 - **Reporting period** — The week each summary covers (start and end boundaries). Source: System-derived from the delivery schedule. Needed so each email clearly states its coverage (FR-011) and so idempotency can key on the period (FR-003).
 - **Delivery schedule** — The fixed recurring day and time the summary is generated and sent. Source: Product owner decision (BR-1). Drives the trigger in FR-001.
 - **Recipient list** — The Meridian Travel marketing team members who receive the email. Source: Product owner decision / customer (BR-4). Drives delivery in FR-012.
@@ -303,9 +303,8 @@ Unresolved boundaries for planning: which service owns scheduling (3 candidates)
 
 _Applied reviewer's request._
 
-- Updated the Campaign spend by channel information-requirement source to name the performance reporter as the authoritative source (resolves OQ-001).
-- Updated FR-006 to name the analyst's manual performance-reporter pull as the authoritative figures source (resolves OQ-001).
-- Updated the data-accuracy risk mitigation to record the performance reporter as the confirmed authoritative source (resolves OQ-001).
+- Resolved BR-2: set the fixed channel set (paid search, paid social, display, email, affiliate), same weekly, all in USD, removing DEC-002 tag.
+- Updated the Confirmed channel set information requirement with the resolved five-channel list in USD.
 
 
 ---
@@ -320,16 +319,18 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What day and time each week should the spend summary email be sent? | Product owner (Mayank Ukey / Meridian Travel marketing) | Monday 08:00 in the marketing team's local timezone, matching the existing manual Monday pull it replaces. |
-| **DEC-002** | Which specific marketing channels should the spend summary include, and do any of them need special calculation before they're shown? | Product owner (Meridian Travel marketing) | Include all channels that currently appear in the analyst's manual Monday report, with no special transformation beyond the aggregation the manual report already applies. |
 | **DEC-003** | Who exactly should receive the weekly summary email? | Product owner (Meridian Travel marketing) | The same marketing team distribution list or individuals who receive the manual Monday report today; a single team distribution address if one exists. |
 | **DEC-004** | What level of detail should the spend numbers show: totals only, totals with prior-week or budget comparisons, or a breakdown by campaign within each channel? | Product owner (Meridian Travel marketing) | Per-channel spend totals for the week as a static summary table, matching the current manual report's content, with prior-week comparison added only if the manual report already includes it. |
 | **DEC-005** | When upstream spend data is missing, delayed, or incomplete at send time, should the email still go out with partial data, be delayed, or should the team just be alerted instead? | Product owner (Meridian Travel marketing) | Do not send a silently-partial summary; alert the marketing team that data is incomplete and hold the summary until data is complete or the team decides, so an inaccurate number never lands unflagged. |
 | **DEC-006** | Before we switch off the manual Monday report, how long should the automated email run side by side with the manual one, and how close do the numbers need to match before we trust the automation and stop the manual pull? | Product owner (Mayank Ukey) with marketing analyst input | Run in parallel for 3 consecutive weeks; retire the manual pull once automated per-channel totals match the manual figures exactly (zero variance) for all 3 weeks. |
 | **DEC-007** | For the first version, is a simple static table of spend by channel in the email enough, or does the marketing team need clickable links to drill into each channel's detail? | Product owner with Meridian Travel marketing team | Static summary table only for Phase 1; drill-down links deferred to a future phase. |
 
+### Decisions Resolved
+
+- **DEC-002**: Resolved — channels to include are paid search, paid social, display, email and affiliate, the same set every week, all reported in USD with no special per-channel calculation or transformation required.
+
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: Which specific channels must be included in the summary, and does any channel need special calculation or transformation (currency, rounding, de-duplication) before it's reported?
 - **OQ-003**: What exact day and time should the weekly email go out, and in which timezone?
 - **OQ-004**: Who are the recipients, and does the recipient list / send schedule need to be configurable by the marketing team (which would pull in a client/config and possibly UI surface), or is a fixed internal job acceptable?
 - **OQ-005**: When upstream spend data is missing, delayed, or incomplete, should the email still send with partial data, delay delivery, or send an alert instead?
@@ -341,6 +342,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: OQ-001 resolved: the authoritative source is the performance reporter — specifically the channel spend totals the analyst pulls by hand from the performance reporter every Monday, and the automated numbers must reconcile against those figures.
+- **OQ-002**: Resolved OQ-002/DEC-002: the weekly summary includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate — all reported in USD, with no other special calculation or transformation required.
 
 ---
 > **Classification:** Type A
