@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
-- **High Issues:** 5
+- **Critical Issues:** 1
+- **High Issues:** 6
 - **Medium Issues:** 7
-- **Blocking:** No
+- **Blocking:** Yes
 
 ---
 
@@ -17,9 +17,8 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | **Partial data vs. missing data is conflated.** FR-009 fails-closed only when retrieval "fails or no spend data can be obtained." There is no defined behavior for *partially* retrieved data — e.g. 4 of 6 channels return, 2 time out. The system could silently render a summary that looks complete but is missing channels, violating NFR-005 ("correctness over availability"). | High | FR-009 / NFR-005 | Define a requirement for partial-retrieval detection: if any expected channel in the known channel set fails to resolve, treat the run as an unrecoverable data-retrieval failure (fail-closed), not a success with missing lines. |
-| CG-002 | **Idempotency key collides with a legitimate re-send need.** FR-005 + NFR-007 block any duplicate email for the same account+reporting-week. But if the *first* email was rendered with wrong/incomplete totals and corrected, the idempotency guard would block the corrected re-send. No "supersede/correct" path is defined. | High | FR-005 / NFR-007 / NFR-015 | Add a requirement distinguishing an idempotent *retry* (same inputs) from an authorized *re-issue* (corrected data). Rollback (NFR-015) says emails are never retracted — but offers no corrected-resend path either, leaving a bad email as the final state. |
-| CG-003 | **"Configured send day/time" has no defined source-of-truth timezone for the trigger itself.** FR-001 fires when "the system clock reaches the configured send day and time," but DEC-002 leaves the timezone unsettled. A trigger evaluated in UTC against a locally-intended send time can fire on the wrong calendar day. This is a scheduling correctness gap, not merely a product decision. | High | FR-001 / BR-3 / DEC-002 | Require the trigger evaluation, the reporting-week boundary, and the email's displayed week to all resolve against a single declared timezone. Make the dependency explicit so DEC-002 cannot be resolved for display only while leaving the trigger ambiguous. |
+| CG-001 | **Alert email is itself a delivery via the same downstream path that just failed.** FR-013/FR-014/NFR-014 all mitigate silent non-delivery by sending a *failure alert email* to the marketing ops owner. But if the failure mode is the email-delivery dependency being down (NFR-013), the alert email travels the exact same path and will also fail — producing the silent non-delivery the whole design claims to prevent. No alternate alert channel (ops alerting from NFR-003, paging, dashboard) is specified as the authoritative signal. | Critical | FR-013, FR-014, NFR-003, NFR-014 | Decouple the human-facing failure signal from the email path. Make the operational alert (NFR-003 monitoring) the authoritative, path-independent notification; treat the alert email as best-effort only. Add an FR stating delivery-path failures raise a non-email operational alert. |
+| CG-002 | **Idempotency vs. intentional re-run after a fixed failure is ambiguous.** FR-005/NFR-007 forbid a duplicate email for the same account+reporting-week key. But NFR-015 rollback and manual recovery scenarios (operator re-runs after a data fix) would be *blocked* by idempotency — leaving the team permanently without that week's email once a bad/empty run is recorded. There is no defined "failed run does not consume the idempotency key" rule. | High → treated under CG for visibility | FR-005, NFR-007, NFR-015 | Clarify that the idempotency key is consumed only by a *successful send*, so a failed/alerted run can be legitimately re-run and still deliver exactly one email. |
 
 ---
 
@@ -29,12 +28,12 @@
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-003 | "failure rate exceeds 1% of scheduled runs over a 15-minute window, **sustained**" | "Sustained" is unquantified — how many consecutive windows? Not automatable as written. | Given the weekly job failure rate exceeds 1% of scheduled runs, When that condition holds across 2 consecutive 15-minute windows, Then an operational alert is raised. |
-| NFR-012 | "disables new weekly runs **within 5 minutes** of being flipped" | Testable number, but "in-flight runs complete under prior behavior" has no bound. A run stuck in retry could run far past 5 min. | Given the kill-switch is flipped, When an in-flight run is already started, Then it is allowed to complete within its own retry/timeout bound, And no new run starts after the switch propagates (≤ 5 min). |
-| NFR-011 | "Mitigated when the integration path is resolved early in engineering planning" | "Early" is not testable and the mitigation is a planning activity, not a verifiable system condition. | Not a system requirement — move to a planning checklist item with a dated gate, or define a concrete acceptance condition. |
-| FR-014 | "retries delivery a **bounded number of times** using exponential backoff" | FR body omits the number; only NFR-004 names "default 3." FR should be self-testable. | Given delivery fails for a transient reason, When recovery is attempted, Then delivery is retried at most 3 times with exponential backoff, And honoring any Retry-After, And on exhaustion the failure is recorded and alerted. |
+| FR-011 | "the email **clearly identifies** the reporting week the totals cover" | "Clearly identifies" is subjective/not testable — no defined format, field, or location. | Given the email body is rendered, When the summary is composed, Then the email header contains the reporting week start date and end date in ISO 8601 (YYYY-MM-DD) with the timezone label "ET", e.g. "2026-11-16 to 2026-11-22 (ET)". |
+| FR-004 | "the already-running job is allowed to complete" | No assertion on what the *second* attempt observes/returns — untestable outcome for the blocked run. | Given a run is in progress for account+week, When a second run is attempted for the same key, Then the second attempt exits without side effects And logs a "concurrent-run-skipped" status And the first run completes unaffected. |
+| NFR-010 | "beyond what is **needed to diagnose a failure**" | "Needed to diagnose" is unbounded and unmeasurable; no test can assert what a log *should* contain. | Define an explicit allowlist: Then logs may contain account ID (opaque), run ID, failure reason code, and channel count, And must not contain raw recipient email addresses or raw spend amounts. |
+| NFR-012 | "disables new weekly runs **within 5 minutes**" | Testable, but "in-flight runs already started complete under prior behavior" lacks a bounded definition of how long an in-flight run may persist. | Add: And any in-flight run must complete or self-terminate within its configured max run duration (define value). |
 
-> Note: The FRs are overall strong and genuinely Gherkin-formatted. The vagueness is concentrated in the NFR prose, which is acceptable as NFRs but should still be tightened.
+*Note: Most FRs are correctly in Gherkin — testability issues above are primarily in the NFRs and two FRs with soft predicates.*
 
 ---
 
@@ -42,30 +41,29 @@
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard ~5-week deadline / schedule risk (NFR-011) | Partial | FAIL | Mitigation is a planning activity ("resolve integration path early"), not a verifiable requirement. No concrete gate or launch date (DEC-006 open). |
-| Multi-service blast radius (NFR-012) | Yes | PASS | Config kill-switch, ≤5 min propagation, in-flight completes. Well-specified. |
-| Email-delivery dependency failure (NFR-013) | Yes | PASS | Covered by FR-013, FR-014, bounded retry, distinct reason, alert. |
-| Silent non-delivery (NFR-014) | Yes | PASS | Every failure raises an alert (NFR-003, BR-8). Strong. |
-| Shared query-resource degradation (NFR-001) | Yes | PASS | p95 ≤ 5s cap + off-peak scheduling defined. |
-| Partial/incomplete data correctness (NFR-005) | Partial | FAIL | Fails-closed on *total* retrieval failure but not on *partial* channel loss (see CG-001). |
-| Backward compatibility on shared services (NFR-016) | Yes | PASS | Additive-only requirement stated. Verification method not specified but requirement is testable. |
+| Hard ~5-week / ~4-week deadline (NFR-011) | Partial | **FAIL** | "Mitigated when the integration path is resolved early" is a hope, not a mitigation. The spec admits (Section 1 KG note) the service set is unresolved and conflicting. There is no fallback plan or decision deadline if reuse of k4a-sam-backend/sam-performance-reporter turns out *not* to be close enough. A deadline risk mitigated by "resolve it early" is unmitigated. |
+| Multi-service blast radius / kill-switch (NFR-012) | Yes | PASS | Config kill-switch, 5-min disable, in-flight behavior defined. Minor: in-flight bound unspecified (see §2). |
+| Email-delivery dependency failure (NFR-013) | Partial | **FAIL** | Mitigation is retry + alert, but the alert uses the same failed email path (CG-001). The mitigation does not survive the exact failure it names. |
+| Silent non-delivery (NFR-014) | Partial | **FAIL** | Same root cause as CG-001 — the "human is notified" guarantee collapses when the email dependency is the thing that is down. |
+| Shared query-resource contention (NFR-001) | Yes | PASS | p95 target + off-peak scheduling defined and measurable. |
+| Cross-account data leakage (NFR-008) | Yes | PASS | Server-side re-derivation of scope specified. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Partial channel retrieval:** Some channels resolve, others time out — not covered (see CG-001).
-2. **Channel appears/disappears mid-week:** A new channel starts spending, or a tracked channel is retired, between runs. FR-008 handles zero/missing but not a dynamically-changing channel *set* (BR-6 / DEC-004 open).
-3. **Corrected re-send after bad email:** No path to supersede an already-sent incorrect summary (see CG-002).
-4. **Empty account — zero channels entirely:** FR-008 handles a zero-spend *channel*, but not the case where the account has *no* channels at all for the week. Is an email with zero lines sent, or is this a failure?
-5. **Recipient list empty or all addresses invalid:** FR-012 delivers "to all configured recipients" — undefined if the list is empty or every address hard-bounces. Does this count as a delivery failure for NFR-003?
-6. **Partial recipient delivery:** Email delivered to 2 of 3 recipients. Is this success, failure, or partial? FR-013 treats delivery as binary.
-7. **Clock skew / missed scheduler tick:** If the scheduler is down at the configured send time and recovers 90 min late, does the run still fire (and violate NFR-002's 60-min window) or get skipped? No catch-up policy defined.
-8. **DST transition on send day:** Related to CG-003 — a send time during a spring-forward/fall-back transition could fire twice or not at all.
-9. **Retry-After exceeds the retry window:** NFR-004 honors Retry-After, but a downstream `Retry-After: 3600` would blow past NFR-002's 60-min delivery window. Interaction undefined.
-10. **Kill-switch flipped mid-render:** NFR-012 addresses "in-flight runs already started" but not a run paused between aggregation and delivery — does it deliver or abort?
-11. **Duplicate alert storm:** If one account fails every week, NFR-003's per-account alert fires repeatedly with no dedup/suppression guidance.
-12. **Spend record currency/unit mismatch:** No requirement that spend amounts share a currency/unit before summing in FR-007. Mixed-currency channels would produce a meaningless total.
+1. **Alert path = failure path (recursive silent failure):** Covered in CG-001 — the single most important missed case; no path-independent escalation.
+2. **Partial channel data (some channels retrieved, one source silent):** FR-008 covers zero/missing *per channel*, and NFR-005 fails closed on total retrieval failure, but there is no defined behavior for a *partially successful* retrieval where one channel's source is up but returns suspect/stale data vs. genuinely zero. "No data" and "zero spend" are collapsed into the same zero rendering (FR-008), which can silently mask a data outage as a legitimate $0.
+3. **DST transition week:** Reporting week and send time are bounded in "Eastern time." The spring/fall DST changeover produces a 23- or 25-hour day and an 8:00 AM that occurs twice or not at all. No rule for scheduler behavior across the transition.
+4. **Clock skew / missed scheduler tick:** FR-002 says "do not run outside cadence," but there is no catch-up rule if the scheduler is down *at* 8:00 AM Monday and recovers at 8:30. Does the week get skipped entirely (silent non-delivery) or run late? NFR-002's 60-min window implies late-run is acceptable but no FR specifies catch-up.
+5. **Currency / multi-currency spend:** "Total spend" assumes a single currency. If channels report in different currencies, summing is invalid. No currency field in Section 4's spend records or aggregation.
+6. **Recipient list is a shared mailbox (marketing-team@):** If the distribution list bounces or is reconfigured, delivery "succeeds" at the SMTP hop but no human reads it. No bounce-handling requirement.
+7. **New channel appears / channel retired mid-quarter:** BR-6 hardcodes four channels. FR-008 keys off "every channel in the same state" but the channel *set* source (Section 4) is system-derived — behavior when a 5th channel appears or one of the four disappears is undefined.
+8. **Negative spend / refunds / adjustments:** Aggregation sums spend records. If a credit/refund produces a negative record, the "total" could be negative or understated. No rule.
+9. **Idempotency across a data correction (CG-002):** Re-run blocked after a bad run leaves the week permanently undelivered.
+10. **Kill-switch flipped mid-render:** NFR-012 disables "new runs," but a run already past the scheduler check but mid-aggregation/mid-send is "in-flight" — the boundary between "new" and "in-flight" is not precisely defined for the render/deliver stages.
+11. **Alert fatigue / alert storm:** NFR-003 alerts on >1% failure rate sustained — but the per-account alert email (NFR-003 first clause) has no dedup; a total outage would send one alert email per account attempt.
+12. **Timezone of the recipient vs. Eastern:** Email identifies the week in ET, but marketing team members in other timezones have no stated handling; minor but worth a decision.
 
 ---
 
@@ -73,22 +71,27 @@
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-014 are all proper Gherkin blocks. |
-| Document contains only Sections 0–6 | FAIL | The document ends with an **"Appendix: Engineering Reference"** — a multi-subsection narrative appendix (Affected Services list plus prose cross-check reconciliation). This is not a sanctioned Revision Summary nor a short one-line labeled metadata blockquote; it is extra content beyond Sections 0–6 and should be removed or relocated out of the reviewed spec. (Note: Section numbering also starts at 1, not 0 — no Section 0 present.) |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a bullet list with italic *Source/Why it matters* annotations and no attribute tables or type declarations. |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-014 are all in valid Gherkin blocks. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains a full **"Appendix: Engineering Reference"** — a multi-paragraph narrative section with "Affected Services" prose, bulleted service analyses, and reconciliation guidance — placed *before* the Revision Summary. This is exactly the stray multi-paragraph KG cross-check/analysis appendix the format rule is written to catch, not an exempt one-line metadata trailer and not the sanctioned Revision Summary. Move its engineering-planning content out of the product spec. (The trailing "## Revision Summary" section itself is EXPECTED and is **not** flagged.) |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a bullet list; each item uses prose annotations (Source/Why it matters) but contains no attribute tables or type declarations. |
+
+---
+
+## Grounding Cross-Check (KG evidence vs. spec claims)
+
+- The independent KG lookup **agrees** with the spec's own Section 1 cross-check note: the service set is genuinely unresolved, and k4a-sam-backend / sam-performance-reporter are the strongest reuse candidates (medium confidence). The spec is honest about this discrepancy rather than contradicting the evidence — good.
+- **However:** the spec commits to a ~5-week (really ~4-week) deadline and to a *reuse* strategy while admitting via its own evidence that the owning service for both scheduling and delivery is only *medium/low confidence* and unconfirmed against code. This is an internal-consistency / schedule-risk contradiction (see NFR-011 FAIL), not a factual contradiction with the evidence. No spec claim about data flow, joins, tables, or existing endpoints is asserted as confirmed fact that the evidence refutes — the spec correctly hedges all of them as "engineering to confirm."
 
 ---
 
 ## 6. Recommendations
 
-1. **Define partial-retrieval behavior (CG-001).** Decide and specify that any missing expected channel triggers fail-closed; do not let a partial summary render as complete. Highest correctness risk.
-2. **Add a corrected-resend / supersede path (CG-002).** Idempotency must not permanently block re-issuing a corrected summary after a bad email, since rollback never retracts.
-3. **Bind trigger, week-boundary, and display to one declared timezone (CG-003).** Resolve DEC-002 as a single timezone dependency, not a display-only decision, and specify catch-up and DST behavior (edge cases 7, 8).
-4. **Convert NFR-011's deadline mitigation into a verifiable gate** with a concrete date (resolve DEC-006) rather than "resolve early in planning."
-5. **Tighten NFR-003 "sustained"** into a concrete consecutive-window count, and add alert dedup/suppression guidance (edge case 11).
-6. **Specify empty/invalid/partial recipient handling** (edge cases 4, 5, 6) and empty-channel-set handling.
-7. **Add a currency/unit consistency precondition to FR-007** before summing spend per channel.
-8. **Remove or relocate the "Appendix: Engineering Reference"** so the document conforms to Sections 0–6; its KG reconciliation content is planning material, not spec content.
-9. **Reconcile the KG integration-path discrepancy before build** (see note below) — the spec correctly flags it but leaves it open, which is appropriate for product review but blocks engineering.
-
-> **Note on KG cross-check (grounding, not a document-content defect):** The spec is commendably honest that the Context Seed's curated service list (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api) does not fully agree with an independent knowledge-graph lookup. The independent evidence corroborates the spec's own caveats: the *scheduler* owner is ambiguous (reporting-dispatcher vs. sam-report-scheduler / reporting-subscriptions-worker), the *email delivery* owner is ambiguous (k4a-mcp-server vs. notifications-api), and spend-summary logic may already exist in k4a-sam-backend (possible scope reduction). The spec does **not** make any false concrete implementation claim (no asserted joins, tables, or endpoints that contradict the evidence) — it explicitly defers the integration path to engineering planning, which is the correct posture. This is flagged as an open planning item, not a contradiction defect in the spec's stated behavior.
+1. **(Critical — CG-001) Decouple failure notification from the email path.** Make a path-independent operational alert the authoritative signal that a run failed; downgrade the alert email to best-effort. This is blocking.
+2. **(High) Define failed-run idempotency semantics (CG-002):** key is consumed only on successful send, so recovery re-runs can still deliver.
+3. **(High) Add a concrete deadline-risk fallback (NFR-011):** a decision gate date by which reuse-vs-build must be settled, and a reduced-scope contingency if reuse is not close enough.
+4. **(High) Distinguish "zero spend" from "data unavailable" (Edge #2):** do not render a data outage as a legitimate $0 with no caveat.
+5. **(High) Specify DST and missed-tick/catch-up behavior (Edges #3, #4).**
+6. **(Medium) Add currency and negative/refund handling to aggregation (Edges #5, #8).**
+7. **(Medium) Tighten vague predicates:** FR-011 ("clearly identifies"), NFR-010 ("needed to diagnose"), and in-flight-run bound for NFR-012.
+8. **(Format) Remove the "Appendix: Engineering Reference" section** from the product spec (relocate to an engineering planning doc); keep only Sections 0–6 plus the sanctioned Revision Summary.
+9. **(Medium) Add alert dedup/suppression to prevent per-account alert storms (Edge #11).**
