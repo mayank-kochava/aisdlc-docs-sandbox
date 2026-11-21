@@ -24,6 +24,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-5 — Dual surface:** The spend-by-channel summary is delivered as an email, and that email includes a link to the existing K4A dashboard where the underlying spend data already lives. No new on-screen view or UI build is created in K4A for this feature.
 - **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
 - **BR-7 — Detail level:** The summary content shows total spend per channel. A prior-week comparison is included if it is low-effort to add; impressions and conversions are explicitly excluded. (Resolves DEC-005 / OQ-002.)
+- **BR-8 — Granularity:** The summary is one flat weekly total per channel for the last completed week. There is no filtering or segmentation by campaign, region, product line, or sub-period within the week. (Resolves OQ-007.)
 
 ### Knowledge-Graph Reconciliation Note
 
@@ -125,6 +126,7 @@ Given spend data exists for a customer for the covered week
 When the summary is generated
 Then the summary presents campaign spend aggregated and broken down by each channel in the defined channel set
 And a per-channel spend value is shown for each channel in that set
+And each per-channel value is a single flat weekly total for the covered week, with no filtering or segmentation by campaign, region, product line, or sub-period within the week
 And the summary does not include impressions or conversions
 ```
 
@@ -205,11 +207,11 @@ Now reporting the decisions I flagged in Sections 0–3.
 The system must track the following business information to support the Functional Requirements above. Attribute-level definitions, types, and storage are intentionally deferred to eng-plan.
 
 - **Weekly spend-by-channel summary** — the generated artifact for a given customer and covered week, containing per-channel spend. System-derived, built by aggregating spend data. This is the core content delivered by email (FR-008, FR-011); the email links to the existing K4A dashboard where the same data is viewable (FR-014).
-- **Per-channel spend figure** — the spend amount attributed to each channel in the defined channel set for the covered week. System-derived from the underlying campaign spend data. Drives the breakdown in FR-008.
+- **Per-channel spend figure** — the spend amount attributed to each channel in the defined channel set for the covered week, expressed as a single flat weekly total with no filtering or segmentation. System-derived from the underlying campaign spend data. Drives the breakdown in FR-008.
 - **Prior-week per-channel spend comparison** — per channel, the prior week's spend figure used to compute a current-vs-prior comparison when low-effort to derive. System-derived from the prior covered week's summary. Supports FR-008a.
 - **Channel set** — the fixed list of marketing channels included in the breakdown: paid search, paid social, display, email, and affiliate (see Section 1, BR-6). The same five channels appear every week and the set does not vary by campaign. Determines which channels appear in every summary.
 - **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009 and FR-010.
-- **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-008) and to key idempotent re-runs (FR-007).
+- **Covered week** — the time window a given summary represents: the last completed week relative to the generation trigger. System-derived from the generation trigger. The summary is a single flat weekly total per channel over this window, with no sub-period breakdown (see BR-8, OQ-007). Needed to label summaries (FR-008) and to key idempotent re-runs (FR-007).
 - **Customer plan entitlement** — whether the customer's plan permits the weekly summary feature. External, verified against the authoritative account source. The standard plan already includes automated/scheduled recurring email reports, so no new entitlement is required for this feature. Gates generation and the on-screen view (FR-001–FR-004).
 - **Marketing-team recipient list** — the marketing team distribution list the email is delivered to for a customer, with membership controlled by the customer's marketing ops lead (see Section 1, BR-3). Used in FR-011.
 - **Viewer authorization state** — whether a given user following the email link to the existing K4A dashboard is authorized to see the spend data. External/system-derived from the authoritative auth source on each request. Gates FR-004 and FR-015.
@@ -271,7 +273,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 | Item | Rationale | Phase |
 |------|-----------|-------|
 | Additional content dimensions: impressions, conversions, budget comparison | Not required for the core spend-by-channel objective; explicitly excluded per BR-7 (DEC-005/OQ-002). Prior-week comparison is in scope for Phase 1 only if low-effort (FR-008a) | Future |
-| Filtering/segmentation of the summary (by campaign, region, product line, intra-week period) | Named as an open question, not critical path to the weekly spend-by-channel objective | Future |
+| Filtering/segmentation of the summary (by campaign, region, product line, intra-week period) | Resolved (OQ-007): the summary is one flat weekly total per channel for the last completed week, with no filtering/segmentation; any future filtering is out of scope | Future |
 | Self-service scheduling/subscription management UI (users configuring cadence or recipients themselves) | Cadence and recipients are fixed configuration in Phase 1; self-service management is net-new UX, and Phase 1 adds no new K4A screen at all (the email simply links to the existing dashboard) | Future |
 | Rollout to customers beyond Meridian Travel / plans beyond standard | Requirement is scoped to one customer on the standard plan | Future |
 | Configurable per-recipient or role-based access controls over who gets the data | Raised as an open question; Phase 1 delivers to the configured marketing-team recipients | Future |
@@ -313,7 +315,11 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Updated FR-009 to defer missing/incomplete channel-data handling to engineering discretion per OQ-006 resolution.
+- Updated out-of-scope rationale for filtering/segmentation to reflect OQ-007 resolution (one flat weekly total per channel, no filtering).
+- Added BR-8 fixing granularity as one flat weekly total per channel for the last completed week with no filtering (resolves OQ-007).
+- Added an FR-008 criterion requiring a single flat weekly total per channel with no filtering/segmentation (OQ-007).
+- Defined 'Covered week' as the last completed week and noted the flat weekly total with no sub-period breakdown (OQ-007).
+- Clarified the per-channel spend figure is a single flat weekly total with no filtering/segmentation (OQ-007).
 
 
 ---
@@ -340,7 +346,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-007**: Are there filtering/segmentation needs (by campaign, region, product line, or sub-period within the week), or is it one flat weekly total per channel?
 - **OQ-008**: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
 
 ### Questions Resolved
@@ -351,6 +356,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: Resolved OQ-004 (and DEC-003, which asks the same question): the standard plan tier already includes scheduled/automated recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 - **OQ-005**: Resolved OQ-005 — the customer sees nothing new on-screen; the weekly email includes a link to the existing K4A dashboard, and no new screen or UI build is needed in K4A.
 - **OQ-006**: Resolved OQ-006: when a channel's spend data is missing or incomplete for the week, handling is deferred to engineering discretion.
+- **OQ-007**: Resolved OQ-007: the summary is one flat weekly total per channel for the last completed week, with no filtering/segmentation by campaign, region, product line, or sub-period within the week.
 
 ---
 > **Classification:** Type A
