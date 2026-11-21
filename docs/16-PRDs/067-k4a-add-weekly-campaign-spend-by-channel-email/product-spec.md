@@ -13,7 +13,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 
 - **Eliminates recurring manual work:** replaces the weekly Monday data pull with an automated delivery.
 - **Timely visibility:** marketing sees spend-by-channel on a predictable weekly cadence, supporting faster budget decisions ahead of the summer campaign.
-- **In-product surface:** the summary is visible on screen inside the K4A console (confirmed by the requester), not only in an email, so the data is available in-context.
+- **In-product surface:** the summary data lives in the existing K4A dashboard; the weekly email includes a link to that dashboard (confirmed by the requester). No new K4A screen or UI build is required.
 
 ### Business Rules
 
@@ -21,7 +21,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-2 — Content:** Each summary breaks down campaign spend by marketing channel.
 - **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the marketing team distribution list, and their marketing ops lead controls who is on that list. Whether access to the data should additionally be limited by role or permission remains an open business decision. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. The standard plan already includes automated/scheduled recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
-- **BR-5 — Dual surface:** The same spend-by-channel summary is available both as a delivered email and as an on-screen view in the K4A console.
+- **BR-5 — Dual surface:** The spend-by-channel summary is delivered as an email, and that email includes a link to the existing K4A dashboard where the underlying spend data already lives. No new on-screen view or UI build is created in K4A for this feature.
 - **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
 - **BR-7 — Detail level:** The summary content shows total spend per channel. A prior-week comparison is included if it is low-effort to add; impressions and conversions are explicitly excluded. (Resolves DEC-005 / OQ-002.)
 
@@ -42,22 +42,15 @@ flowchart TD
     E -->|"no (missing/incomplete data)"| F["Apply missing-data handling and mark affected channels"]
     E -->|"yes (complete)"| G["Build spend-by-channel summary"]
     F --> G
-    G --> H["Deliver summary email to marketing team"]
+    G --> H["Deliver summary email (including a link to the existing K4A dashboard) to marketing team"]
     H --> I{"Did email delivery succeed?"}
     I -->|"yes (delivered)"| J["Record delivery success"]
     I -->|"no (delivery failed)"| K["Retry with bounded backoff, then record failure and alert"]
-    G --> L["Render summary on-screen in K4A console"]
 
-    subgraph OnScreen["On-screen view in K4A console"]
-        M["Marketing user opens K4A console"] --> N{"Is user authorized to view the summary?"}
-        N -->|"no (unauthorized)"| O["Deny access (server-side 403)"]
-        N -->|"yes (authorized)"| P["Display latest spend-by-channel summary"]
-        P --> Q{"Is latest summary available?"}
-        Q -->|"no (none generated yet)"| R["Show empty/not-yet-available state"]
-        Q -->|"yes (available)"| S["Show spend broken down by channel"]
-    end
-
-    L --> M
+    J --> T["Recipient clicks the email link to the existing K4A dashboard"]
+    T --> U{"Is user authorized (entitlement/auth re-derived server-side)?"}
+    U -->|"no (unauthorized)"| O["Deny access (server-side 403)"]
+    U -->|"yes (authorized)"| P["Existing K4A dashboard shows spend-by-channel data"]
 ```
 
 ---
@@ -91,9 +84,9 @@ And the system records a failure status indicating entitlement could not be veri
 And the system fires an operational alert for the failed verification
 ```
 
-#### FR-004 — Enforce entitlement on the on-screen view server-side
+#### FR-004 — Enforce entitlement server-side when the dashboard link is followed
 ```gherkin
-Given a user requests the on-screen spend-by-channel summary in the K4A console
+Given a user follows the email link to view spend-by-channel data in the existing K4A dashboard
 When the request reaches the backend
 Then the backend re-derives the user's entitlement from the authoritative source on that request
 And an ineligible user's request is rejected server-side with a 403, regardless of what the UI displays
@@ -186,29 +179,22 @@ Then the system records a distinct named status for each of those conditions rat
 And a rate-limited response's Retry-After header is honored rather than retrying on a fixed schedule
 ```
 
-### Feature Area E — On-Screen View in K4A Console
+### Feature Area E — Email Link to the Existing K4A Dashboard
 
-#### FR-014 — Display the latest summary on screen
+#### FR-014 — Include a link to the existing K4A dashboard in the email
 ```gherkin
-Given an authorized marketing user opens the spend-by-channel summary view in the K4A console
-When a summary has been generated for the customer
-Then the console displays the latest spend-by-channel summary with a per-channel spend breakdown
-And the view indicates the week the summary covers
+Given a spend-by-channel summary email is delivered to an entitled customer
+When the email is composed
+Then the email includes a link to the existing K4A dashboard where the spend-by-channel data lives
+And no new on-screen view or UI build is created in K4A for this feature
 ```
 
-#### FR-015 — Show a not-yet-available state when no summary exists
+#### FR-015 — Enforce authorization when the dashboard link is followed
 ```gherkin
-Given an authorized marketing user opens the spend-by-channel summary view in the K4A console
-When no summary has yet been generated for the customer
-Then the console displays a clear "not yet available" empty state
-And the console does not display stale or placeholder spend figures
-```
-
-#### FR-016 — Reflect missing-channel marking in the on-screen view
-```gherkin
-Given a generated summary has one or more channels marked as missing or incomplete
-When an authorized user views that summary on screen in the K4A console
-Then the on-screen view marks those channels as missing or incomplete consistently with the delivered email
+Given a recipient follows the email's link to the existing K4A dashboard
+When the request reaches the backend
+Then the backend re-derives the user's entitlement and viewer authorization from the authoritative source on that request
+And an unauthorized or ineligible user is rejected server-side with a 403, regardless of what the UI displays
 ```
 
 Now reporting the decisions I flagged in Sections 0–3.
@@ -217,15 +203,15 @@ Now reporting the decisions I flagged in Sections 0–3.
 
 The system must track the following business information to support the Functional Requirements above. Attribute-level definitions, types, and storage are intentionally deferred to eng-plan.
 
-- **Weekly spend-by-channel summary** — the generated artifact for a given customer and covered week, containing per-channel spend. System-derived, built by aggregating spend data. This is the core content delivered by email (FR-008, FR-011) and shown on-screen (FR-014).
+- **Weekly spend-by-channel summary** — the generated artifact for a given customer and covered week, containing per-channel spend. System-derived, built by aggregating spend data. This is the core content delivered by email (FR-008, FR-011); the email links to the existing K4A dashboard where the same data is viewable (FR-014).
 - **Per-channel spend figure** — the spend amount attributed to each channel in the defined channel set for the covered week. System-derived from the underlying campaign spend data. Drives the breakdown in FR-008.
 - **Prior-week per-channel spend comparison** — per channel, the prior week's spend figure used to compute a current-vs-prior comparison when low-effort to derive. System-derived from the prior covered week's summary. Supports FR-008a.
 - **Channel set** — the fixed list of marketing channels included in the breakdown: paid search, paid social, display, email, and affiliate (see Section 1, BR-6). The same five channels appear every week and the set does not vary by campaign. Determines which channels appear in every summary.
-- **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009, FR-010, and FR-016.
-- **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-014) and to key idempotent re-runs (FR-007).
+- **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009 and FR-010.
+- **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-008) and to key idempotent re-runs (FR-007).
 - **Customer plan entitlement** — whether the customer's plan permits the weekly summary feature. External, verified against the authoritative account source. The standard plan already includes automated/scheduled recurring email reports, so no new entitlement is required for this feature. Gates generation and the on-screen view (FR-001–FR-004).
 - **Marketing-team recipient list** — the marketing team distribution list the email is delivered to for a customer, with membership controlled by the customer's marketing ops lead (see Section 1, BR-3). Used in FR-011.
-- **Viewer authorization state** — whether a given user requesting the on-screen view is authorized to see the summary. External/system-derived from the authoritative auth source on each request. Gates FR-004 and FR-014/FR-015.
+- **Viewer authorization state** — whether a given user following the email link to the existing K4A dashboard is authorized to see the spend data. External/system-derived from the authoritative auth source on each request. Gates FR-004 and FR-015.
 - **Generation run status** — per customer and covered week, the outcome of a generation run (succeeded, skipped/blocked, entitlement-unverifiable, failed). System-derived. Supports FR-002, FR-003, and operational visibility.
 - **Email delivery status** — per customer and covered week, the outcome of delivery (delivered, retrying, timed-out, service-unavailable, rate-limited, failed). System-derived. Supports FR-011–FR-013.
 - **Audit record of generation and delivery events** — an append-only trail of who/what triggered each run, the entitlement decision, and the delivery outcome. System-derived. Supports the audit guardrail in Section 5.
@@ -236,7 +222,7 @@ The system must track the following business information to support the Function
 
 ### Performance & Capacity
 
-- **NFR-001 — On-screen view latency:** The K4A console on-screen summary view must return within a p95 latency target measured under representative concurrent load (e.g. N concurrent requests, p95 ≤ X ms). The concrete p95 target and concurrency level are an engineering decision to be set in eng-plan based on the chosen aggregation path.
+- **NFR-001 — Dashboard view latency:** When a recipient follows the email link, the existing K4A dashboard's spend-by-channel view must return within a p95 latency target measured under representative concurrent load (e.g. N concurrent requests, p95 ≤ X ms). The concrete p95 target and concurrency level are an engineering decision to be set in eng-plan based on the chosen aggregation path.
 - **NFR-002 — Spend-query rate cap:** The spend-by-channel aggregation runs against a shared data/query resource. Both the generation (batch) query path and the on-screen (read) query path must have their own separate rate caps rather than a single shared value, to protect the shared resource. Concrete caps are an engineering decision for eng-plan.
 - **NFR-003 — Weekly delivery timeliness:** Each entitled customer's weekly summary must be generated and delivered within a bounded window after its weekly trigger time, so the marketing team receives it on a predictable cadence replacing the Monday manual pull. The exact delivery-window target and the day/time of the weekly trigger are a product decision. [DECISION REQUIRED: DEC-006]
 - **NFR-004 — Generation & delivery monitoring:** The system must alert when the generation-failure rate or delivery-failure rate exceeds 1% for 5 minutes, sustained, and when any single customer's weekly summary fails to deliver after all retries. This directly protects the customer-facing email reliability called out in the HIGH risk tier.
@@ -249,7 +235,7 @@ The system must track the following business information to support the Function
 
 ### Security & Access Control
 
-- **NFR-008 — Server-side entitlement/authorization enforcement:** Entitlement and viewer authorization must be enforced server-side and re-derived from the authoritative source on every request. A direct API call from an ineligible plan or unauthorized user must be rejected (403) regardless of UI state; the gate must fail closed if the auth/account source is unreachable (reinforces FR-003, FR-004).
+- **NFR-008 — Server-side entitlement/authorization enforcement:** Entitlement and viewer authorization must be enforced server-side and re-derived from the authoritative source on every request. A direct API call from an ineligible plan or unauthorized user must be rejected (403) regardless of UI state; the gate must fail closed if the auth/account source is unreachable (reinforces FR-003, FR-004, FR-015).
 - **NFR-009 — No sensitive data in logs:** The system must never log raw recipient email addresses, credentials, secrets, or tokens. Where a recipient identity must appear for operational diagnosis, it must be masked.
 - **NFR-010 — Audit trail for generation and delivery:** Each generation run and delivery attempt must write an append-only, immutable audit record capturing actor/trigger identity, customer/account identity, action (generate / deliver / skip), covered week, timestamp, and outcome/status. Records must not be editable or deletable by any role or code path. Audit writes must be asynchronous so they never block generation or delivery, but an audit-write failure must fire an immediate operational alert rather than fail silently. Minimum retention: 12 months. [DECISION REQUIRED: DEC-007]
 
@@ -276,7 +262,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 - Weekly, scheduled generation of a spend-by-channel summary for the entitled customer.
 - Standard-plan entitlement gating (server-side).
 - Email delivery of the summary to the marketing-team recipients, with bounded retry and failure handling.
-- On-screen display of the latest summary in the K4A console, with a not-yet-available empty state.
+- A link in the delivered email to the existing K4A dashboard where the spend-by-channel data is viewable (no new K4A screen or UI build).
 - Missing/incomplete channel-data handling and marking.
 
 ### Out of Scope / Future Phases
@@ -285,7 +271,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 |------|-----------|-------|
 | Additional content dimensions: impressions, conversions, budget comparison | Not required for the core spend-by-channel objective; explicitly excluded per BR-7 (DEC-005/OQ-002). Prior-week comparison is in scope for Phase 1 only if low-effort (FR-008a) | Future |
 | Filtering/segmentation of the summary (by campaign, region, product line, intra-week period) | Named as an open question, not critical path to the weekly spend-by-channel objective | Future |
-| Self-service scheduling/subscription management UI (users configuring cadence or recipients themselves) | Cadence and recipients are fixed configuration in Phase 1; self-service management is net-new UX beyond the confirmed display surface | Future |
+| Self-service scheduling/subscription management UI (users configuring cadence or recipients themselves) | Cadence and recipients are fixed configuration in Phase 1; self-service management is net-new UX, and Phase 1 adds no new K4A screen at all (the email simply links to the existing dashboard) | Future |
 | Rollout to customers beyond Meridian Travel / plans beyond standard | Requirement is scoped to one customer on the standard plan | Future |
 | Configurable per-recipient or role-based access controls over who gets the data | Raised as an open question; Phase 1 delivers to the configured marketing-team recipients | Future |
 | Secure time-limited download/export of the summary | Not requested; email + on-screen view satisfy the stated objective | Future |
@@ -326,9 +312,19 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Resolved DEC-003/OQ-004 in BR-4: standard plan already includes scheduled recurring email reports, no new entitlement work needed.
-- Noted in the Customer plan entitlement info requirement that the standard plan already includes scheduled recurring email reports (resolves DEC-003/OQ-004).
-- Updated NFR-014 to drop plan entitlement (and detail level) from the open scope decisions, noting both are now resolved.
+- Rewrote the in-product surface value bullet to reflect that the email links to the existing K4A dashboard rather than a new on-screen view.
+- Updated BR-5 so the dual surface is email + a link to the existing K4A dashboard, not a new on-screen view.
+- Replaced the new on-screen K4A view subgraph in the flow diagram with the email linking to the existing K4A dashboard, keeping server-side authorization.
+- Reframed FR-004 to enforce entitlement when the email's link to the existing K4A dashboard is followed.
+- Replaced the on-screen-view feature area (FR-014/015/016) with requirements for an email link to the existing K4A dashboard and its server-side authorization.
+- Updated the summary information requirement to reference the email link to the existing K4A dashboard instead of an on-screen view.
+- Removed the FR-016 reference from the channel data-completeness state since FR-016 (on-screen missing-channel marking) no longer exists.
+- Repointed the covered-week summary-labeling reference from FR-014 to FR-008 since FR-014 is no longer an on-screen display.
+- Updated viewer authorization state to reference following the dashboard link and the corrected FR citations.
+- Reframed NFR-001 latency from a new on-screen view to the existing K4A dashboard reached via the email link.
+- Added FR-015 to the NFR-008 server-side enforcement cross-reference for the dashboard-link authorization gate.
+- Updated Phase 1 scope to deliver an email link to the existing K4A dashboard rather than a new on-screen display.
+- Clarified the self-service UI out-of-scope rationale to note Phase 1 adds no new K4A screen, only a link to the existing dashboard.
 
 
 ---
@@ -355,7 +351,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-005**: On-screen in K4A, what exactly is the customer seeing — a preview of the email, a screen to manage/subscribe to the weekly schedule, or a live spend-by-channel dashboard? These are very different UI builds.
 - **OQ-006**: How should the email behave when a channel's spend data is missing or incomplete for the week, and what data latency is acceptable before send?
 - **OQ-007**: Are there filtering/segmentation needs (by campaign, region, product line, or sub-period within the week), or is it one flat weekly total per channel?
 - **OQ-008**: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
@@ -366,6 +361,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Each email needs total spend per channel only, plus a prior-week comparison if it's easy to add; no impressions or conversions. This answer also settles DEC-005, which asks the same question in other words.
 - **OQ-003**: OQ-003 answered: the 'marketing team' recipient resolves to the marketing team distribution list, with membership controlled by the customer's marketing ops lead.
 - **OQ-004**: Resolved OQ-004 (and DEC-003, which asks the same question): the standard plan tier already includes scheduled/automated recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
+- **OQ-005**: Resolved OQ-005 — the customer sees nothing new on-screen; the weekly email includes a link to the existing K4A dashboard, and no new screen or UI build is needed in K4A.
 
 ---
 > **Classification:** Type A
