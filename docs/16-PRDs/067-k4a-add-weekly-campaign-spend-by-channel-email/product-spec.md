@@ -22,7 +22,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The recipient resolves to the whole Meridian Travel marketing team distribution list, and their marketing ops lead controls who is on that list. Access to the data is not additionally limited by role or permission — there are no extra access controls beyond membership of that distribution list.
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. The standard plan already includes automated/scheduled recurring email reports, so enabling scheduled delivery for this customer requires no extra entitlement or feature work.
 - **BR-5 — Dual surface:** The spend-by-channel summary is delivered as an email, and that email includes a link to the existing K4A dashboard where the underlying spend data already lives. No new on-screen view or UI build is created in K4A for this feature.
-- **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
+- **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign. (Resolves DEC-004.)
 - **BR-7 — Detail level:** The summary content shows total spend per channel. A prior-week comparison is included if it is low-effort to add; impressions and conversions are explicitly excluded. (Resolves DEC-005 / OQ-002.)
 - **BR-8 — Granularity:** The summary is one flat weekly total per channel for the last completed week. There is no filtering or segmentation by campaign, region, product line, or sub-period within the week. (Resolves OQ-007.)
 
@@ -315,8 +315,7 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 _Applied reviewer's request._
 
-- Resolved BR-3: recipient is the whole marketing team distribution list with no extra role/permission access controls, removing the DEC-002 tag.
-- Updated Section 6 out-of-scope row to reflect DEC-002 resolution: no extra access controls in Phase 1.
+- Marked BR-6 as resolving DEC-004 (fixed five-channel set, same every week).
 
 
 ---
@@ -324,19 +323,12 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-004** | Which marketing channels should the spend breakdown include, and is that channel list the same every week or can it change by campaign? | Product owner (with Meridian Travel marketing team) | Include the customer's active channels, defaulting to paid search, social media, email, display, and affiliate, derived dynamically each week from the channels that have campaign activity. |
-
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
 - **DEC-002**: DEC-002: The whole Meridian Travel marketing team distribution list should receive the email. No extra access controls — access to the data is not limited by role or permission.
 - **DEC-003**: Duplicate of OQ-004; same answer settles it — standard plan already includes scheduled email reports with no extra entitlement work.
+- **DEC-004**: DEC-004 resolved: the spend breakdown includes paid search, paid social, display, email, and affiliate, and the channel list is the same every week (fixed week-to-week, does not change by campaign).
 - **DEC-005**: DEC-005 is a duplicate of OQ-002 and is settled by the same answer: total spend per channel plus optional prior-week comparison, no impressions or conversions.
 - **DEC-006**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
 - **DEC-007**: DEC-001 resolved: the spend summary is generated and delivered every Monday at 8am; this same answer also settles DEC-006 (day/time the weekly summary is sent).
