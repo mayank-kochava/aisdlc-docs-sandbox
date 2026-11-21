@@ -106,7 +106,7 @@ And each channel in the confirmed channel set appears with its aggregated spend 
 
 **FR-006 — Accuracy reconciliation against the manual process**
 ```gherkin
-Given the current manual report produces the authoritative weekly spend-by-channel figures
+Given the analyst's manual Monday pull of channel spend totals from the performance reporter produces the authoritative weekly spend-by-channel figures
 When the automated summary is generated for the same period during pre-launch validation
 Then the automated per-channel totals match the manual figures within an agreed tolerance
 And any discrepancy is surfaced for review rather than silently delivered
@@ -206,7 +206,7 @@ Now I'll report the decisions I flagged in Sections 0–3.
 
 The system must track the following business information to support the functional requirements above. These describe *what* is tracked and *why* — not storage structure, which belongs in eng-plan.
 
-- **Campaign spend by channel** — The per-channel spend figures attributable to Meridian Travel for the reporting period. Source: External/upstream campaign spend data (SAM-side campaign spend sources). This is the core payload of the summary and the subject of the accuracy reconciliation (FR-004, FR-005, FR-006).
+- **Campaign spend by channel** — The per-channel spend figures attributable to Meridian Travel for the reporting period. Source: the performance reporter — the same channel spend totals the analyst currently pulls by hand from the performance reporter every Monday are the authoritative figures the automated numbers must match. This is the core payload of the summary and the subject of the accuracy reconciliation (FR-004, FR-005, FR-006).
 - **Confirmed channel set** — The definitive list of channels to include in the grouping, plus any per-channel calculation or transformation rules. Source: Product owner decision (BR-2). Needed so FR-005 and FR-007 produce a complete, stable set of rows every week.
 - **Reporting period** — The week each summary covers (start and end boundaries). Source: System-derived from the delivery schedule. Needed so each email clearly states its coverage (FR-011) and so idempotency can key on the period (FR-003).
 - **Delivery schedule** — The fixed recurring day and time the summary is generated and sent. Source: Product owner decision (BR-1). Drives the trigger in FR-001.
@@ -251,7 +251,7 @@ Addressing each risk from the Context Seed:
 
 - **Hard 5-week deadline before live campaign (HIGH).** Mitigated when: a short discovery spike resolves service-ownership ambiguity (scheduling, email send, and spend-data source) early, and the accuracy reconciliation (FR-006) is scheduled with enough buffer before the summer launch. The reuse-vs-build question for existing report-subscription paths is an engineering scoping call that directly affects whether the deadline is achievable.
 - **Affects 5 backend services (HIGH).** Mitigated when: a single owner is chosen for scheduling and a single owner for email dispatch, avoiding duplicate/conflicting logic across the overlapping candidate services; the kill-switch (FR-015) is in place so the multi-service feature can be disabled quickly if it misbehaves.
-- **Data accuracy is business-critical (HIGH).** Mitigated when: the authoritative spend-by-channel source is confirmed, the automated totals reconcile against the current manual figures within the agreed tolerance before launch (FR-006, BR-3), and discrepancies are surfaced rather than silently delivered. Any missing/partial data follows the confirmed partial-data policy (BR-6) instead of being presented as complete.
+- **Data accuracy is business-critical (HIGH).** Mitigated when: the authoritative spend-by-channel source is confirmed (the performance reporter — the channel spend totals the analyst pulls by hand each Monday), the automated totals reconcile against the current manual figures within the agreed tolerance before launch (FR-006, BR-3), and discrepancies are surfaced rather than silently delivered. Any missing/partial data follows the confirmed partial-data policy (BR-6) instead of being presented as complete.
 
 ### Rollout & Rollback (HIGH-risk, multi-service)
 
@@ -299,6 +299,15 @@ An independent KG cross-check surfaced additional candidate services not in the 
 
 Unresolved boundaries for planning: which service owns scheduling (3 candidates), which owns email send (2 candidates), and which holds authoritative spend-by-channel data (4–5 candidates). A short discovery spike to settle ownership is the highest-leverage de-risking step for the deadline.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Updated the Campaign spend by channel information-requirement source to name the performance reporter as the authoritative source (resolves OQ-001).
+- Updated FR-006 to name the analyst's manual performance-reporter pull as the authoritative figures source (resolves OQ-001).
+- Updated the data-accuracy risk mitigation to record the performance reporter as the confirmed authoritative source (resolves OQ-001).
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -320,7 +329,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: What is the authoritative source the analyst currently pulls spend-by-channel from each Monday? We need to reconcile automated numbers against it, and the codebase has several candidate spend data sources (SAM API, performance reporter, data-sync services) that may not all agree.
 - **OQ-002**: Which specific channels must be included in the summary, and does any channel need special calculation or transformation (currency, rounding, de-duplication) before it's reported?
 - **OQ-003**: What exact day and time should the weekly email go out, and in which timezone?
 - **OQ-004**: Who are the recipients, and does the recipient list / send schedule need to be configurable by the marketing team (which would pull in a client/config and possibly UI surface), or is a fixed internal job acceptable?
@@ -329,6 +337,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-007**: Does the email need interactive/drill-down links, or is a static summary table sufficient?
 - **OQ-008**: Is any human review or approval required before each weekly send, or is it fully automated once deployed?
 - **OQ-009**: Is there an existing scheduled-report / email-subscription capability the team already uses that this should build on, rather than a net-new pipeline?
+
+### Questions Resolved
+
+- **OQ-001**: OQ-001 resolved: the authoritative source is the performance reporter — specifically the channel spend totals the analyst pulls by hand from the performance reporter every Monday, and the automated numbers must reconcile against those figures.
 
 ---
 > **Classification:** Type A
