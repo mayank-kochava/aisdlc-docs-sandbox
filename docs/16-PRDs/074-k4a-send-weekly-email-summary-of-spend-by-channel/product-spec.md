@@ -26,7 +26,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 
 ### Knowledge-Graph Cross-Check Note
 
-An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code (see OQ-001); it is not a product decision and does not change the behavior this spec requires. Per the requester (answering OQ-002), engineering should reuse any existing spend report if one is close enough rather than building new — the team needs only total spend per channel, so a near-match can be extended rather than rebuilt. A fresh knowledge-graph cross-check continues to surface k4a-sam-backend (likely owns spend-summary logic) and sam-performance-reporter (generates SAM performance/spend reports) as the strongest reuse candidates; engineering should confirm against the code which, if either, is close enough before committing to the 5-week estimate. The requester has confirmed the service choice is an engineering call and advised that scheduling should be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the concrete service names still need engineering confirmation against the code. The grounding detail is attached as a separate appendix at the end of this document.
+An independent codebase knowledge-graph lookup performed for this spec surfaced a meaningful discrepancy from the service set named in the Context Seed's engineering reference. The two lookups do not fully agree on which backend services schedule the job, aggregate spend by channel, render the email, and deliver it — including disagreement over which service actually sends the mail and which owns spend-summary logic (some summary logic may already exist and could reduce build scope). This is flagged here as an unresolved integration-path question for the engineering planning phase to settle against the actual code (see OQ-001); it is not a product decision and does not change the behavior this spec requires. Per the requester (answering OQ-002), engineering should reuse any existing spend report if one is close enough rather than building new — the team needs only total spend per channel, so a near-match can be extended rather than rebuilt. A fresh knowledge-graph cross-check continues to surface k4a-sam-backend (likely owns spend-summary logic) and sam-performance-reporter (generates SAM performance/spend reports) as the strongest reuse candidates; engineering should confirm against the code which, if either, is close enough before committing to the 5-week estimate. The requester has confirmed the service choice is an engineering call: engineering owns deciding which service schedules the weekly job (reporting-dispatcher vs. sam-report-scheduler vs. reporting-subscriptions-worker) and which service sends the email (k4a-mcp-server vs. notifications-api), and advised that scheduling should be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the concrete service names for both scheduling and delivery still need engineering confirmation against the code (see OQ-001). The grounding detail is attached as a separate appendix at the end of this document.
 
 ## 2. User Flows (Visuals)
 
@@ -297,10 +297,7 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Resolved BR-1 cadence to Monday 8:00 AM Eastern and removed the DEC-001 tag.
-- Resolved BR-4 recipient to marketing-team@meridiantravel.example and removed the DEC-003 tag.
-- Specified send day/time (Monday, 8:00 AM Eastern) in the weekly summary configuration information requirement.
-- Specified the recipient address (marketing-team@meridiantravel.example) in the recipient-list information requirement.
+- Clarified in Section 1 that engineering owns selecting both the scheduling service and the email-sending service, naming the competing candidates.
 
 
 ---
@@ -327,7 +324,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
+- **OQ-001**: OQ-001 remains open and is handed to engineering to decide: engineering owns selecting both the scheduling service (reporting-dispatcher vs sam-report-scheduler vs reporting-subscriptions-worker) and the email-sending service (k4a-mcp-server vs notifications-api), to be confirmed against the actual code before scoping.
 
 ### Questions Resolved
 
