@@ -353,4 +353,4 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-007**: OQ-007 resolved — historical weekly financial report PDFs must be retained and remain downloadable for two years.
 
 ---
-> **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly PDF attribution report, last-quarter data, finance-team download) and the open questions are standard engineering/design decisions (metrics layout, retention, failure handling) rather than genuine product ambiguity — so this is engineering-led design across 6 backend+frontend services, not discovery.
+> **Classification:** Type B (confirmed)
