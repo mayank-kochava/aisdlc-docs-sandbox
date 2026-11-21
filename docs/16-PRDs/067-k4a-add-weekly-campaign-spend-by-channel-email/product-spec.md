@@ -22,7 +22,7 @@ The marketing team at Meridian Travel currently pulls campaign spend data manual
 - **BR-3 — Recipient:** The summary is delivered to the marketing team at Meridian Travel. The requester confirmed the recipient is "the marketing team" as a group, not a single named individual. The resolution of that group to concrete recipients is an open business decision. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Plan entitlement:** The customer is on the standard plan. The feature is gated on standard-plan entitlement; the system must verify entitlement before producing or delivering a summary. Whether the standard plan already includes automated recurring email reports, or whether this is a new entitlement, must be confirmed. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Dual surface:** The same spend-by-channel summary is available both as a delivered email and as an on-screen view in the K4A console.
-- **BR-6 — Channel set:** The set of channels included in the breakdown must be defined. [DECISION REQUIRED: DEC-004]
+- **BR-6 — Channel set:** The breakdown includes a fixed set of five channels every week — paid search, paid social, display, email, and affiliate. This set is the same every week and does not vary by campaign.
 - **BR-7 — Detail level:** The summary content shows, at minimum, spend per channel. Any additional dimensions (impressions, conversions, budget comparison, prior-week comparison) are a content-scope decision. [DECISION REQUIRED: DEC-005]
 
 ### Knowledge-Graph Reconciliation Note
@@ -210,7 +210,7 @@ The system must track the following business information to support the Function
 
 - **Weekly spend-by-channel summary** — the generated artifact for a given customer and covered week, containing per-channel spend. System-derived, built by aggregating spend data. This is the core content delivered by email (FR-008, FR-011) and shown on-screen (FR-014).
 - **Per-channel spend figure** — the spend amount attributed to each channel in the defined channel set for the covered week. System-derived from the underlying campaign spend data. Drives the breakdown in FR-008.
-- **Channel set** — the defined list of marketing channels included in the breakdown. Source depends on the open channel-set decision (see Section 1, BR-6); until resolved, treat as customer/product configuration. Determines which channels appear in every summary.
+- **Channel set** — the fixed list of marketing channels included in the breakdown: paid search, paid social, display, email, and affiliate (see Section 1, BR-6). The same five channels appear every week and the set does not vary by campaign. Determines which channels appear in every summary.
 - **Channel data-completeness state** — per channel, whether spend data for the covered week is complete, incomplete, or missing. System-derived. Drives the missing-data marking in FR-009, FR-010, and FR-016.
 - **Covered week** — the time window a given summary represents. System-derived from the generation trigger. Needed to label summaries (FR-014) and to key idempotent re-runs (FR-007).
 - **Customer plan entitlement** — whether the customer's plan permits the weekly summary feature. External, verified against the authoritative account source. Gates generation and the on-screen view (FR-001–FR-004).
@@ -250,7 +250,7 @@ The Context Seed classifies this work as **HIGH risk** (hard 5-week deadline, mu
 - **NFR-011 — Kill-switch for the feature:** Because this is HIGH risk and spans multiple services, the weekly summary feature (generation + delivery) must be disableable via configuration without a code deploy. An on-call engineer must be able to disable it during an incident without separate approval. New-request propagation target: 5 minutes; a run already in flight at the time of the flip completes under prior behavior. *Mitigates: multi-service blast radius / customer-facing reliability.*
 - **NFR-012 — Email reliability mitigation:** Mitigated when FR-011–FR-013, NFR-004, and NFR-005 are all in place: delivery is retried with bounded backoff, each named failure condition is distinctly recorded, and sustained failure triggers an alert. *Mitigates: customer-facing email reliability.*
 - **NFR-013 — Service-topology mitigation:** The two knowledge-graph lookups disagree on the real service map (see Section 1 reconciliation note). This risk is mitigated only when an engineer who knows the K4A/SAM topology confirms the actual repositories before implementation begins. No build work should proceed against an unconfirmed service map. *Mitigates: multi-service blast radius / unclear technical design.*
-- **NFR-014 — Deadline mitigation:** The hard 5-week deadline (before the summer campaign launch) is mitigated only if the open scope decisions in Section 1 (channel set, recipient resolution, detail level, plan entitlement, cadence) are resolved early, since each materially affects scope. The out-of-scope phasing in Section 6 protects the deadline by deferring non-critical-path content.
+- **NFR-014 — Deadline mitigation:** The hard 5-week deadline (before the summer campaign launch) is mitigated only if the remaining open scope decisions in Section 1 (recipient resolution, detail level, plan entitlement, cadence) are resolved early, since each materially affects scope. The out-of-scope phasing in Section 6 protects the deadline by deferring non-critical-path content.
 - **NFR-015 — Rollback:** On a decision to roll back, the feature owner (Product owner, operationally the on-call engineer during an incident) triggers the kill-switch in NFR-011. Rollback disables future generation and delivery only; already-delivered emails and already-generated on-screen summaries are not retroactively reverted. Timing target follows the 5-minute kill-switch propagation.
 
 ### Backward Compatibility
@@ -312,6 +312,15 @@ Two independent knowledge-graph lookups produced **two different service maps** 
 
 **Reconciliation:** There appear to be ~6 logical roles (aggregate spend data, sync data, schedule, send email, verify entitlement, display on-screen) spread across two naming conventions. No evidence block cites a concrete symbol, endpoint, file, or table — all evidence is role-level. Collapse these to actual repositories before scoping.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved BR-6: channel set is the fixed weekly set of paid search, paid social, display, email, and affiliate.
+- Updated Section 4 Channel set info requirement to the resolved fixed five-channel set.
+- Removed channel set from NFR-014's list of open scope decisions now that it is resolved.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -333,7 +342,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: What specific channels must appear in the spend breakdown (e.g. paid search, social, email, display, affiliate), and is that set fixed week-to-week or does it vary by campaign?
 - **OQ-002**: What level of detail does each email need — total spend only, or spend plus impressions/conversions/budget/prior-week comparison?
 - **OQ-003**: Does the 'marketing team' recipient resolve to specific named addresses, a distribution list, or a role/permission group — and who controls who's on it?
 - **OQ-004**: Does the standard plan tier already permit automated recurring email reports, or does enabling scheduled delivery for this customer require new entitlement/feature work?
@@ -341,6 +349,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-006**: How should the email behave when a channel's spend data is missing or incomplete for the week, and what data latency is acceptable before send?
 - **OQ-007**: Are there filtering/segmentation needs (by campaign, region, product line, or sub-period within the week), or is it one flat weekly total per channel?
 - **OQ-008**: Is there an existing spend-by-channel aggregation and an existing per-customer recurring-email capability we can reuse, or should we budget for building both from scratch within the 5-week window?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001/DEC-004 (BR-6): the spend breakdown includes a fixed weekly set of five channels — paid search, paid social, display, email, and affiliate — the same every week, not varying by campaign.
 
 ---
 > **Classification:** Type A
