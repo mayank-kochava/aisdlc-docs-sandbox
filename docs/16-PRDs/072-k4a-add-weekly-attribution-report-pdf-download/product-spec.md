@@ -19,10 +19,10 @@ Brightway Retail's finance team cannot currently obtain attribution results in a
 
 - **BR-1 — Cadence:** The report is generated and made available on a weekly cadence.
 - **BR-2 — Format:** The report is delivered as a PDF.
-- **BR-3 — Reporting window:** The report covers the last quarter only. Whether "last quarter" means the most recent completed quarter recalculated each week, or a fixed quarter pinned to the year-end close period, is not settled by the input. [DECISION REQUIRED: DEC-001]
+- **BR-3 — Reporting window:** The report covers the last quarter only, meaning the most recent completed quarter relative to the generation date, recalculated every week.
 - **BR-4 — Customer scope:** This capability applies to Brightway Retail, a standard-plan customer. Whether the feature is gated to Brightway Retail specifically, to all standard-plan accounts, or to all K4A accounts is not settled by the input. [DECISION REQUIRED: DEC-002]
 - **BR-5 — Access:** Who within the Brightway Retail account may download the report is not settled by the input. [DECISION REQUIRED: DEC-003]
-- **BR-6 — Delivery mechanism:** Whether the report is manually triggered by the finance team, automatically emailed, or continuously available for download in the K4A console is not settled by the input. [DECISION REQUIRED: DEC-004]
+- **BR-6 — Delivery mechanism:** The finance team triggers the report themselves from the K4A console (manual on-demand trigger from the console). The report is not automatically emailed and is not generated without a user-initiated trigger in the console.
 - **BR-7 — Data readiness:** When attribution data for a reporting window is incomplete or still processing, the report must still generate against the data that is final, and must clearly indicate on the report that some data was incomplete at generation time, rather than blocking generation (default posture — see FR-013).
 - **BR-8 — Retention:** How long historical weekly reports remain downloadable is not settled by the input. [DECISION REQUIRED: DEC-005]
 
@@ -85,7 +85,7 @@ When the system determines the reporting window
 Then the report includes only attribution data for the last quarter
 And data outside the last-quarter window is excluded from the report
 ```
-> Whether "last quarter" is the most recent completed quarter recomputed per run or a fixed quarter is governed by BR-3 (see Section 1). Working default: the most recent completed quarter relative to the generation date.
+> Per BR-3 (see Section 1), "last quarter" is the most recent completed quarter relative to the generation date, recalculated every week.
 
 **FR-004 — Single report per cycle (idempotency)**
 ```gherkin
@@ -233,7 +233,7 @@ Now reporting the decisions I flagged in Sections 1–3.
 The system must track the following business information to support the functional requirements above. This is a product-level inventory of concepts, not a schema — field names, types, and storage decisions belong to `eng-plan`.
 
 - **Weekly Report instance** — a single generated attribution report for an account and reporting window. System-derived (produced by the weekly generation cycle). Needed to make reports available for download (FR-009), list past reports (FR-011), and enforce idempotency so a retry doesn't create a duplicate (FR-004).
-- **Reporting window** — the last-quarter date range a given report covers. System-derived from the generation date and the BR-3 window semantics. Needed to scope report contents (FR-003) and to key a report instance uniquely per account+window (FR-004).
+- **Reporting window** — the last-quarter date range a given report covers, i.e. the most recent completed quarter relative to the generation date, recalculated every week (BR-3). System-derived from the generation date. Needed to scope report contents (FR-003) and to key a report instance uniquely per account+window (FR-004).
 - **Generation run status** — the outcome of each weekly generation attempt, including the distinct named failure conditions (timeout, dependency-unavailable, rate-limited, no-data). System-derived. Needed for FR-007, FR-008, FR-014, and for operational alerting.
 - **Data-completeness indicator** — whether the attribution data for the window was fully final or partially still-processing at generation time. System-derived from the attribution data source. Needed to flag incomplete data on the report (FR-013).
 - **Attribution data for the window** — the source metrics/data points the report renders: total attributed revenue and conversions by channel, plus the change from the prior week, presented in a single simple table. External to this feature (read from the authoritative attribution data source, read-only). Needed for FR-006.
@@ -281,7 +281,7 @@ The system must track the following business information to support the function
 
 Explicit treatment of each risk from the Context Seed:
 
-- **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (delivery mechanism, reporting-window semantics, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
+- **Hard 5-week year-end deadline.** Mitigated only if the unsettled product decisions in Section 1 (delivery mechanism, access/eligibility scope) are answered early, since each gates a buildable requirement. The working defaults in Section 3 let engineering proceed in parallel, but final content and scope must be confirmed before the report is considered acceptance-ready. The service-map reconciliation (below) is also on the critical path.
 - **Multi-service blast radius (6 services, with disagreement across KG passes).** Mitigated by (a) reconciling the actual service map during `eng-context`/`eng-plan` before scope is locked — see the Section 1 service-map note — and (b) the kill-switch (NFR-015) so the feature can be pulled without a deploy if any participating service misbehaves.
 - **UX scope (confirmed: simple download button).** The PM has confirmed finance wants only a simple download button, not a full report management/listing interface. Phase 1 is therefore constrained to the minimum viable surface (see Section 6): a download action plus a basic availability/"no report" state, with any richer management interface explicitly deferred.
 - **Attribution data incompleteness / mid-processing reads.** Mitigated by FR-013/FR-014 and the BR-7 default posture (generate against final data, flag incomplete, never block), and by NFR-006 bounded retries against the source.
@@ -339,8 +339,11 @@ Per the Context Seed's technical analysis, the following services are named as a
 
 _Applied reviewer's request._
 
-- Updated the UX-scope risk bullet to reflect the PM's confirmation that the UI is just a download button.
-- Updated the out-of-scope rationale for the report management interface to reflect the confirmed download-button-only decision.
+- Resolved BR-6: finance manually triggers the report from the K4A console; removed DEC-004 tag.
+- Resolved BR-3: "last quarter" is the most recent completed quarter recalculated weekly, removing the DEC-001 tag.
+- Updated FR-003 note to state the resolved reporting-window semantics rather than a working default.
+- Updated the Reporting window information requirement to reflect the resolved weekly most-recent-completed-quarter semantics.
+- Removed reporting-window semantics from the list of unsettled Section 1 decisions in the Risk Mitigation note, now that it is resolved.
 
 
 ---
@@ -354,7 +357,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Should the weekly report always cover the most recent completed quarter recalculated each week, or should it stay pinned to one fixed quarter tied to the year-end close period? | Product owner (with Brightway Retail finance team) | Most recent completed quarter relative to each generation date, recalculated weekly. |
 | **DEC-002** | Should this weekly report capability be available only to the Brightway Retail account, to every standard-plan account, or to all K4A accounts? | Product owner | Gated to the Brightway Retail account only for this phase, enforced server-side. |
 | **DEC-003** | Which users within the Brightway Retail account are allowed to download these reports, or can any user on the account download them? | Product owner (with Brightway Retail finance team) | Any user with access to the Brightway Retail K4A account may download, enforced server-side. |
 | **DEC-004** | Should the finance team get the report by manually triggering it each week, by automated email delivery, or simply by it being continuously available for download in the K4A console? | Product owner (with Brightway Retail finance team) | Reports are continuously available for download in the K4A console, no email delivery in this phase. |
@@ -364,12 +366,11 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Decisions Resolved
 
+- **DEC-001**: Duplicate of OQ-004; settled by the same answer — report covers the most recent completed quarter, recalculated each week.
 - **DEC-006**: Resolved — the report must contain total attributed revenue and conversions by channel, plus the change from last week, presented as one simple table. Same answer as OQ-001.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-003**: How should the report be delivered: manually triggered by finance, automatically emailed weekly, or always available for download in the K4A console?
-- **OQ-004**: Does 'last quarter only' mean the most recent completed quarter recalculated each week, or a fixed quarter (e.g. Q4) regardless of generation date?
 - **OQ-005**: How should the report handle weeks where attribution data is still processing or incomplete, generate anyway, or block/delay until finalized?
 - **OQ-006**: Are access controls needed (e.g. finance-only), or can any user on the Brightway Retail account download these reports?
 - **OQ-007**: Should historical weekly reports stay downloadable indefinitely, or is there a retention/archival policy?
@@ -379,6 +380,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved OQ-001 and DEC-006: the weekly report must contain total attributed revenue and conversions by channel, plus the change from last week, in a single simple table layout.
 - **OQ-002**: Resolved OQ-002 — PM confirmed the UI is just a simple download button, not a full report management/listing interface.
+- **OQ-003**: OQ-003 resolved: finance triggers the report themselves from the K4A console (manually triggered from the console).
+- **OQ-004**: Resolved OQ-004 (and DEC-001, the same question): "last quarter only" means the most recent completed quarter relative to the generation date, recalculated every week.
 
 ---
 > **Classification:** Type A
