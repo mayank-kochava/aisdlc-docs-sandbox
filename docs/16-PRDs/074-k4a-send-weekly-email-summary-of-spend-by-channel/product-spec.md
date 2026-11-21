@@ -20,7 +20,7 @@ Automating a weekly email summary of total spend per channel eliminates the recu
 - **BR-3 — Reporting week:** Each email covers one reporting week. The precise boundaries of the reporting week (which day it starts and ends on, and the timezone used to bound it) are a product decision not yet settled. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient address or distribution list is a product decision not yet settled. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan. This feature must function for a standard-plan K4A account.
-- **BR-6 — Channels displayed:** The set of channels Meridian Travel tracks, and whether all have spend data available within the product versus requiring manual aggregation from external sources, is a product decision not yet settled. [DECISION REQUIRED: DEC-004]
+- **BR-6 — Channels displayed:** Meridian Travel tracks four channels — email, paid search, paid social, and display. All four run through K4A today, so all have spend data available within the product; none require manual aggregation from external sources (per the requester, answering OQ-003/DEC-004).
 - **BR-7 — Zero / missing data handling:** How the email treats a channel with zero spend or missing data for the reporting week (omit the line, or show the channel with a zero/placeholder value) is a product decision not yet settled. [DECISION REQUIRED: DEC-005]
 - **BR-8 — Delivery failure notification:** If weekly generation or delivery fails, the team must not be left silently without their expected email. The system records the failure and raises an operational alert so a human is aware the email did not go out (see Section 5).
 
@@ -185,7 +185,7 @@ The system must track the following business information to support the function
 
 - **Recipient list** — The address or distribution list for the Meridian Travel marketing team that should receive the email. *Source: User-Entered / configured.* *Why it matters: FR-012 delivers to configured recipients; BR-4.*
 
-- **Channel set** — The set of channels tracked for the account, including which have in-product spend data and which (if any) require external aggregation. *Source: System-Derived (from spend/channel data), with product confirmation of the expected set.* *Why it matters: FR-006, FR-007, FR-010; BR-6.*
+- **Channel set** — The four channels tracked for the account — email, paid search, paid social, and display — all of which have in-product spend data flowing through K4A today; none require external aggregation. *Source: System-Derived (from spend/channel data), confirmed by the requester.* *Why it matters: FR-006, FR-007, FR-010; BR-6.*
 
 - **Spend records (scoped to account + reporting week)** — Individual spend amounts with their channel attribution for the reporting week. *Source: System-Derived (queried from the spend/channel data source).* *Why it matters: FR-006 and FR-007 depend on retrieving and summing these.*
 
@@ -256,7 +256,7 @@ The Context Seed classifies this as **HIGH risk** (hard ~5-week external deadlin
 | Week-over-week change, budget variance, or performance indicators in the email | Requester confirmed total spend per channel alone is sufficient (BR-2); comparison metrics are a future enhancement. |
 | Customizable channel names, ordering, email branding, or template design | Not required for the Phase 1 "one line per channel" summary; branding/template requirements are an open question deferred to a later phase. |
 | Self-service UI for configuring the summary (schedule, recipients, channels) | UI/frontend impact is unconfirmed in the Context Seed; Phase 1 can rely on configured defaults set during design. [DECISION REQUIRED: DEC-007] |
-| Manual aggregation of spend from external sources not available in-product | Phase 1 covers channels whose spend is available within the product; external-source aggregation is unresolved (BR-6) and deferred. |
+| Manual aggregation of spend from external sources not available in-product | Meridian Travel's four channels (email, paid search, paid social, display) all run through K4A today (BR-6), so no external-source aggregation is needed for Phase 1. |
 | On-demand / ad-hoc generation of the summary outside the weekly cadence | The requirement is a weekly scheduled email; ad-hoc runs are not part of Phase 1. |
 | Recipient-managed subscription / unsubscribe self-service | Phase 1 delivers to a configured recipient list; subscription management is a future enhancement. |
 | Rollout beyond the Meridian Travel standard-plan use case to other accounts/plan tiers | Phase 1 targets the specific Meridian Travel requirement; broader rollout is a future phase. |
@@ -291,8 +291,9 @@ Independent knowledge-graph cross-check surfaced additional/alternate candidates
 
 _Applied reviewer's request._
 
-- Folded OQ-002 resolution into the Section 1 cross-check note: reuse an existing close-match spend report (totals per channel only).
-- Added OQ-002 reuse resolution to NFR-011 schedule-risk mitigation as a scope-reduction lever.
+- Resolved BR-6: Meridian's four channels (email, paid search, paid social, display) all run through K4A; no external aggregation needed.
+- Updated Section 4 Channel set info requirement to name the four confirmed in-product channels.
+- Updated Section 6 external-aggregation row to reflect that all four channels are in-product, so no external aggregation is needed.
 
 
 ---
@@ -317,7 +318,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-001**: Requester deferred OQ-001 to engineering as a technical call, advising that scheduling be owned by whichever service already schedules weekly/recurring reports rather than a new scheduler; the exact scheduling and delivery service names still require engineering confirmation against the code.
-- **OQ-003**: What exactly counts as a 'channel' for Meridian Travel, and do all their channels have spend data flowing through K4A/SAM, or do some come from external sources that aren't in our systems today?
 - **OQ-004**: What day and time should the email go out, and what is the exact recipient email address or distribution list?
 - **OQ-005**: Should the email be total-spend-per-channel only, or also include comparisons (week-over-week, budget variance, performance)? Intake answer says totals-only is enough — can we lock that as the v1 scope?
 - **OQ-006**: How should the email handle weeks with zero spend or missing data for a channel — omit the line, show zero, or something else?
@@ -327,6 +327,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-002**: Resolved OQ-002: reuse any existing spend report if it is a close match rather than building new, since only total spend per channel is required.
+- **OQ-003**: Resolved OQ-003/DEC-004 — Meridian Travel's channels are email, paid search, paid social, and display, all flowing through K4A today with no external-source aggregation required.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The desired behavior is clearly specified (weekly email with one-line-per-channel spend totals, confirmed by requester), and the remaining open questions are routine design details (send time, recipient list, zero-spend handling) rather than genuine product ambiguity; the work is multi-service backend integration across query/scheduler/dispatch/data services, which is engineering-led design, not discovery.
