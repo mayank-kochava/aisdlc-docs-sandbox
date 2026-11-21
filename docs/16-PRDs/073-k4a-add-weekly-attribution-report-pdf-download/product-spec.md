@@ -20,7 +20,7 @@ Brightway Retail's finance team needs attribution reporting data in a consumable
 ### Business Rules
 
 - **Report cadence:** The attribution report is generated on a weekly schedule and becomes available for download each week.
-- **Data scope:** Each report contains attribution data for the **last quarter only**. Scope and metrics are assumed standard for K4A attribution reports.
+- **Data scope:** Each report contains attribution data for the **most recent completed quarter**, recalculated every week (so each week's report reflects the same completed-quarter window re-run against the latest data). Metrics are assumed standard for K4A attribution reports.
 - **Output format:** The report is delivered as a downloadable **PDF**.
 - **Plan eligibility:** Brightway Retail is on the **standard plan**; this capability must be available to them under that plan.
 - **Audience:** The report is intended for the Brightway Retail **finance team**.
@@ -52,11 +52,11 @@ Two independent codebase knowledge-graph lookups disagree on the attribution **d
 
 ```mermaid
 flowchart TD
-    A["Weekly generation (system-triggered on schedule)"] --> B{"Attribution data available for last quarter?"}
+    A["Weekly generation (system-triggered on schedule)"] --> B{"Attribution data available for most recent completed quarter?"}
     B -->|"no (data source unavailable)"| C["Mark week's report as failed"]
     C --> D["Fire operational alert to owning team"]
     D --> E["Prior available report(s) remain downloadable"]
-    B -->|"yes"| F["Generate PDF for last quarter"]
+    B -->|"yes"| F["Generate PDF for most recent completed quarter (recalculated this week)"]
     F --> G{"PDF generation succeeded?"}
     G -->|"no (render failure)"| C
     G -->|"yes"| H["Mark week's report as available"]
@@ -87,12 +87,13 @@ And the generated report is produced in PDF format
 And the report is marked as available for download for that week
 ```
 
-#### FR-002 — Last-quarter data scope
+#### FR-002 — Most-recent-completed-quarter data scope
 ```gherkin
 Given a weekly attribution report is being generated
 When the system assembles the report content
-Then the report includes attribution data scoped to the last quarter only
-And data outside the last-quarter window is excluded from the report
+Then the report includes attribution data scoped to the most recent completed quarter only
+And the completed-quarter window is recalculated on each weekly run against the latest available data
+And data outside the most-recent-completed-quarter window is excluded from the report
 ```
 
 #### FR-003 — Report content uses the standard K4A attribution metric set
@@ -211,7 +212,7 @@ I have written Sections 0–3. Now reporting the business trade-offs I flagged.
 The system must track the following business information to support the Functional Requirements:
 
 - **Weekly Report Record** — represents one generated (or attempted) weekly attribution report for an account. *System-derived.* Needed by FR-001, FR-006, FR-008, and FR-010 to list, de-duplicate, and serve reports and to reflect per-week availability.
-- **Report Covered Period** — the last-quarter window the report's data represents. *System-derived* from the generation run date. Needed by FR-002 and FR-008 so finance users know exactly which period each report reflects.
+- **Report Covered Period** — the most-recent-completed-quarter window the report's data represents, re-derived on each weekly run. *System-derived* from the generation run date. Needed by FR-002 and FR-008 so finance users know exactly which period each report reflects.
 - **Report Availability Status** — whether a given week's report is available, failed, or not-yet-generated. *System-derived.* Needed by FR-004, FR-008, FR-009, and FR-010 to drive what the download interface shows and permits.
 - **Report Failure Reason** — the distinct cause when a week's report fails (attribution-data-unavailable vs. PDF-render-failure). *System-derived.* Needed by FR-004 and FR-005 to drive distinct operational alerts.
 - **Attribution Data (last quarter)** — the standard K4A attribution metric set that populates the report body. *System-derived* from the attribution data source (unresolved between the two KG candidate sources — see Section 1). Needed by FR-002 and FR-003 as the report's content.
@@ -270,7 +271,7 @@ The following are explicitly **NOT** included in Phase 1 to prevent scope creep.
 | Historical report archive beyond the confirmed retention horizon | Out of scope (Phase 1) | Retention horizon is an open decision (Section 1); Phase 1 serves at least the current week plus whatever horizon is confirmed, not an open-ended archive. |
 | Reports for products other than K4A | Out of scope (Phase 1) | This work item is scoped to K4A only. |
 | Plans other than standard | Out of scope (Phase 1) | Brightway Retail is on the standard plan; cross-plan eligibility is not in scope. |
-| Date ranges other than last quarter (e.g. custom ranges, full year) | Out of scope (Phase 1) | Each report is scoped to last quarter per the Context Seed. |
+| Date ranges other than the most recent completed quarter (e.g. custom ranges, full year) | Out of scope (Phase 1) | Each report is scoped to the most recent completed quarter, recalculated weekly. |
 | Compliance/audit archival requirements specific to Brightway Retail | Out of scope (Phase 1) pending input | The Context Seed raised but did not confirm Brightway-specific audit/retention obligations; absent that input, Phase 1 applies the standard audit/retention guardrails in Section 5 only. |
 
 ---
@@ -294,8 +295,12 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Marked in-browser PDF preview as confirmed out of scope per reviewer's OQ-001 resolution.
-- Updated frontend-mos appendix role to drop PDF preview, reflecting the confirmed download-only scope.
+- Resolved OQ-003 in the Data scope business rule: last quarter = most recent completed quarter, recalculated weekly.
+- Updated flow diagram node to reference the most recent completed quarter instead of generic "last quarter".
+- Updated flow diagram generation node to reflect the recalculated most-recent-completed-quarter window.
+- Rewrote FR-002 to define scope as the most recent completed quarter, recalculated each weekly run.
+- Updated Report Covered Period information requirement to the most-recent-completed-quarter window re-derived weekly.
+- Updated the out-of-scope date-ranges row to reference the most recent completed quarter.
 
 
 ---
@@ -315,11 +320,11 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-004** | How far back should past weekly reports stay downloadable - current week only, the full quarter, or a rolling twelve months? | Product owner (with Brightway Retail finance stakeholder) | Keep the full last quarter of weekly reports downloadable, which aligns with the last-quarter data scope, until a specific retention period is confirmed. |
 | **DEC-005** | How long should audit records of who viewed or downloaded these finance reports be retained? | Compliance/Security (with Product owner) | Retain report-access audit records for 12 months, extended to match any Brightway-specific audit agreement if one exists. |
 | **DEC-006** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-007** | The Context Seed states a download capability is required but does not resolve whether the PDF should also be automatically emailed to the finance team each week or whether a self-service download portal alone is sufficient. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Should delivery be a self-service download portal, an automatic weekly email of the PDF, or both? This decides which backend services (subscriptions/dispatch vs. just download endpoint) are actually in scope.
-- **OQ-003**: Does 'last quarter only' mean the trailing calendar quarter, the current quarter-to-date, or a rolling 3 months? Finance/year-end framing makes the exact window and reset timing matter.
 - **OQ-004**: Who on the finance team needs access, and does this report need role/permission gating distinct from existing K4A console access? There's no evidence of how report access is currently restricted.
 - **OQ-005**: What specific attribution metrics and layout must the PDF contain (tables, charts, channel breakdowns)? Needed before anyone can build the generation/export logic.
 - **OQ-006**: What should happen on a failed weekly generation — alert, auto-retry, or skip? This drives whether we build monitoring/retry into the scheduler and dispatcher.
@@ -328,6 +333,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001: in-browser PDF preview is not required — delivery is a plain download button only, with no preview, to avoid increasing frontend scope on the tight deadline.
+- **OQ-003**: Resolved OQ-003: 'last quarter only' means the most recent completed quarter, recalculated every week.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly PDF attribution report, last-quarter data, finance-team download) and the open questions are standard engineering/design decisions (metrics layout, retention, failure handling) rather than genuine product ambiguity — so this is engineering-led design across 6 backend+frontend services, not discovery.
