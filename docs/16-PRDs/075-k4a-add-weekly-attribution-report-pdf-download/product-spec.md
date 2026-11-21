@@ -24,7 +24,7 @@ Brightway Retail's finance team currently has no self-service way to obtain attr
 - **Plan eligibility:** This capability is scoped to the standard plan (Brightway Retail is on the standard plan).
 - **Audience:** The intended consumers are the finance team at Brightway Retail.
 - **Delivery model:** Whether finance pulls the report on demand from K4A (self-service download) or the report is pushed to them on a schedule remains unconfirmed in the intake (the requester answered "for engineering to confirm"). This is a product-facing choice because it changes what the customer sees and does. [DECISION REQUIRED: DEC-002]
-- **Download consistency:** If the report is downloaded more than once within the same week, whether each download returns identical data for that week or reflects the most current available data is a reporting-integrity rule finance relies on. [DECISION REQUIRED: DEC-003]
+- **Download consistency:** If the report is downloaded more than once within the same week, every download returns identical data — the week's report is a frozen weekly snapshot, not refreshed to the most current available data on each download.
 - **Access control:** Who within the finance team may obtain the report (all finance members, specific roles, or a designated finance manager) is a product rule that defines who the feature serves. [DECISION REQUIRED: DEC-004]
 - **Attribution content:** Which attribution metrics and dimensions the PDF must contain, and how they are grouped or ordered, defines what the report actually delivers to finance. [DECISION REQUIRED: DEC-005]
 - **Retention / compliance:** Whether these weekly PDFs must be archived, timestamped, or retained for an audit period is a compliance rule the business must set. [DECISION REQUIRED: DEC-006]
@@ -111,8 +111,8 @@ And no duplicate report record is created for that account and week
 Given a weekly report for an account and week has been generated and marked available
 When an authorized user obtains that report more than once within the same week
 Then each retrieval returns the same report content for that week
-# Provisional rule (pending the download-consistency decision): a given week's report is
-# a fixed snapshot — repeated downloads in the same week return identical data.
+# Rule (download-consistency decision resolved): a given week's report is a fixed
+# snapshot — repeated downloads in the same week return identical data.
 ```
 
 ## 3.2 Delivery & Download
@@ -322,6 +322,14 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 Additional services surfaced at lower confidence during an independent knowledge-graph cross-check, flagged for engineering to verify during discovery (not asserted as in-scope): **summary-report-cloud** (may assemble report content output) and **koch-query-api** (may supply the underlying attribution query data, and may be where the last-quarter filter must be applied).
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved DEC-003 in the Download-consistency business rule: a week's report is a frozen snapshot, identical on every download.
+- Updated FR-005 note to reflect that the download-consistency decision is now resolved as a frozen snapshot.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -345,12 +353,15 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Is this a pull or push model — should finance download the report on demand from K4A, or should it be generated and delivered to them on a weekly schedule? This single decision determines whether two backend services (scheduling/subscription workers) are even in scope, so it heavily affects effort and the 5-week deadline.
 - **OQ-002**: For 'last quarter only,' should the report always show a rolling 90 days, or snap to fixed calendar-quarter boundaries that reset on specific dates? This changes the data-scoping logic.
-- **OQ-003**: If finance downloads the report multiple times in a week, should they get identical data (a frozen weekly snapshot) or the most current data each time?
 - **OQ-004**: What specific attribution metrics and dimensions must the PDF contain, and how should they be grouped/ordered (by channel, campaign, product, geography)? Needed before any report template or UI can be built.
 - **OQ-005**: Who should be able to download this report — all finance team members, specific roles, or a designated manager — and does that permission boundary tie into any existing subscription concept?
 - **OQ-006**: Does the report need in-PDF filtering, date-range customization, or drill-down, or is a static pre-formatted PDF sufficient?
 - **OQ-007**: Are there compliance, audit, or retention requirements for the weekly PDFs (archival, timestamping, signing)?
 - **OQ-008**: Should report content be assembled in the main reporting path, or does an existing summary-report component already produce this output we should reuse? (Affects which services get touched — flagging because the brief should confirm the intended data source.)
+
+### Questions Resolved
+
+- **OQ-003**: OQ-003 resolved: a given week's report is a frozen weekly snapshot — every download within the same week returns identical data, not the most current numbers.
 
 ---
 > **Classification:** Type A
