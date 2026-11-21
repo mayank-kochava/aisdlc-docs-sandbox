@@ -351,10 +351,6 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **DEC-006**: DEC-006 / OQ-007 resolved: weekly report PDFs are retained for two years for audit.
 - **DEC-007**: DEC-007 resolved — the secure download link for reports delivered outside an in-app download stays valid for seven days before expiring.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-006**: Does the report need in-PDF filtering, date-range customization, or drill-down, or is a static pre-formatted PDF sufficient?
-
 ### Questions Resolved
 
 - **OQ-001**: Resolved DEC-002/OQ-001: delivery model is push — the report is emailed to the finance team every Monday, not self-service download; scheduled-distribution and subscription-worker services are therefore in scope.
@@ -362,6 +358,7 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-003**: OQ-003 resolved: a given week's report is a frozen weekly snapshot — every download within the same week returns identical data, not the most current numbers.
 - **OQ-004**: Resolved OQ-004/DEC-005: the PDF contains total attributed revenue and conversions by channel, presented as one simple static table.
 - **OQ-005**: Access control resolved: all finance-team members on the account may obtain the report, with no narrower role/manager restriction and no tie to any existing subscription concept.
+- **OQ-006**: Resolved OQ-006 — a static, pre-formatted PDF is sufficient; no in-PDF filtering, date-range customization, or drill-down is required.
 - **OQ-007**: DEC-006 / OQ-007 resolved: weekly report PDFs are retained for two years for audit.
 - **OQ-008**: Resolved OQ-008 — report content is produced by reusing the existing summary-report component (summary-report-cloud) if one exists, rather than assembling it in the main reporting path.
 
