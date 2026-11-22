@@ -18,7 +18,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 ### Business Rules
 
 - **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. [DECISION REQUIRED]
-- **BR-2 — Cadence:** The report is generated on a recurring weekly schedule (confirmed by the requester: "they want it every week"). It is not a one-time year-end export.
+- **BR-2 — Cadence:** The report is generated on a permanently recurring weekly schedule (confirmed by the requester: weekly, every week, not just through year-end close). It is not a one-time year-end export, and the weekly cadence does not stop after year-end close — durable scheduling is in scope rather than a lighter-weight interim solution.
 - **BR-3 — Report period:** Each report covers the last quarter (Q4) only. The reporting window is a trailing-quarter window, not a configurable range in this phase.
 - **BR-4 — Format:** The report is delivered as a downloadable PDF. The specific visual appearance and generation method are engineering decisions, deferred to downstream planning.
 - **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. [DECISION REQUIRED]
@@ -227,6 +227,13 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 > **Cross-check discrepancy (for planning):** An independent KG lookup additionally surfaced **summary-report-cloud** (builds attribution summary report data), **koch-query-api** (queries attribution data, low confidence), and **entitlements-api** (gates access to the report feature, low confidence), none of which appear in the primary affected-services list; and did not re-find **pubsuite-attribution**. Which backend owns report-content data (pubsuite-attribution vs. summary-report-cloud vs. koch-query-api) is not settled by the evidence and must be resolved during planning. entitlements-api is relevant because Brightway is a standard-plan customer and the feature may be plan-gated (see BR-1 / NFR-004).
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Updated BR-2 to state the weekly cadence is permanently recurring, not limited to year-end close, per reviewer answer to OQ-001.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -246,10 +253,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-006** | Does this report need to be delivered to the finance team automatically each week — for example by email or an in-app alert when a new one is ready — or is it enough for them to download it on demand from the console? | Product owner | On-demand download in the console only for Phase 1; add active delivery (email/in-app notification) in a later phase if the finance team confirms they need it. |
 | **DEC-007** | Are there any regulatory, audit, or contractual rules that dictate how long this finance report and its access records must be retained, or the format they must follow? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; no special format mandate assumed, confirm with Brightway Retail's finance/audit stakeholders before launch. |
 | **DEC-008** | When a weekly report fails to generate, who should be alerted and who is accountable for investigating it — the finance team, an internal operations owner, or both? | Product owner, with Engineering/Operations | Alert an internal operations/on-call owner for investigation; do not alert the finance team directly in Phase 1 unless they ask to be notified. |
+| **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-010** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-011** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Is this a permanently recurring weekly report, or a weekly cadence only needed through year-end close? The intake answer ('every week but really need it before year end') is ambiguous and changes whether we invest in durable scheduling or a lighter-weight interim solution.
 - **OQ-002**: Does the finance team need the report actively delivered (email/notification when ready) or only on-demand download from the console? This decides whether the subscriptions/delivery workflow is in scope.
 - **OQ-003**: Is this attribution report a plan-gated/premium feature? The customer is on the standard plan, so if entitlements apply we may need to grant access or adjust gating before they can use it.
 - **OQ-004**: What exactly should 'last quarter' resolve to each week — a fixed Q4 window, or a rolling trailing-quarter that shifts with each weekly run?
@@ -257,6 +266,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-006**: What specific attribution metrics/data points must the PDF contain and how should they be grouped for year-end close?
 - **OQ-007**: Beyond PDF download, does the finance team need any filtering, column customization, or ability to regenerate for a custom date range?
 - **OQ-008**: Does the report need to be Brightway-only, or include any benchmarking/comparison against other customers or industry standards?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001 — the report is a permanently recurring weekly report (weekly, every week), not a cadence limited to year-end close, so durable scheduling is in scope.
 
 ---
 > **Classification:** Type A
