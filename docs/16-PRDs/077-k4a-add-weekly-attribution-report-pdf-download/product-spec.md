@@ -201,7 +201,7 @@ The system must track the following business information to support the Function
 | --- | --- |
 | Hard external deadline (5 weeks, year-end close) | Scope held strictly to MVP (Section 6); BR-5 year-end close date and BR-6 report content resolved early so build is not blocked (both flagged in Section 1). Kill-switch (NFR-010) limits blast radius if a late issue appears. |
 | Multi-service blast radius (5+ services) | Server-side enforcement (NFR-004), kill-switch (NFR-010), bounded retries (NFR-008), and idempotent non-overlapping generation (NFR-009) contain cross-service failure. Service-ownership ambiguity for report-content data is called out in Section 1 for planning to resolve. |
-| Unconfirmed UX scope | MVP UX limited to a download action, empty state, and error state (FR-006–FR-010). Any report-management view (filtering, custom columns, date-range regeneration) is explicitly Out of Scope (Section 6). |
+| Unconfirmed UX scope | Resolved: the finance team confirmed no filtering, column customization, or custom date-range regeneration is needed — just the PDF. MVP UX limited to a download action, empty state, and error state (FR-006–FR-010). Any report-management view (filtering, custom columns, date-range regeneration) is explicitly Out of Scope (Section 6). |
 | Unclear recurring vs. one-time requirement | Resolved: weekly cadence only through year-end close, not permanently recurring and not one-time (BR-2). A time-bounded interim weekly schedule is built, not durable indefinite scheduling. |
 
 ### Rollback
@@ -221,8 +221,8 @@ The following are explicitly **NOT** included in Phase 1 (MVP). Phase 1 delivers
 | Active delivery (email / in-app notification when a new report is ready) | Out of scope (future phase) | Delivery model unresolved (BR-7); MVP is on-demand download. Revisit if finance team confirms a delivery need. |
 | Benchmarking / comparison against other customers or industry standards | Out of scope (future phase) | Benchmarking requirement unresolved (BR-8); MVP covers Brightway Retail's own data only. |
 | User-configurable date ranges within the quarter | Out of scope (future phase) | MVP window is the most recent completed quarter, recalculated weekly, only (BR-3). |
-| Filtering, custom column selection, or report customization in the UI | Out of scope (future phase) | MVP UX is a single download action; controls scope creep against the deadline. |
-| On-demand regeneration for arbitrary date ranges | Out of scope (future phase) | MVP generation is the recurring weekly cycle only. |
+| Filtering, custom column selection, or report customization in the UI | Out of scope (future phase) | Confirmed by the finance team: no filtering or column customization is needed — just the PDF. MVP UX is a single download action; controls scope creep against the deadline. |
+| On-demand regeneration for arbitrary date ranges | Out of scope (future phase) | Confirmed by the finance team: no custom date-range regeneration is needed — just the PDF. MVP generation is the recurring weekly cycle only. |
 | Rollout to customers/plans beyond Brightway Retail | Out of scope (future phase) | MVP targets Brightway Retail specifically; broader entitlement rollout is a later decision. |
 | Report formats other than PDF (e.g. CSV, XLSX) | Out of scope (future phase) | MVP format is PDF only (BR-4). |
 
@@ -244,7 +244,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved NFR-007 retention: report and access records retained for two years, no format mandate, removing the [DECISION REQUIRED] tag.
+- Updated Out-of-Scope rationale to record the finance team's confirmation that no filtering/column customization is needed (resolves OQ-007).
+- Updated Out-of-Scope rationale to record the finance team's confirmation that no custom date-range regeneration is needed (resolves OQ-007).
+- Updated the UX-scope risk-mitigation row to record that the finance team confirmed no filtering/customization is needed (resolves OQ-007).
 
 
 ---
@@ -270,6 +272,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-016** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-018** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-019** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-020** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
@@ -284,7 +287,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does the finance team need the report actively delivered (email/notification when ready) or only on-demand download from the console? This decides whether the subscriptions/delivery workflow is in scope.
-- **OQ-007**: Beyond PDF download, does the finance team need any filtering, column customization, or ability to regenerate for a custom date range?
 - **OQ-008**: Does the report need to be Brightway-only, or include any benchmarking/comparison against other customers or industry standards?
 
 ### Questions Resolved
@@ -294,6 +296,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: Resolved OQ-004: "last quarter" resolves to the most recent completed quarter, recalculated every week (a rolling trailing-quarter window, not a fixed Q4).
 - **OQ-005**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
 - **OQ-006**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
+- **OQ-007**: Resolved OQ-007: the finance team confirmed no filtering, column customization, or custom date-range regeneration is needed — just the PDF download.
 
 ---
 > **Classification:** Type A
