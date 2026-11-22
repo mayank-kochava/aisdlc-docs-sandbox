@@ -366,13 +366,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | What time of day and in which timezone should the weekly summary email be sent on Monday? | Product owner (with Meridian Travel marketing team) | Send at 07:00 in Meridian Travel's primary business timezone on Monday, so the summary is waiting in inboxes before the team starts their week. |
 | **DEC-006** | Monday alignment. The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | Channel set. Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
+- **DEC-001**: DEC-001 resolved: the weekly summary email is sent every Monday at 8:00 AM Eastern Time, which is already the value stated throughout the document (BR-2, Scope at a glance, Send schedule).
 - **DEC-002**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 - **DEC-003**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 - **DEC-004**: Resolved DEC-004 (BR-7 reporting period): each weekly email covers the previous calendar week, Monday to Sunday.
