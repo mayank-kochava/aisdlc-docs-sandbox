@@ -20,7 +20,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 - **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. The report is part of the standard plan: no gating, upgrade, or special entitlement is required, and a standard-plan account is entitled to it by default. Brightway can use it without any entitlement change.
 - **BR-2 — Cadence:** The report is generated on a permanently recurring weekly schedule (confirmed by the requester: weekly, every week, not just through year-end close). It is not a one-time year-end export, and the weekly cadence does not stop after year-end close — durable scheduling is in scope rather than a lighter-weight interim solution.
 - **BR-3 — Report period:** Each report covers the most recent completed quarter only, recalculated on every weekly run so the window shifts to whichever quarter most recently closed as of that run (confirmed by the requester). The reporting window is a rolling trailing-quarter window, not a fixed calendar quarter and not a configurable range in this phase.
-- **BR-4 — Format:** The report is delivered as a downloadable PDF. The specific visual appearance and generation method are engineering decisions, deferred to downstream planning.
+- **BR-4 — Format:** The report is delivered as a downloadable PDF. The Brightway Retail logo must appear on the PDF (confirmed by the finance team). Other aspects of the visual appearance and the generation method are engineering decisions, deferred to downstream planning.
 - **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. [DECISION REQUIRED]
 - **BR-6 — Report content:** The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. [DECISION REQUIRED]
 - **BR-7 — Delivery model:** Whether the finance team needs active delivery (e.g. an email or in-app notification when a new weekly report is ready) or whether on-demand download in the console is sufficient is not specified in the input. [DECISION REQUIRED]
@@ -126,6 +126,13 @@ Then the system shows a clear not-yet-available / empty state
 And no Download PDF action is presented
 ```
 
+**FR-008a — Brightway logo on the generated PDF**
+```gherkin
+Given a weekly attribution report is being rendered as a PDF
+When the system generates the PDF document
+Then the Brightway Retail logo is included on the PDF
+```
+
 **FR-008 — Successful PDF download**
 ```gherkin
 Given a finance user whose account is entitled to the weekly attribution report
@@ -160,7 +167,7 @@ The system must track the following business information to support the Function
 
 - **Report generation record** — tracks each weekly generation cycle for an account: the account it belongs to, the trailing-quarter window covered, the cycle it corresponds to, and whether the cycle succeeded or failed. *System-derived.* Supports FR-001, FR-003, FR-004, FR-005, and distinguishes an available report from a failed cycle.
 - **Report availability state** — whether a generated report currently exists and is downloadable for an account, including which one is the latest available. *System-derived.* Supports FR-006, FR-007, FR-008, and the "prior report remains available" guarantee in FR-003.
-- **Generated PDF artifact** — the rendered most-recent-completed-quarter attribution report delivered to the finance user. *System-derived* (built from attribution data). Supports FR-008.
+- **Generated PDF artifact** — the rendered most-recent-completed-quarter attribution report delivered to the finance user, including the Brightway Retail logo. *System-derived* (built from attribution data; logo asset is a provided brand asset). Supports FR-008, FR-008a.
 - **Attribution report content** — the underlying attribution metrics and data points that populate the report for the most-recent-completed-quarter window (resolved and recalculated on each weekly run). *External/upstream* (sourced from the attribution data service, which backend owns this is unresolved per the Section 1 service-ownership note). Supports FR-001, FR-002. The exact metrics, data points, and grouping are unspecified (see BR-6, already flagged in Section 1).
 - **Account entitlement state** — whether a given account is entitled to the weekly attribution report feature. *System-derived / external* (from the authoritative entitlement source). Supports FR-006, FR-009. Standard-plan accounts are entitled to the report by default (see BR-1); entitlement is still re-derived and enforced server-side on every download request (NFR-004).
 - **Requesting user and account identity** — the user and account making a download request, used to authorize the request server-side on every call. *System-derived* (from the authenticated session). Supports FR-008, FR-009.
@@ -237,21 +244,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Updated Problem statement to define the report window as the most recent completed quarter, recalculated weekly.
-- Rewrote BR-3 to specify the most-recent-completed-quarter, recalculated-weekly rolling window.
-- Updated the flow diagram node to reflect resolving the most recent completed quarter each run.
-- Updated FR-001 to cover the most recent completed quarter recalculated per run.
-- Rewrote FR-002 to resolve and recalculate the most recent completed quarter each weekly run.
-- Updated FR-008 delivery wording to the most-recent-completed-quarter report.
-- Updated Generated PDF artifact information requirement to the most-recent-completed-quarter window.
-- Updated Attribution report content to the recalculated most-recent-completed-quarter window.
-- Updated Section 6 phasing summary to the recalculated most-recent-completed-quarter window.
-- Updated Out-of-Scope rationale to reference the recalculated most-recent-completed-quarter window.
-- Updated NFR-009 idempotency key wording to the most-recent-completed-quarter window.
-- Resolved NFR-008 failure notification: retry once then email the finance owner, removing the [DECISION REQUIRED] tag.
-- Updated FR-003 to state retry-once-then-email-finance-owner failure handling.
-- Updated flow diagram failure branch to show retry-once then alert + email finance owner.
-- Renamed node I to I2 in flow diagram to avoid collision after adding retry branch.
+- Added the Brightway logo requirement to BR-4 (report format).
+- Added FR-008a requiring the Brightway logo on the generated PDF.
+- Updated the Generated PDF artifact info requirement to include the Brightway logo.
 
 
 ---
@@ -276,6 +271,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-011** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-012** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-013** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-014** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-015** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
