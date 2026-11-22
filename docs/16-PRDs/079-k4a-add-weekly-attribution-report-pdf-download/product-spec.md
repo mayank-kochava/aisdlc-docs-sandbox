@@ -22,7 +22,7 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 - **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team members only. Access is restricted to that audience; no other roles or accounts may download or see the report, and users without the entitlement must not be able to retrieve it.
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
 - **BR-06 — Plan:** Brightway Retail is on the standard plan. Weekly PDF generation and storage is included at the standard plan tier; no upgrade or phased rollout is required to fit the five-week window (resolves DEC-002 / OQ-006).
-- **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED]
+- **BR-07 — "Last quarter" definition:** "Last quarter" resolves to the most recent *completed* calendar quarter, recalculated every week: each weekly run re-evaluates which calendar quarter is the most recently completed as of that run, so the window rolls forward as newer quarters complete rather than being held fixed (resolves DEC-003 / OQ-002).
 - **BR-08 — Generation model:** Each report is **generated fresh on demand when the finance user clicks download** (not pre-generated on a schedule and stored), covering the last-quarter window at the time of the request.
 - **BR-09 — Finance-grade correctness:** Because these figures feed a year-end close, the attribution numbers in the PDF must match the authoritative attribution data for the same window shown elsewhere in the product. Any discrepancy is treated as a defect.
 
@@ -170,7 +170,7 @@ The system must track the following business information to support the function
 
 - **Brightway logo asset:** The Brightway logo image displayed on the report PDF (per finance's request, FR-014). *Source: Provided brand asset.* Matters because the PDF must carry the Brightway logo for the finance team.
 - **Attribution report data (last quarter):** The analytical content of the report — total attributed revenue and conversions by channel, covering the last-quarter window, presented as one simple table. *Source: System-derived from the authoritative attribution data pipeline.* Matters because it is the substance the finance team consumes for year-end close. The required metrics and dimension are resolved (total attributed revenue and conversions, broken out by channel; see the Report Contents section in Section 1).
-- **Resolved "last quarter" window:** The concrete start/end boundary that "last quarter" resolves to for a given generation run. *Source: System-derived.* Matters because it defines FR-002's data scope and because the finance team must know exactly which period a given report covers. Depends on the rolling-vs-fixed decision flagged in Section 1 (BR-07).
+- **Resolved "last quarter" window:** The concrete start/end boundary that "last quarter" resolves to for a given generation run — the most recent *completed* calendar quarter as of that run, recalculated each week (per BR-07, resolving DEC-003 / OQ-002). *Source: System-derived.* Matters because it defines FR-002's data scope and because the finance team must know exactly which period a given report covers.
 - **Generated weekly report artifact (PDF):** The produced PDF file for a given weekly window, plus enough identity to know which window it covers and that it is the latest available. *Source: System-derived.* Matters because it is the downloadable deliverable (FR-001, FR-008) and the stable "weekly" artifact under the pre-generated model (BR-08).
 - **Latest-available-report pointer:** Which stored report is currently the latest available for the customer. *Source: System-derived.* Matters because FR-003 and FR-006 require the prior report to remain the served one when a run is skipped or fails.
 - **Generation run status:** The outcome of each weekly generation run (succeeded, skipped due to data-not-ready, failed). *Source: System-derived.* Matters because FR-003 and FR-006 branch on this and because failed/skipped runs must raise operational alerts.
@@ -236,7 +236,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 
 ### Deferred / Pending Decisions
 
-The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the "last quarter" definition (fixed vs. rolling). The standard-plan capacity/timeline question is now settled — weekly PDF generation and storage is included at the standard plan tier, with no upgrade or phased rollout required (resolves DEC-002 / OQ-006). The report's exact contents are now settled — total attributed revenue and conversions by channel, presented as one simple table (resolves DEC-005). The entitlement audience is now settled — download access is restricted to Brightway Retail finance team members only (no other roles or accounts).
+The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize. The "last quarter" definition is now settled — it resolves to the most recent completed calendar quarter, recalculated every week (resolves DEC-003 / OQ-002). The standard-plan capacity/timeline question is now settled — weekly PDF generation and storage is included at the standard plan tier, with no upgrade or phased rollout required (resolves DEC-002 / OQ-006). The report's exact contents are now settled — total attributed revenue and conversions by channel, presented as one simple table (resolves DEC-005). The entitlement audience is now settled — download access is restricted to Brightway Retail finance team members only (no other roles or accounts).
 
 ## Appendix: Engineering Reference
 
@@ -258,8 +258,9 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Resolved OQ-007 in FR-007: download button on the K4A reports page, no history/list shown.
-- Noted OQ-007 resolution (latest only, download button on reports page) in the out-of-scope history-archive row.
+- Resolved BR-07: "last quarter" = most recent completed calendar quarter, recalculated weekly; removed DECISION REQUIRED tag.
+- Updated Information Requirements "last quarter window" bullet to reflect the resolved rolling-completed-quarter definition.
+- Moved the "last quarter" definition from unresolved to settled in the Deferred/Pending Decisions section.
 
 
 ---
@@ -273,7 +274,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-003** | Should the report always show the same most recent completed calendar quarter held fixed, or should the window roll forward as newer data completes week to week? | Product owner (with Brightway finance) | Use the most recent completed calendar quarter, held fixed until the next quarter completes, so finance sees a stable close-ready figure that only changes at quarter boundaries. |
 | **DEC-004** | Should each weekly report be generated ahead of time on the schedule and saved for the finance team to pick up, or generated fresh only when they click download? | Product owner | Pre-generate on the weekly schedule and store the report for retrieval, so downloads are fast and each week's document is stable and reproducible. |
 | **DEC-006** | Access: The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. | _(not yet assigned)_ | _(not yet specified)_ |
 
@@ -281,6 +281,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **DEC-001**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
 - **DEC-002**: Resolved — Brightway's standard plan includes weekly PDF report generation and storage within the five-week window; no plan upgrade or phased rollout is required. OQ-006 is the same question and is resolved by the same answer.
+- **DEC-003**: Resolved — "last quarter" is the most recent completed calendar quarter, recalculated every week (rolls forward as quarters complete; not held fixed).
 - **DEC-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
 
 ### Open Questions (evidence gaps — needs more input)
