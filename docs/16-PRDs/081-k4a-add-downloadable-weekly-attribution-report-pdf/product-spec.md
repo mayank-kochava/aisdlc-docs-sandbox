@@ -34,7 +34,7 @@ The PDF is produced on a fixed weekly schedule — generated every Monday — an
 
 ### Report contents
 
-The specific attribution metrics and dimensions the finance team needs (e.g. revenue by channel, conversion by campaign, ROI by touchpoint), their order, and whether row-level detail or summaries are required for year-end close, are not yet specified. [DECISION REQUIRED]
+The report presents total attributed revenue and conversions by channel, laid out as one simple table (one row per channel, with total attributed revenue and total conversions as columns). This is the fixed Phase-1 content set.
 
 ### Branding / compliance in the PDF
 
@@ -126,7 +126,7 @@ When the weekly report is generated
 Then the report applies the defined data-freshness handling for affected weeks
 And the user can distinguish complete data from incomplete or still-processing data in the report
 ```
-> Note: whether incomplete weeks are excluded, flagged with a data-quality warning, or stamped with a freshness timestamp is a content decision tied to Section 1 Report contents. Engineering should default to including a data-freshness timestamp and a visible warning for affected weeks until the product decision lands.
+> Note: whether incomplete weeks are excluded, flagged with a data-quality warning, or stamped with a freshness timestamp is a separate data-freshness decision (see OQ-005). Engineering should default to including a data-freshness timestamp and a visible warning for affected weeks until the product decision lands.
 
 ### FR-007 — Attribution data source dependency failure
 ```gherkin
@@ -186,7 +186,7 @@ The system must track the following business information to support the Function
 - **Generation cycle / cadence marker:** The weekly trigger and the identity of the week each generated report belongs to. System-derived. Matters to FR-001, FR-004, FR-005 — identifies the current report and provides the idempotency key for a given week and window.
 - **Report availability state:** Whether a current report exists, is pending generation, or last generation failed. System-derived. Matters to FR-008, FR-009 — drives whether a download is offered or an unavailable state is shown.
 - **Generation outcome / failure status:** The distinct, named result of each generation run (succeeded, data-source unavailable, etc.). System-derived. Matters to FR-007 — distinguishes failure conditions and preserves the prior successful report.
-- **Attribution data (source input):** The underlying attribution metrics and dimensions pulled from the attribution data source. External to the generation service (read dependency). Matters to FR-001, FR-002, FR-006, FR-007 — the raw material the report is built from. Exact metrics and dimensions are pending a product decision (see Section 1, Report contents).
+- **Attribution data (source input):** The underlying attribution metrics and dimensions pulled from the attribution data source. External to the generation service (read dependency). Matters to FR-001, FR-002, FR-006, FR-007 — the raw material the report is built from. The Phase-1 report presents total attributed revenue and conversions by channel (see Section 1, Report contents).
 - **Data freshness / completeness state per week:** Whether each week's attribution data is complete or still processing at generation time. System-derived (from the data source's reported state). Matters to FR-006 — drives incomplete-data handling in the report.
 - **Requesting user identity and authorization context:** The user's identity, role, and account (standard-plan eligibility). Re-derived from the authoritative source on each request. Matters to FR-008, FR-010 — determines whether the download is permitted.
 - **Secure download link / validity window:** The time-limited link through which the PDF is served and its expiry. System-derived. Matters to FR-011 — governs secure delivery and link expiry.
@@ -254,7 +254,7 @@ The system must track the following business information to support the Function
 | Delivery-status indicator in K4A | Same as above — not required to satisfy on-demand download. | Future |
 | Historical access to prior weeks' PDFs | Success criteria require only the current week's last-quarter report; multi-week retention/browsing is unconfirmed. | Future |
 | Automatic push/email delivery on a fixed day | Deadline-scoped MVP is on-demand download from K4A; a fixed-schedule push depends on the unresolved delivery-model decision. | Future |
-| Configurable/custom metrics, dimensions, and report layout | Specific report contents are unsettled (see Section 1 Report contents); Phase 1 ships a fixed content set once that decision lands. | Future |
+| Configurable/custom metrics, dimensions, and report layout | Phase 1 ships a fixed content set — total attributed revenue and conversions by channel as one simple table (see Section 1 Report contents); configurable/custom metrics, dimensions, and layout are deferred. | Future |
 | Custom branding, disclaimers, or audit formatting in the PDF | Unconfirmed for year-end close (see Section 1 Branding / compliance). | Future |
 | Non–standard-plan or multi-account rollout beyond Brightway Retail | Requirement is scoped to Brightway Retail on the standard plan. | Future |
 
@@ -285,7 +285,10 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved the delivery-model decision: generate every Monday and store for on-demand download, removing the [DECISION REQUIRED] tag.
+- Resolved DEC-003/OQ-003: report contents are total attributed revenue and conversions by channel as one simple table.
+- Updated FR-006 note to point to the freshness open question rather than the now-resolved Report contents section.
+- Updated Section 4 attribution-data bullet to reflect the resolved report contents instead of a pending decision.
+- Updated Section 6 out-of-scope row to reflect the fixed Phase-1 content set now that report contents are settled.
 
 
 ---
@@ -313,7 +316,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-- **OQ-003**: What specific attribution metrics and dimensions does the finance team need in the PDF (e.g. revenue by channel, conversion by campaign, ROI by touchpoint), and in what layout/order?
 - **OQ-004**: Should the report always cover a rolling 13-week window, or snap to calendar/fiscal quarter boundaries? 'Last quarter' is ambiguous.
 - **OQ-005**: How should weeks with incomplete or still-processing attribution data be handled — include with a freshness timestamp, exclude, or show a data-quality warning?
 - **OQ-006**: Does finance need access to previous weeks' PDF reports (history), or only the current week's report?
@@ -323,6 +325,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **OQ-003**: Resolved DEC-003 / OQ-003 — the report presents total attributed revenue and conversions by channel as one simple table.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement clarity is "clear" and UX need is "none" — the desired behavior (weekly attribution PDF, last-quarter data, on-demand download from K4A) is confirmed; the open questions are routine engineering/design decisions (schedule vs. on-demand, metrics layout, data freshness) rather than genuine product ambiguity, so the multi-service (4-6 services, backend+frontend) build is engineering-led design, not discovery.
