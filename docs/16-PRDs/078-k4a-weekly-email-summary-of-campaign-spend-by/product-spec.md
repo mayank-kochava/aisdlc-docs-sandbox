@@ -367,7 +367,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-007** | Channel set. Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
@@ -378,6 +377,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-004**: Resolved DEC-004 (BR-7 reporting period): each weekly email covers the previous calendar week, Monday to Sunday.
 - **DEC-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 - **DEC-006**: Resolved DEC-006 — the weekly summary send time and timezone is confirmed as every Monday at 8:00 AM Eastern Time.
+- **DEC-007**: Resolved DEC-007 — the email lists every channel K4A tracks for Meridian Travel (email, paid search, paid social, and display), not a curated subset.
 
 ### Questions Resolved
 
