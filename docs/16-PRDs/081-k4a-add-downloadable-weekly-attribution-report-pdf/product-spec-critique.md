@@ -1,4 +1,4 @@
-# Spec Critique: Brightway Retail Weekly Attribution PDF Report
+# Spec Critique: Brightway Retail Weekly Attribution Report (K4A)
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
-- **High Issues:** 5
-- **Medium Issues:** 7
-- **Blocking:** No
+- **Critical Issues:** 2
+- **High Issues:** 6
+- **Medium Issues:** 5
+- **Blocking:** Yes
 
 ---
 
@@ -17,10 +17,8 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-008 requires the delivered file be "a valid PDF containing the last-quarter attribution data," but no FR defines behavior when a report was generated successfully but is later found corrupt/truncated at download time (e.g. storage partial read). FR-009 only covers "not generated / generation failed," not "generated-but-unreadable." Download path dead-ends. | High | 3 / FR-008, FR-009 | Add an FR for integrity validation at serve time, falling back to the report-unavailable state (FR-009) with a distinct reason if the stored artifact fails validation. |
-| CG-002 | FR-011 serves via a time-limited secure link. No FR defines what happens when a user clicks an EXPIRED link (the exact `[DECISION REQUIRED]`-adjacent happy-path break). User hits a dead end with no defined re-request flow. | High | 3 / FR-011 | Add a Gherkin scenario: expired link → user is returned to the report area to re-initiate a fresh download, not a raw error. |
-| CG-003 | The KG cross-check could not re-confirm `pubsuite-attribution` as the authoritative data source, yet FR-007/FR-002/FR-006 all depend on "the attribution data source" as a single known dependency. If the real source is `summary-report-cloud` or `aaas-reporting`, the retry/freshness semantics may not hold. This is routed to engineering but no FR is conditional on resolving it. | High | 1 KG note / 3 | Keep as design blocker but add an explicit acceptance gate: generation FRs are not testable until the authoritative source is confirmed. |
-| CG-004 | NFR-009 kill-switch says in-flight requests "complete under the prior behavior." A download in flight when generation is killed is fine, but a generation run in flight when the switch flips has undefined artifact disposition (partial PDF persisted? FR-004 overwrite-in-place could leave a half-written report as "current"). | High | 5 / NFR-009, FR-004 | Define that a generation interrupted by kill-switch leaves the prior successful report as current and never promotes a partial artifact. |
+| CG-001 | **Delivery model self-contradiction between Section 1 and Section 3.** Section 1 (BR-1, Delivery model) states the PDF is "generated fresh on demand at the moment the finance team downloads it" and is "not pre-generated or stored ahead on a schedule." But FR-001, FR-004, FR-005, FR-008, FR-009, and NFR-001 all describe a **weekly system-triggered generation cycle** that produces a stored "current report" served without synchronous generation on the download path ("Serving a pre-generated file must not trigger synchronous report generation"). These are two mutually exclusive architectures. Engineering cannot build both. This is the core logic of the feature and it is unresolved. | Critical | 1, 3, 5 | Pick ONE model. If on-demand (per BR-1), delete FR-001/FR-004/FR-005 and the weekly-cadence framing, and rewrite NFR-001 to permit the "minute or two" generation latency Section 1 explicitly allows. If pre-generated weekly (per FR-001), fix BR-1 and the entire "Delivery model" subsection. The Risk Mitigation table's claim that "FR-001–FR-003 are written to hold for either model" is false — FR-001 hard-codes a weekly cycle. |
+| CG-002 | **Authoritative data source is unverified and the independent KG lookup actively contradicts it.** FR-007, NFR-002, and the Information Requirements all depend on "the attribution data source" (`pubsuite-attribution`). The independent KG cross-check did NOT re-confirm `pubsuite-attribution` as a data source. The spec routes this to "engineering to verify during design" — meaning the entire failure-handling, rate-protection, and data-freshness logic is built on an unconfirmed dependency. If the real source differs, FR-006/FR-007/NFR-002 may need to be rewritten. | Critical | 1, 3, 5, Appendix | Reconcile the data source before engineering starts. A requirement set whose central external dependency is "unconfirmed, verify later" is not implementable with confidence. At minimum, FR-007/NFR-002 must name the verified source or be explicitly gated on that verification. |
 
 ---
 
@@ -30,12 +28,11 @@
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| FR-006 | "the report applies the defined data-freshness handling" | "The defined handling" is undefined in the FR itself (deferred to a note). Not independently testable — a tester cannot assert on "the defined handling." | Given a week in the window has incomplete data, When the report is generated, Then that week is stamped with a data-freshness timestamp AND a visible warning label, And complete weeks carry no warning. (Bind the default into the FR, not a note.) |
-| FR-001 | "the weekly generation cycle runs" | "Weekly" cadence trigger is unspecified (which day/time, which timezone) — directly collides with the unresolved Delivery model decision. Cannot write a deterministic scheduled test. | Given the configured weekly trigger time arrives in the account's reporting timezone, When the cycle runs, Then ... (parameterize trigger + timezone explicitly). |
-| NFR-001 | "measured under expected concurrent K4A finance-user load" | "Expected concurrent load" is not quantified — p95 ≤ 3s is meaningless without a stated concurrency figure. | Given N concurrent authorized finance users (specify N), When each initiates a download of a pre-generated PDF, Then serving begins at p95 ≤ 3s. |
-| NFR-002 | "conservative default that engineering can tune" | No numeric read-rate cap. Not testable as written; "conservative" is subjective. | State a concrete default cap value (e.g. ≤ X reads/sec) as the testable baseline, tunable thereafter. |
-
-Note: All Section 3 items ARE in Gherkin — this is a prose/vagueness issue inside otherwise well-formed Gherkin (FR-006), not a format failure.
+| FR-006 | "the report applies the defined data-freshness handling for affected weeks" | "Defined data-freshness handling" is indirection to a prose Note. The FR body itself is not independently testable — a tester cannot assert against "the defined handling." | `Given one or more weeks in the last-quarter window have incomplete or still-processing attribution data at generation time, When the report is generated, Then each affected week's row displays a visible data-quality warning label, And complete weeks display no such warning, And no affected week is omitted from the report.` |
+| FR-008 | "a current weekly attribution PDF has been generated" | In the on-demand model (BR-1) there is no pre-"generated current" PDF — this precondition only holds under the pre-generated model, exposing CG-001 at the test level. Also "current" is undefined if generation is stale/failed. | Resolve CG-001 first. If on-demand: `Given an authorized finance user requests the report, When generation for the latest completed quarter succeeds within the acceptable latency window, Then a valid PDF for that window is delivered.` |
+| NFR-002 | "cap its read load … conservative default that engineering can tune" | No concrete, testable cap value. "Conservative default" is not measurable. Acceptable to defer the number, but the requirement as written has no pass/fail condition for QA. | `Given report generation is reading from the attribution data source, When measured over any 1-minute window, Then generation read throughput must not exceed the configured cap of N req/s (default value TBD-by-eng, MUST be a concrete config value before release).` |
+| NFR-006 | "default to a short validity window (e.g. 15 minutes)" | "e.g." makes the 15-minute figure illustrative, not binding → untestable. | `Given a secure download link is issued, When 15 minutes (configurable) have elapsed since issuance, Then any request using that link is rejected as expired.` |
+| BR-6 / Value | "available before year-end close (~5 weeks from request)" | A delivery-deadline, not a product requirement — not testable as system behavior, and the "~" is imprecise. Acceptable as context but should not masquerade as a rule. | N/A — reclassify as a project constraint, not a Business Rule. |
 
 ---
 
@@ -43,29 +40,32 @@ Note: All Section 3 items ARE in Gherkin — this is a prose/vagueness issue ins
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard 5-week year-end deadline | Yes — scope held to MVP, decisions carry working defaults | PASS | Reasonable; defaults keep engineering unblocked. |
-| Multi-service blast radius | Yes — NFR-010 backward compat + NFR-009 kill-switch + rollback | PASS | Well covered. |
-| Unresolved delivery architecture (on-demand vs scheduled) | Partial — FR-001–003 "hold for either model" | FAIL | Claiming FRs hold for both models hides a testability gap: a fixed-schedule model vs on-demand model produce different acceptance criteria (freshness, which week is "current"). Risk is acknowledged but no FR actually resolves the user-visible difference; it is deferred, not mitigated. |
-| Data freshness / completeness uncertainty | Yes — FR-006 with default | PASS (with FR-006 testability caveat above) | Mitigation exists; wording needs tightening. |
-| Authoritative data source unconfirmed (KG cross-check) | No | FAIL | The cross-check could not re-confirm `pubsuite-attribution`. No risk row or mitigation exists for "we may be building against the wrong data source." This is the single highest-value missing mitigation. Add a risk row + design gate. |
-| Audit retention beyond 12 months for year-end financial close | Open | FAIL | NFR-008 flags retention as `[DECISION REQUIRED]` but a financial-close artifact with unresolved retention is a compliance risk with no mitigation/default. Supply a safe default (e.g. align to finance audit cycle) pending the decision. |
+| Hard 5-week deadline | Yes — scope held to Phase-1 MVP; decisions flagged with defaults | PASS | Reasonable. |
+| Multi-service backend + frontend blast radius | Yes — NFR-010 backward compat + NFR-009 kill-switch + rollback plan | PASS | Well covered. |
+| Unresolved delivery architecture (on-demand vs weekly) | Claimed resolved/routed, but **FRs contradict the stated model** | **FAIL** | The table claims "FR-001–FR-003 hold for either model." FR-001 explicitly encodes a weekly cycle; BR-1 explicitly forbids pre-generation. This risk is NOT mitigated — it is unresolved and the spec is internally contradictory (see CG-001). |
+| Ambiguous "last quarter" window | Yes — most recent completed calendar quarter | PASS | Clear. |
+| Data freshness / completeness uncertainty | Yes — FR-006 + warning | PASS (with FR-006 testability caveat) | OK. |
+| Shared data-source dependency (named services may already provide scheduling / overlapping generation) | Routed to eng design, no binding requirement | **FAIL** | KG surfaced `reporting-subscriptions-worker` (existing weekly cadence) and `summary-report-cloud` (overlapping generation). The spec notes these but defines NO requirement preventing duplicate/conflicting generation across services. Given FR-005 (no overlapping runs) only governs *this* feature's runs, a cross-service collision is unmitigated. |
+| Unconfirmed authoritative data source | Noted, deferred to eng | **FAIL** | See CG-002. A noted-but-unmitigated dependency risk at the center of the feature. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Expired download link reuse:** No defined flow when an authorized user clicks a link after the validity window (see CG-002).
-2. **Quarter boundary crossing mid-window:** When the calendar/fiscal quarter rolls over between two weekly cycles, the definition of "last quarter" shifts. No FR defines whether an in-flight or already-current report is recomputed or held. Directly tied to the unresolved Quarter window decision.
-3. **Empty quarter / zero attribution data:** No FR covers a report where the last-quarter window legitimately contains no attribution rows (new account, no activity). Is an empty-but-valid PDF produced, or the unavailable state shown?
-4. **Partial data-source failure (not total):** FR-007 handles the source being "unavailable or returns an error" wholesale. It does not cover the source returning data for SOME weeks only (partial success) — does generation proceed with freshness flags (FR-006) or fail?
-5. **Plan downgrade/eligibility change mid-cycle:** BR-5 requires standard-plan. No FR covers an account losing standard-plan eligibility between generation and download — FR-010 re-derives auth per request, but is a previously generated report still served or blocked?
-6. **Concurrent download of a report being overwritten:** FR-004 overwrites in place; FR-005 prevents overlapping generation but not a download racing an overwrite. User could download a mid-overwrite file.
-7. **Timezone of "weekly" and "quarter":** No timezone is specified for either cadence or window boundaries. For a year-end financial close this is material.
-8. **Audit-write failure during a successful download:** NFR-008 fires an alert on audit-write failure but does not say whether the download still succeeds (async, so presumably yes) — confirm the download is not retroactively invalidated.
-9. **Kill-switch flipped mid-generation artifact disposition:** See CG-004.
-10. **Retry-After exceeding the generation window:** NFR-004 honors Retry-After, but if Retry-After pushes retries past the weekly cycle, no FR defines whether the cycle is abandoned or deferred.
-11. **Multiple finance users downloading simultaneously:** NFR-001 references concurrency but no FR confirms concurrent downloads of the same report are supported and all receive valid files.
-12. **Reused scheduler collision (reporting-subscriptions-worker):** If the existing weekly-cadence worker is reused per KG note, its existing schedule may conflict with this feature's cadence — no FR/NFR guards against double-triggering via two schedulers.
+1. **First quarter / no prior data:** FR-002 computes "most recent completed calendar quarter." What happens if the account was onboarded mid-quarter and has zero attribution data for the window? Empty table vs. error vs. "no data" state is undefined.
+2. **Quarter boundary race:** Generation computed "at the moment of generation." If generation spans a quarter boundary (e.g., runs at 23:59 on the last day of a quarter), which quarter is reported? FR-002 says "computed at generation" but doesn't fix the boundary.
+3. **User clicks "download" while generation in progress (on-demand model):** Section 1 mandates an in-progress state, but NO FR defines behavior when a second download request arrives during generation, or when the user navigates away ("Back") mid-generation.
+4. **Download interrupted / resumed:** FR-008 ends at "delivered." Partial download, network drop, and whether the time-limited link (FR-011) permits a retry within its window are undefined.
+5. **Link expiry mid-download:** NFR-006 says link is "unusable after its validity window." If a large PDF download is in flight when the 15-min window lapses, is the in-flight transfer killed? Undefined.
+6. **Generation succeeds but PDF is corrupt/zero-byte:** FR-009 covers "generation failed," but a run that reports success yet produces an invalid PDF is not addressed. FR-008 asserts "valid PDF" but defines no validation gate.
+7. **All 3 retries fail AND no prior report exists:** FR-007 preserves "the prior successfully generated report (if any)." If there is no prior report (first run fails), the user state is FR-009's "unavailable" — but the hand-off between FR-007 failure and FR-009 state is implicit, not specified.
+8. **Partial data-source response:** FR-007 handles "unavailable or returns an error." A source that returns a 200 with truncated/partial data (not an error) is not covered and would silently produce a wrong report.
+9. **Authorization changes between link issuance and download:** FR-010 re-derives auth "on every request," but a time-limited link (FR-011) could be reused after the user loses permission. Is auth re-checked on the link-redemption request specifically? Not stated.
+10. **Kill-switch flipped mid-generation:** NFR-009 says in-flight requests "complete under prior behavior," but a long-running generation (minutes) during an incident is exactly what an operator wants to stop. Conflict between NFR-009's in-flight guarantee and the rollback trigger intent.
+11. **Standard-plan downgrade/eligibility change:** BR-5 requires standard plan. If Brightway downgrades mid-cycle, is the current report revoked? Undefined.
+12. **Concurrent downloads by multiple finance users:** NFR-001 mentions "concurrent K4A finance-user load" but no FR defines multi-user concurrent download behavior or per-user link isolation.
+13. **Audit-write failure path (NFR-008):** Fires an alert but "must not block the primary operation" — so a report can be downloaded with NO audit trail. For a financial-close artifact this may be an unacceptable compliance gap; no FR reconciles this.
+14. **Timezone of "calendar quarter":** Quarter boundaries are timezone-dependent. No timezone is specified for the window computation (Brightway's TZ vs. UTC vs. K4A's).
 
 ---
 
@@ -73,22 +73,20 @@ Note: All Section 3 items ARE in Gherkin — this is a prose/vagueness issue ins
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-011 are all in `gherkin` fenced blocks with Given/When/Then. Explanatory `>` notes accompany some but the requirement bodies are Gherkin. |
-| Document contains only Sections 0–6 | PASS | Sections 1–6 present. The trailing "Appendix: Engineering Reference" is the sanctioned KG-grounding reference material the spec explicitly marks as not-required-reading; it is the engineering reference appendix the spec's own Section 1 routes grounding to, not stray narrative prose, and is permitted. No duplicate or out-of-band sections found. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is entirely bullet-list business concepts with no attribute tables or type declarations; it explicitly defers types/storage to eng-plan. |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-011 are all in Gherkin code blocks. Supplementary `> Note` lines are acceptable annotations, not prose FRs. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains an **"Appendix: Engineering Reference"** with multi-paragraph narrative content ("Affected Services (grounded context)", confidence-level discussion, cross-check analysis). This is a stray appendix beyond Sections 0–6 and is NOT the sanctioned trailing Revision Summary (which also exists and is correctly placed last). A multi-paragraph KG-analysis appendix with its own findings is exactly the kind of extra content the format rule catches. The trailing `## Revision Summary` itself is EXPECTED and is NOT flagged. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a pure bullet list of business concepts with no attribute tables or type definitions. |
 
-Note on the KG cross-check: the spec correctly surfaces the data-source discrepancy in Section 1 (KG cross-check note) rather than silently picking a side, consistent with the independent cross-check evidence (which likewise did not re-confirm `pubsuite-attribution` and surfaced `reporting-subscriptions-worker`, `summary-report-cloud`, `aaas-reporting` at low confidence). This is handled correctly — flagged as CG-003 / Risk FAIL only because no acceptance gate binds its resolution, not because the spec contradicts the evidence.
+> Note on the Appendix: It should be removed from the spec and relocated to eng-plan. The spec even labels it "not required reading for product/requirement review," which is a tacit admission it does not belong in the product spec.
 
 ---
 
 ## 6. Recommendations
 
-1. **Resolve the authoritative data source (CG-003 / Risk FAIL):** The generation FRs are untestable until it is confirmed whether the source is `pubsuite-attribution` or one of the low-confidence alternatives. Add a design gate.
-2. **Define expired-link and corrupt-artifact fallbacks (CG-001, CG-002):** Add Gherkin scenarios routing both to the report-unavailable state / re-request flow so the download path has no dead ends.
-3. **Specify kill-switch behavior for in-flight generation (CG-004):** Guarantee no partial artifact is ever promoted to "current."
-4. **Bind FR-006's default handling into the FR body**, not a note, so it is independently testable.
-5. **Quantify NFR-001 concurrency and NFR-002 read-rate cap** with concrete baseline numbers.
-6. **Add quarter-rollover, empty-quarter, and partial-source-failure edge cases** (#2, #3, #4) as FRs — these are year-end-close-material.
-7. **Pin timezones** for both the weekly cadence and the quarter-window boundaries (#7).
-8. **Supply a safe default for audit retention** pending the NFR-008 decision, given the financial-close compliance context.
-9. **Guard against dual scheduling** if `reporting-subscriptions-worker` is reused (#12).
+1. **Resolve CG-001 (delivery model contradiction) immediately.** Choose on-demand (BR-1) OR pre-generated weekly (FR-001) and make Section 1, Section 3, and NFR-001 internally consistent. This blocks all download/generation requirements and is the single highest-priority fix.
+2. **Resolve CG-002 (unverified data source).** Confirm the authoritative attribution data source before engineering; FR-006/FR-007/NFR-002 all hang on it.
+3. **Define cross-service generation collision handling.** The KG surfaced `reporting-subscriptions-worker` (existing weekly cadence) and `summary-report-cloud` (overlapping generation). Add a requirement ensuring no duplicate/conflicting generation across existing services, or explicitly mandate reuse of the existing scheduler.
+4. **Remove the "Appendix: Engineering Reference"** from the product spec (format violation) and relocate to eng-plan.
+5. **Make FR-006 self-contained and testable** (fold the warning behavior into the Gherkin), and convert NFR-002/NFR-006's "e.g." / "conservative default" language into concrete config-backed, testable values (value may be TBD but the requirement must assert against a configured value).
+6. **Add FRs for the missed edge cases**, prioritizing: in-flight download/link expiry (CG-adjacent), corrupt-but-"successful" PDF validation, auth re-check at link redemption, audit-write-failure vs. compliance, and quarter-boundary/timezone definition.
+7. **Reclassify BR-6 (5-week deadline)** as a project constraint rather than a testable Business Rule.
