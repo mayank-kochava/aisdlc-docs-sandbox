@@ -24,7 +24,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 - **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. **Working assumption (not confirmed):** target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline; the exact calendar close date must still be confirmed with the customer.
 - **BR-6 — Report content:** The report contains total attributed revenue and conversions broken down by channel, presented as one simple table (confirmed by the finance team). No additional metrics, groupings, or supplementary tables are in scope for this phase.
 - **BR-7 — Delivery model:** On-demand download from the K4A console is sufficient; the finance team downloads the report themselves and no active delivery (email or in-app notification when a new weekly report is ready) is needed (confirmed by the reviewer). The subscriptions/delivery workflow is therefore out of scope for this phase.
-- **BR-8 — Benchmarking:** Whether the report includes only Brightway Retail's own data or must compare against other customers / industry benchmarks is not specified in the input. [DECISION REQUIRED]
+- **BR-8 — Benchmarking:** The report includes only Brightway Retail's own data; it does not compare against other customers or industry benchmarks (confirmed by the reviewer). Benchmarking/comparison is out of scope for this phase.
 
 > **Service-ownership note (information requirement, not an implementation choice):** An independent knowledge-graph cross-check against the Context Seed's claimed service set did not fully agree on which backend owns the attribution report-content data: one view names a dedicated attribution-data source while the fresh lookup surfaced a separate attribution-summary builder (and a lower-confidence query layer) not in the original list. The data source for report content is therefore not settled by the available evidence and must be resolved during engineering planning. This spec does not pick a side.
 
@@ -219,7 +219,7 @@ The following are explicitly **NOT** included in Phase 1 (MVP). Phase 1 delivers
 | Item | Status | Rationale |
 | --- | --- | --- |
 | Active delivery (email / in-app notification when a new report is ready) | Out of scope | Resolved (BR-7): finance downloads from the console themselves, no email/notification needed; MVP is on-demand download only. |
-| Benchmarking / comparison against other customers or industry standards | Out of scope (future phase) | Benchmarking requirement unresolved (BR-8); MVP covers Brightway Retail's own data only. |
+| Benchmarking / comparison against other customers or industry standards | Out of scope (future phase) | Resolved (BR-8): report covers Brightway Retail's own data only, no benchmarking; benchmarking/comparison is out of scope. |
 | User-configurable date ranges within the quarter | Out of scope (future phase) | MVP window is the most recent completed quarter, recalculated weekly, only (BR-3). |
 | Filtering, custom column selection, or report customization in the UI | Out of scope (future phase) | Confirmed by the finance team: no filtering or column customization is needed — just the PDF. MVP UX is a single download action; controls scope creep against the deadline. |
 | On-demand regeneration for arbitrary date ranges | Out of scope (future phase) | Confirmed by the finance team: no custom date-range regeneration is needed — just the PDF. MVP generation is the recurring weekly cycle only. |
@@ -244,8 +244,8 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved BR-7 delivery model: on-demand console download only, no active delivery; subscriptions/delivery workflow out of scope.
-- Updated Out-of-Scope active-delivery row to reflect resolved BR-7 (on-demand download only, no delivery).
+- Resolved BR-8: report is Brightway-only data, no benchmarking (reviewer-confirmed), removing the [DECISION REQUIRED] tag.
+- Updated Section 6 benchmarking row to reflect BR-8 is now resolved (Brightway-only, no benchmarking).
 
 
 ---
@@ -259,7 +259,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-005** | Should the report show only Brightway Retail's own data, or does it need to compare against other customers or industry benchmarks? | Product owner | Scope the report to Brightway Retail's own data only, with no cross-customer or industry benchmarking in Phase 1. |
 | **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
@@ -268,6 +267,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-002**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-003**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
 - **DEC-004**: Resolved OQ-002 (and duplicates DEC-004, DEC-006, DEC-021): finance downloads the report themselves from the console, no email/notification needed — on-demand download only, so the subscriptions/delivery workflow is out of scope.
+- **DEC-005**: Resolved OQ-008 and DEC-005 (same question): the report covers Brightway Retail's own data only — no benchmarking or comparison against other customers/industry standards.
 - **DEC-006**: Resolved OQ-002 (and duplicates DEC-004, DEC-006, DEC-021): finance downloads the report themselves from the console, no email/notification needed — on-demand download only, so the subscriptions/delivery workflow is out of scope.
 - **DEC-007**: Resolved DEC-007: the finance report and its access records must be retained for two years; no specific format mandate applies.
 - **DEC-008**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
@@ -284,10 +284,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-020**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-021**: Resolved OQ-002 (and duplicates DEC-004, DEC-006, DEC-021): finance downloads the report themselves from the console, no email/notification needed — on-demand download only, so the subscriptions/delivery workflow is out of scope.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-008**: Does the report need to be Brightway-only, or include any benchmarking/comparison against other customers or industry standards?
-
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 — the weekly report is needed only through year-end close, not permanently recurring, so a lighter-weight interim solution is in scope rather than durable scheduling.
@@ -297,6 +293,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-005**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
 - **OQ-006**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
 - **OQ-007**: Resolved OQ-007: the finance team confirmed no filtering, column customization, or custom date-range regeneration is needed — just the PDF download.
+- **OQ-008**: Resolved OQ-008 and DEC-005 (same question): the report covers Brightway Retail's own data only — no benchmarking or comparison against other customers/industry standards.
 
 ---
 > **Classification:** Type A
