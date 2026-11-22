@@ -23,7 +23,7 @@ Meridian Travel's marketing team manually pulls spend-by-channel data every Mond
 - **BR-3a — Partial data is sent with a caveat:** If spend data for the covered week is delayed or incomplete at send time, the email is still sent with whatever data is available, accompanied by a note identifying what is missing — the report does not wait for complete data. The target delivery is roughly one day after the covered week ends.
 - **BR-4 — Spreadsheet-ready output:** The spend totals must be presented as a plain table inside the body of the email (no attachment), laid out so the marketing team can copy it directly into their spreadsheet.
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan; the feature must be deliverable to a standard-plan account.
-- **BR-6 — Channel set:** The specific set of channels included in the breakdown, and whether that set can vary seasonally or by campaign, is a business decision affecting what each email row represents. [DECISION REQUIRED: DEC-003]
+- **BR-6 — Channel set:** The breakdown covers a fixed set of four channels — Email, paid search, paid social, and display. One row per channel, every week; the set does not vary seasonally or by campaign.
 - **BR-7 — Recipients:** The specific recipient(s) on Meridian Travel's marketing team who receive the email is a business decision. [DECISION REQUIRED: DEC-004]
 - **BR-8 — Send day/time/timezone:** The weekly email is sent every Monday at 8:00 AM Eastern time.
 
@@ -112,17 +112,17 @@ And each returned channel carries exactly one total spend figure for the week
 ```gherkin
 Given total spend by channel has been retrieved for the covered week
 When the email content is assembled
-Then the content contains exactly one line per channel in the configured channel set
+Then the content contains exactly one line per channel in the fixed channel set (Email, paid search, paid social, and display)
 And each line shows the channel name and that channel's total spend for the week
 ```
 
 ### FR-008 — Channel with zero spend for the week
 ```gherkin
-Given a channel in the configured channel set has no spend recorded for the covered week
+Given a channel in the fixed channel set (Email, paid search, paid social, or display) has no spend recorded for the covered week
 When the email content is assembled
 Then that channel is represented with a total spend of zero rather than omitted
 ```
-*Note: whether zero-spend channels appear as a zero line or are omitted is tied to the channel-set business decision (BR-6); the default above shows them as zero and must be confirmed with the same decision.*
+*Note: because the channel set is fixed at four channels (BR-6), every email always contains exactly those four rows; a channel with no spend appears as a zero line rather than being omitted.*
 
 ### FR-009 — Spreadsheet-ready formatting
 ```gherkin
@@ -198,7 +198,7 @@ The system must track the following business information to support the Function
 
 - **Account / customer identity** — Which account the weekly summary belongs to (e.g., Meridian Travel) and its plan tier (standard). Source: System-derived from existing account records. Matters because eligibility (BR-5) and recipient/configuration scoping are per-account.
 - **Covered-week date range** — The resolved start and end dates for the "previous week" a given email covers, derived as the preceding calendar week (Monday through Sunday) in Eastern time. Source: System-derived from the week-boundary definition (BR-3). Matters for FR-004/FR-005 (unambiguous, contiguous, non-overlapping coverage) and for idempotency keying in FR-003.
-- **Channel set** — The list of channels that should appear as rows for the account, and whether that set varies seasonally/by campaign. Source: Business-defined configuration (BR-6). Matters for FR-007/FR-008 (one line per channel; zero-spend handling).
+- **Channel set** — The fixed list of channels that appear as rows for the account: Email, paid search, paid social, and display. The set does not vary seasonally or by campaign. Source: Business-defined (BR-6). Matters for FR-007/FR-008 (one line per channel; zero-spend handling).
 - **Total spend by channel** — The aggregated spend figure per channel for the covered week. Source: System-derived from the spend/channel data source. Matters as the core payload of every FR in Feature Area C.
 - **Channel name** — The human-readable label shown on each line. Source: System-derived from the spend/channel dimension data. Matters for FR-007 (each line shows the channel name).
 - **Recipient list** — The marketing-team email recipient(s) for the account. Source: Business-defined configuration (BR-7). Matters for FR-010 delivery.
@@ -262,7 +262,7 @@ This spec covers **Phase 1 (MVP) only**: an automated weekly email showing total
 | Additional metrics (spend vs. budget, week-over-week change, clicks, impressions) | Out of scope / Future phase | Not part of the confirmed MVP requirement; candidate for a future phase if the team still needs manual pulls for these. |
 | Self-serve UI for configuring the report (channels, schedule, recipients) | Out of scope | Intake confirmed no UI/frontend change needed for Phase 1; configuration is handled operationally. |
 | Generalizing the feature to accounts beyond Meridian Travel | Out of scope | Phase 1 targets the requesting account on the standard plan; broader rollout is a future phase. |
-| Seasonal / per-campaign variation of the channel set as an automated rule | Out of scope | Whether the channel set varies is a business decision (BR-6); automating that variation is deferred. |
+| Seasonal / per-campaign variation of the channel set as an automated rule | Out of scope | The channel set is fixed at four channels (BR-6: Email, paid search, paid social, display); any future variation is deferred. |
 | Interactive dashboard or on-demand ("pull now") generation | Out of scope | Phase 1 is a scheduled weekly push only. |
 | Historical backfill of prior weeks' emails | Out of scope | Phase 1 begins sending from go-live forward. |
 
@@ -309,8 +309,11 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Resolved BR-4: spend totals are a plain in-email table, no attachment; removed DEC-002 tag.
-- Updated FR-009 to specify a plain in-email table with no attachment.
+- Resolved BR-6: channel set is the fixed four channels (Email, paid search, paid social, display).
+- Updated FR-007 to name the fixed four-channel set.
+- Updated FR-008 and its note to reflect the fixed channel set rather than an open decision.
+- Updated Information Requirements channel-set entry to the fixed four-channel list.
+- Updated Out-of-Scope row to reflect the now-fixed channel set.
 
 
 ---
@@ -326,17 +329,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | How should "the previous week" be defined for Meridian Travel's report, and how long after the week ends are we willing to wait for complete ad-platform data before sending? | Product owner (with input from Meridian Travel) | Previous week = calendar week Monday through Sunday, in Meridian Travel's local timezone. Accept up to 24 hours of lag for data completeness before sending; if still incomplete after that window, skip the send and notify rather than send partial data. |
 | **DEC-002** | What format should the spend totals arrive in so the team can drop them straight into their spreadsheet? | Product owner (with input from Meridian Travel) | An inline plain-text table in the email body with two columns (channel name, total spend), tab/column aligned for direct copy-paste into a spreadsheet. Revisit a CSV attachment only if copy-paste proves unreliable. |
-| **DEC-003** | Which channels should appear in the weekly breakdown, and can that list change by season or campaign? | Product owner (with input from Meridian Travel) | Include every channel that had spend for the account during the covered week, one line each, derived automatically from the spend data; zero-spend channels in the account's active set shown as a zero line. Treat the channel set as automatically data-driven rather than a fixed manually-curated list, pending confirmation. |
 | **DEC-004** | Who exactly on Meridian Travel's marketing team should receive this weekly email? | Product owner (with input from Meridian Travel) | A single configurable recipient list for the Meridian Travel account, seeded with the marketing-team contact(s) the requester provides at launch; supports multiple addresses. |
 | **DEC-006** | How long must we keep the audit records of each weekly spend email that gets sent? | Compliance/Security | 12 months minimum retention, append-only and immutable, matching Kochava's standard platform audit retention floor. |
 
 ### Decisions Resolved
 
+- **DEC-003**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
 - **DEC-005**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-005**: Which channels should appear in the breakdown, and is that list fixed or does it vary by campaign/season?
 - **OQ-006**: Who are the exact recipients, and does recipient management or spend-data visibility need any permission/access control?
 - **OQ-007**: Is there an existing scheduled-report / report-subscription + email pipeline we're expected to reuse, or is building new scheduler/email orchestration in scope for this deadline?
 
@@ -346,6 +348,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: 'Previous week' is defined as a calendar week, Monday to Sunday, anchored to Eastern time, which is also the timezone for the week boundary and send time.
 - **OQ-003**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **OQ-004**: Resolved OQ-004/DEC-002: the email presents spend totals as a plain table inside the email body, with no attachment (no CSV or separate file).
+- **OQ-005**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly email, one line per channel, previous week's total spend, spreadsheet-ready) with intake's own clarity marked "clear"; the open questions are routine implementation parameters (week definition, send time, recipients) that engineering can reasonably spec, not genuine product ambiguity—so this is engineering-led multi-service design across the reporting/scheduler/email stack, not Type A discovery.
