@@ -253,14 +253,6 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
-
 ### Decisions Resolved
 
 - **DEC-001**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
@@ -271,6 +263,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-006**: Resolved OQ-002 (and duplicates DEC-004, DEC-006, DEC-021): finance downloads the report themselves from the console, no email/notification needed — on-demand download only, so the subscriptions/delivery workflow is out of scope.
 - **DEC-007**: Resolved DEC-007: the finance report and its access records must be retained for two years; no specific format mandate applies.
 - **DEC-008**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
+- **DEC-009**: DEC-009 resolved: the report is part of the standard plan and Brightway Retail, a standard-plan customer, is entitled to it by default with no gating, upgrade, or entitlement change required.
 - **DEC-010**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-011**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
 - **DEC-012**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
