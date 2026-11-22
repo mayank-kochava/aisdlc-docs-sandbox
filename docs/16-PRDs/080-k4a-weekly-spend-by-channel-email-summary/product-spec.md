@@ -22,7 +22,7 @@ An automated weekly email delivered every Monday morning removes the manual data
 - **BR-3 — Reporting period:** Each Monday email covers the spend for a defined preceding reporting window. The exact window (e.g. the prior Monday–Sunday calendar week) is not supplied in the input. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Channel scope:** The breakdown lists spend per marketing channel. Which channels are included, and whether that list varies by season or campaign type, is not supplied in the input. [DECISION REQUIRED: DEC-003]
 - **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient list (who, how many people, and whether different people have different permission to view spend data) is not supplied in the input. [DECISION REQUIRED: DEC-004]
-- **BR-6 — Plan entitlement:** Meridian Travel is on the standard plan. Whether automated weekly report emails are entitled under the standard plan is not settled in the input. [DECISION REQUIRED: DEC-005]
+- **BR-6 — Plan entitlement:** Meridian Travel is on the standard plan, and automated weekly report emails are included in the standard plan — no plan change, add-on, or upsell is required before building. The run-time entitlement check (FR-014) is retained as a defensive safeguard that re-derives entitlement on each run, but the business answer is settled: the standard plan entitles this feature.
 - **BR-7 — Delivery channel:** Delivery is email only. There is no on-screen view or in-product UI for this feature (PM-confirmed in intake).
 - **BR-8 — Spend data integrity:** The spend figures are customer-facing billing/spend numbers. The per-channel totals in the email must match the authoritative spend figures the customer sees elsewhere; shipping numbers that disagree with the customer's other spend views is a defect, not a cosmetic issue.
 
@@ -216,7 +216,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 - **Channel scope list** — the set of marketing channels to include, and whether it varies by season/campaign. Source not yet settled (see BR-4); candidate sources are a configured list or the channels present in the spend data. Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
 - **Spreadsheet format definition** — the headers, currency symbol, decimal precision, and sort order the marketing team currently uses manually. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008); not yet supplied (see BR-2).
 - **Recipient list** — the Meridian Travel marketing team members who receive the email. User/customer-supplied configuration. Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
-- **Plan entitlement status** — whether the customer's plan permits automated weekly report emails. External/system-derived from the authoritative subscription/entitlement source. Matters because it gates every send (FR-014).
+- **Plan entitlement status** — the customer's standard plan includes automated weekly report emails (settled; no upsell required). The value is still re-derived at run time from the authoritative subscription/entitlement source as a defensive safeguard that gates every send (FR-014).
 - **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Monday email (FR-013, FR-017).
 - **Delivery timestamp** — when a summary was accepted for delivery. System-derived. Matters for the success record and operator verification (FR-013).
 
@@ -316,6 +316,14 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 **Discrepancy to resolve:** `reporting-api` appears in Lookup A but not Lookup B; the entire SAM-specific stack appears in Lookup B but not Lookup A. These represent two competing report-generation paths. `frontend-mos` surfaced at low confidence but is dropped — PM confirmed no UI.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved BR-6: standard plan includes automated weekly report emails, no upsell; removed DEC-005 tag.
+- Updated Information Requirements entry to state standard-plan entitlement is settled.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -331,19 +339,25 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-002** | Which stretch of time should each Monday email cover — the previous Monday-through-Sunday week, or some other window? | Product owner (with Meridian Travel marketing team) | Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). |
 | **DEC-003** | Which marketing channels should appear in the breakdown, and does that list change by season or by campaign type? | Product owner (with Meridian Travel marketing team) | Include every channel the customer currently has recorded spend against for the reporting window, listed dynamically; do not hardcode a seasonal list. Confirm the expected channel set against their current spreadsheet. |
 | **DEC-004** | Who exactly should receive this email, how many people are on that list, and do different recipients have different permission to see spend data? | Product owner (with Meridian Travel marketing team) | Send to a single configured distribution list for Meridian Travel's marketing team; treat all recipients on that list as authorized to view full spend. Collect the actual recipient addresses from the customer before launch. |
-| **DEC-005** | Does the customer's standard plan actually include automated weekly report emails, or does this need a plan change or add-on first? | Product/Billing owner | Assume the standard plan is entitled and enable the feature for this customer, but confirm with billing before launch; if it turns out to be a gated feature, resolve the entitlement (upgrade or add-on) before the summer campaign deadline. |
 | **DEC-006** | When exactly counts as "Monday morning" for delivery, and in which timezone should it be calculated? | Product owner (with Meridian Travel) | Deliver by 08:00 in Meridian Travel's primary business timezone each Monday; confirm the timezone with the customer. |
 | **DEC-007** | How long must we retain the audit records of each weekly run's outcome, and does the customer's spend-data handling agreement require a longer period? | Compliance/Security with Product owner | Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer. |
 
+### Decisions Resolved
+
+- **DEC-005**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
+
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Does the customer's standard plan include automated recurring report emails, or is that a gated/paid entitlement we need to confirm or upsell before building?
 - **OQ-002**: What exactly is a "channel" for this breakdown, and does that list match the channels marketing already tracks in their spreadsheet (and does it change seasonally/by campaign)?
 - **OQ-003**: What does the current manual spreadsheet look like exactly — column headers, sort order, currency symbol, decimal places, and any derived/calculated columns beyond raw spend per channel?
 - **OQ-004**: How fresh does the spend data need to be in Monday's email — previous-day, prior full week, or latest available aggregate?
 - **OQ-005**: What timezone defines "Monday morning" for delivery, and is there a specific send time the marketing team expects?
 - **OQ-006**: Who exactly should receive the email (named recipients or a distribution list), how many people, and are there any permission restrictions on who can see spend figures?
 - **OQ-007**: Should the spend numbers be raw only, or is any validation / anomaly flagging expected (e.g. flag a channel whose spend spiked vs usual)?
+
+### Questions Resolved
+
+- **OQ-001**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is fully specified (Monday email, total spend per channel, one line each, matching the existing spreadsheet format, no UI) and the KG shows well-understood existing services (reporting-subscriptions-worker, reporting-api, cost-v2, accounts-api) that already do scheduled report emails and channel-level spend aggregation — this is engineering-led multi-service build, not product discovery; the "4 services" trigger reflects scope, not genuine ambiguity.
