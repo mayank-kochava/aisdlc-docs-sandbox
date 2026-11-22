@@ -19,7 +19,7 @@ An automated weekly email delivered every Monday morning removes the manual data
 
 - **BR-1 — Cadence:** The summary is generated and delivered on a weekly cadence, every Monday at 8am US Eastern time ("Monday morning").
 - **BR-2 — Content shape:** The email body shows total campaign spend aggregated per channel, one line per channel, matching the layout the marketing team currently reproduces manually in their spreadsheet. The spreadsheet has exactly two columns: channel name and total spend, with spend shown in US dollars to two decimal places.
-- **BR-3 — Reporting period:** Each Monday email covers the spend for a defined preceding reporting window. The exact window (e.g. the prior Monday–Sunday calendar week) is not supplied in the input. [DECISION REQUIRED: DEC-002]
+- **BR-3 — Reporting period:** Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). This is a working assumption adopted in the absence of a confirmed window from the customer, not a customer-confirmed value.
 - **BR-4 — Channel scope:** The breakdown lists spend per marketing channel across a fixed set of four channels: Email, Paid Search, Paid Social, and Display — the same four the marketing team tracks in their spreadsheet today. This list does not vary by season or campaign type.
 - **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team via the `marketing-team@meridiantravel.example` distribution list. There are no per-recipient permission restrictions on viewing spend data — everyone on that list sees the full spend figures.
 - **BR-6 — Plan entitlement:** Meridian Travel is on the standard plan, and automated weekly report emails are included in the standard plan — no plan change, add-on, or upsell is required before building. The run-time entitlement check (FR-014) is retained as a defensive safeguard that re-derives entitlement on each run, but the business answer is settled: the standard plan entitles this feature.
@@ -255,7 +255,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 
 ### Auditability
 
-- **NFR-012 — Immutable run audit.** Each run's terminal outcome is written to an append-only audit record (customer identity, reporting window, action, timestamp, outcome/status) that no role or code path can edit or delete. The write is asynchronous and must not block the send, but a failed audit write raises an immediate operational alert rather than being dropped silently (reinforces FR-017). Minimum retention: 12 months, pending any longer period the customer's billing/spend-data handling agreement requires. [DECISION REQUIRED: DEC-007]
+- **NFR-012 — Immutable run audit.** Each run's terminal outcome is written to an append-only audit record (customer identity, reporting window, action, timestamp, outcome/status) that no role or code path can edit or delete. The write is asynchronous and must not block the send, but a failed audit write raises an immediate operational alert rather than being dropped silently (reinforces FR-017). Retention: run audit records are retained for 12 months unless a billing/spend-data handling agreement with the customer requires longer. This 12-month figure is a working assumption adopted in the absence of a confirmed retention requirement, not a customer-confirmed value.
 
 ### Operability & Rollout
 
@@ -329,9 +329,8 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Resolved BR-5 recipients to the marketing-team@meridiantravel.example list with no permission restrictions, removing the DEC-004 tag.
-- Updated Recipient list information requirement with the marketing-team@meridiantravel.example list and no permission restrictions.
-- Updated out-of-scope rationale for per-recipient permission tiers to reflect that no tiers are required per the resolved BR-5.
+- Resolved BR-3 reporting window to preceding Monday–Sunday week as a working assumption, removing the DEC-002 tag.
+- Resolved NFR-012 audit retention to 12 months as a working assumption, removing the DEC-007 tag.
 
 
 ---
@@ -339,22 +338,15 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | Which stretch of time should each Monday email cover — the previous Monday-through-Sunday week, or some other window? | Product owner (with Meridian Travel marketing team) | Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). |
-| **DEC-007** | How long must we retain the audit records of each weekly run's outcome, and does the customer's spend-data handling agreement require a longer period? | Compliance/Security with Product owner | Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer. |
-
 ### Decisions Resolved
 
 - **DEC-001**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
+- **DEC-002**: Assumed: Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send).
 - **DEC-003**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
 - **DEC-004**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
 - **DEC-005**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 - **DEC-006**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
+- **DEC-007**: Assumed: Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer.
 
 ### Open Questions (evidence gaps — needs more input)
 
