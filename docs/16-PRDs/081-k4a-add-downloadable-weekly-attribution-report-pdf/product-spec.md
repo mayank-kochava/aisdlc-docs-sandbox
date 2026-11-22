@@ -56,7 +56,7 @@ Intake recorded "UI/Frontend change needed: No", but an on-demand download initi
 flowchart TD
     A["Weekly report generation (system-triggered)"] --> B{"Is attribution data for the covered weeks complete?"}
     B -->|"yes"| C["Generate last-quarter attribution PDF"]
-    B -->|"no (incomplete or still processing)"| D["Apply data-freshness handling (timestamp / warning / exclude incomplete week)"]
+    B -->|"no (incomplete or still processing)"| D["Include affected weeks with a visible data-quality warning"]
     D --> C
     C --> E["PDF available for finance team in K4A"]
 
@@ -127,7 +127,7 @@ When the weekly report is generated
 Then the report applies the defined data-freshness handling for affected weeks
 And the user can distinguish complete data from incomplete or still-processing data in the report
 ```
-> Note: whether incomplete weeks are excluded, flagged with a data-quality warning, or stamped with a freshness timestamp is a separate data-freshness decision (see OQ-005). Engineering should default to including a data-freshness timestamp and a visible warning for affected weeks until the product decision lands.
+> Note: weeks with incomplete or still-processing attribution data are included in the report with a visible data-quality warning for each affected week (resolved OQ-005). Affected weeks are not excluded and are not merely timestamped — a data-quality warning must be shown so the user can tell which weeks' data is incomplete or still processing.
 
 ### FR-007 — Attribution data source dependency failure
 ```gherkin
@@ -235,7 +235,7 @@ The system must track the following business information to support the Function
 | Multi-service backend + frontend blast radius | Backward compatibility (NFR-010) protects existing consumers of the shared report services; kill-switch (NFR-009) and rollback plan bound production exposure. |
 | Unresolved delivery architecture (on-demand vs fixed weekly schedule) | The delivery-model decision is surfaced in Section 1 for a product call; FR-001–FR-003 are written to hold for either model, and the possibility of reusing an existing weekly-cadence scheduling mechanism (per KG cross-check) is routed to engineering design to avoid building new scheduling. |
 | Ambiguous "last quarter" window | Resolved: the report covers the most recent completed calendar quarter, recalculated every week (see Section 1 Quarter window definition). |
-| Data freshness / completeness uncertainty | FR-006 mandates explicit incomplete-data handling with a default (freshness timestamp + visible warning) until the content decision lands. |
+| Data freshness / completeness uncertainty | Resolved: FR-006 includes weeks with incomplete or still-processing data and shows a visible data-quality warning for each affected week (resolved OQ-005). |
 
 ---
 
@@ -287,9 +287,9 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Changed BR-1 from weekly-cadence generation to on-demand fresh generation at download time.
-- Rewrote the Delivery model section from scheduled Monday generation + storage to on-demand fresh generation at download time.
-- Updated quarter-window definition to compute the window at on-demand generation/download time rather than recalculated every week.
+- Resolved OQ-005 in the FR-006 note: incomplete weeks are included with a visible data-quality warning.
+- Updated Section 2 flowchart node to reflect the resolved data-quality-warning handling for incomplete weeks.
+- Updated Risk Mitigation row to reflect the resolved data-quality-warning handling for incomplete weeks.
 
 
 ---
@@ -317,7 +317,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-- **OQ-005**: How should weeks with incomplete or still-processing attribution data be handled — include with a freshness timestamp, exclude, or show a data-quality warning?
 - **OQ-007**: Are there branding, compliance, or audit requirements for the PDF (logos, disclaimers, row-level detail vs. summary) needed for year-end close?
 - **OQ-008**: If generated on-demand, what's the acceptable latency between data collection and the PDF being downloadable, and how should users know fresh data is available?
 
@@ -326,6 +325,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **OQ-003**: Resolved DEC-003 / OQ-003 — the report presents total attributed revenue and conversions by channel as one simple table.
 - **OQ-004**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
+- **OQ-005**: Resolved OQ-005 — weeks with incomplete or still-processing attribution data are included in the report with a visible data-quality warning for each affected week (not excluded, not merely timestamped).
 - **OQ-006**: OQ-006 resolved: finance needs only the current week's report, no access to previous weeks' PDF history.
 
 ---
