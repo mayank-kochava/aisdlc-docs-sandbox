@@ -17,7 +17,7 @@ Brightway Retail's finance team currently has no self-service way to obtain a we
 
 ## Business Rules
 
-- **BR-1:** The report is generated on a weekly cadence.
+- **BR-1:** The report is generated fresh on demand when the finance user downloads it (not pre-generated or stored ahead on a schedule).
 - **BR-2:** The report content covers the last quarter only.
 - **BR-3:** The report is delivered as a downloadable PDF file.
 - **BR-4:** The finance team accesses the report on-demand from K4A.
@@ -26,11 +26,11 @@ Brightway Retail's finance team currently has no self-service way to obtain a we
 
 ### Delivery model
 
-The PDF is produced on a fixed weekly schedule — generated every Monday — and stored so the finance team can download the current stored report on-demand from K4A. This is a scheduled-generation model (not generated at the moment of download); the download serves the most recently generated Monday report.
+The PDF is generated fresh on demand at the moment the finance team downloads it from K4A (resolved OQ-001/DEC-001/DEC-007). This is an on-demand generation model: the report is not pre-generated or stored ahead on a schedule; each download triggers generation of the report over the current last-quarter window.
 
 ### Quarter window definition
 
-"Last quarter only" means the most recent completed calendar quarter, recalculated every week so the window always reflects the latest completed quarter at generation time.
+"Last quarter only" means the most recent completed calendar quarter, computed at the moment of generation so the window always reflects the latest completed quarter at download time.
 
 ### Report contents
 
@@ -287,9 +287,9 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Recorded the confirmed Brightway logo requirement on the PDF and narrowed the remaining branding/compliance decision to DEC-004.
-- Added a Brightway-logo acceptance criterion to FR-003 (PDF output format).
-- Updated the out-of-scope branding row to carve the confirmed Brightway logo into Phase 1 while keeping further branding deferred.
+- Changed BR-1 from weekly-cadence generation to on-demand fresh generation at download time.
+- Rewrote the Delivery model section from scheduled Monday generation + storage to on-demand fresh generation at download time.
+- Updated quarter-window definition to compute the window at on-demand generation/download time rather than recalculated every week.
 
 
 ---
@@ -310,9 +310,9 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Decisions Resolved
 
-- **DEC-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **DEC-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **DEC-002**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
-- **DEC-007**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **DEC-007**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 
 ### Open Questions (evidence gaps — needs more input)
 
@@ -323,7 +323,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Questions Resolved
 
-- **OQ-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **OQ-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **OQ-003**: Resolved DEC-003 / OQ-003 — the report presents total attributed revenue and conversions by channel as one simple table.
 - **OQ-004**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
 - **OQ-006**: OQ-006 resolved: finance needs only the current week's report, no access to previous weeks' PDF history.
