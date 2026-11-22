@@ -18,7 +18,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 ### Business Rules
 
 - **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. The report is part of the standard plan: no gating, upgrade, or special entitlement is required, and a standard-plan account is entitled to it by default. Brightway can use it without any entitlement change.
-- **BR-2 — Cadence:** The report is generated on a permanently recurring weekly schedule (confirmed by the requester: weekly, every week, not just through year-end close). It is not a one-time year-end export, and the weekly cadence does not stop after year-end close — durable scheduling is in scope rather than a lighter-weight interim solution.
+- **BR-2 — Cadence:** The report is generated on a weekly schedule only through Brightway Retail's year-end close, not a permanently recurring report (resolved: weekly cadence is needed through year-end close and then stops, not every week indefinitely). It is not a one-time year-end export, but the weekly cadence is time-bounded to the year-end-close period — a lighter-weight interim scheduling solution is in scope rather than durable, indefinitely-recurring scheduling.
 - **BR-3 — Report period:** Each report covers the most recent completed quarter only, recalculated on every weekly run so the window shifts to whichever quarter most recently closed as of that run (confirmed by the requester). The reporting window is a rolling trailing-quarter window, not a fixed calendar quarter and not a configurable range in this phase.
 - **BR-4 — Format:** The report is delivered as a downloadable PDF. The Brightway Retail logo must appear on the PDF (confirmed by the finance team). Other aspects of the visual appearance and the generation method are engineering decisions, deferred to downstream planning.
 - **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. [DECISION REQUIRED]
@@ -202,7 +202,7 @@ The system must track the following business information to support the Function
 | Hard external deadline (5 weeks, year-end close) | Scope held strictly to MVP (Section 6); BR-5 year-end close date and BR-6 report content resolved early so build is not blocked (both flagged in Section 1). Kill-switch (NFR-010) limits blast radius if a late issue appears. |
 | Multi-service blast radius (5+ services) | Server-side enforcement (NFR-004), kill-switch (NFR-010), bounded retries (NFR-008), and idempotent non-overlapping generation (NFR-009) contain cross-service failure. Service-ownership ambiguity for report-content data is called out in Section 1 for planning to resolve. |
 | Unconfirmed UX scope | MVP UX limited to a download action, empty state, and error state (FR-006–FR-010). Any report-management view (filtering, custom columns, date-range regeneration) is explicitly Out of Scope (Section 6). |
-| Unclear recurring vs. one-time requirement | Resolved in intake: recurring weekly (BR-2). No one-time-only path is built. |
+| Unclear recurring vs. one-time requirement | Resolved: weekly cadence only through year-end close, not permanently recurring and not one-time (BR-2). A time-bounded interim weekly schedule is built, not durable indefinite scheduling. |
 
 ### Rollback
 
@@ -244,9 +244,8 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Added the Brightway logo requirement to BR-4 (report format).
-- Added FR-008a requiring the Brightway logo on the generated PDF.
-- Updated the Generated PDF artifact info requirement to include the Brightway logo.
+- Updated BR-2 to reflect OQ-001 resolution: weekly only through year-end close, not permanently recurring.
+- Updated risk-mitigation table row to reflect time-bounded weekly cadence through year-end close per OQ-001 resolution.
 
 
 ---
@@ -273,6 +272,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-013** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-014** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-015** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-016** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-017** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
@@ -288,7 +289,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Questions Resolved
 
-- **OQ-001**: Resolved OQ-001 — the report is a permanently recurring weekly report (weekly, every week), not a cadence limited to year-end close, so durable scheduling is in scope.
+- **OQ-001**: Resolved OQ-001 — the weekly report is needed only through year-end close, not permanently recurring, so a lighter-weight interim solution is in scope rather than durable scheduling.
 - **OQ-003**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
 - **OQ-004**: Resolved OQ-004: "last quarter" resolves to the most recent completed quarter, recalculated every week (a rolling trailing-quarter window, not a fixed Q4).
 - **OQ-005**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
