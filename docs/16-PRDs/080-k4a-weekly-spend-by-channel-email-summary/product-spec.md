@@ -127,6 +127,14 @@ Then the body contains exactly one line per channel showing that channel's total
 And the layout reproduces the two-column format the marketing team currently uses in their manual spreadsheet: a channel-name column and a total-spend column, with spend shown in US dollars to two decimal places.
 ```
 
+**FR-009b — Plain-text alternative version of the email**
+```gherkin
+Given a summary email is being composed for a customer
+When the email is prepared for delivery
+Then the email includes a plain-text version alongside the HTML version (a multipart message), so recipients whose clients do not render HTML still receive the spend-by-channel content
+And the plain-text version contains the same per-channel spend totals, reporting window, and two-column layout (channel name and total spend in US dollars to two decimal places) as the HTML version.
+```
+
 **FR-009a — Meridian logo at the top of the email**
 ```gherkin
 Given a summary email is being composed for a customer
@@ -329,8 +337,7 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Recorded that per-channel spend totals are raw only, with no validation or anomaly flagging, resolving OQ-007.
-- Updated the out-of-scope rationale to reflect the confirmed decision that spend figures are raw only with no anomaly flagging.
+- Added FR-009b: email must include a plain-text version alongside the HTML version.
 
 
 ---
