@@ -168,6 +168,15 @@ Then it is delivered to the configured Meridian Travel marketing team recipient 
 And delivery targets only the configured recipients for that customer.
 ```
 
+**FR-011a — CC the VP on the first send only**
+```gherkin
+Given this is the first weekly summary email ever sent to the Meridian Travel marketing team recipient list (no prior successful delivery has been recorded for this customer)
+When the summary email is sent
+Then the Meridian Travel marketing VP is added as a CC recipient on that first send only
+And every subsequent weekly send goes to the configured marketing team recipient list without the VP CC
+And the VP's email address is sourced from configuration [DECISION REQUIRED] rather than inferred.
+```
+
 **FR-012 — Delivery failure is retried then alerted**
 ```gherkin
 Given a composed summary email is handed off for delivery
@@ -232,6 +241,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 - **Channel scope list** — the fixed set of four marketing channels to include: Email, Paid Search, Paid Social, and Display (the same four the marketing team tracks today). This list does not vary by season or campaign type (see BR-4). Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
 - **Spreadsheet format definition** — the marketing team's existing spreadsheet has exactly two columns: channel name and total spend, with spend in US dollars to two decimal places. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008, BR-2).
 - **Recipient list** — the Meridian Travel marketing team, addressed via the `marketing-team@meridiantravel.example` distribution list. User/customer-supplied configuration. All recipients on the list have equal permission to view the spend figures (no restrictions). Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
+- **Marketing VP CC address** — the email address of the Meridian Travel marketing VP, CC'd on the first send only (FR-011a). User/customer-supplied configuration; not yet provided ([DECISION REQUIRED]). Matters because the VP sees the full spend figures on that first send, so the same restricted-data treatment applies.
 - **Plan entitlement status** — the customer's standard plan includes automated weekly report emails (settled; no upsell required). The value is still re-derived at run time from the authoritative subscription/entitlement source as a defensive safeguard that gates every send (FR-014).
 - **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Monday email (FR-013, FR-017).
 - **Delivery timestamp** — when a summary was accepted for delivery. System-derived. Matters for the success record and operator verification (FR-013).
@@ -337,13 +347,22 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Added FR-009b: email must include a plain-text version alongside the HTML version.
+- Added FR-011a: CC the marketing VP on the first send only, with VP address from configuration.
+- Added Information Requirement for the marketing VP CC address used on the first send.
 
 
 ---
 ## Open Questions & Decisions Register
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
+
+### Decisions Required (business trade-offs — needs a human call)
+
+_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
+
+| ID | Decision | Owner | Provisional Value (build against until confirmed) |
+|----|----------|-------|-----------------------------------------------------|
+| **DEC-008** | What is the Meridian Travel marketing VP's email address to CC on the first send, and is "the first send" defined as the first-ever successful delivery for this customer? | Product owner | CC the VP's address (to be supplied by the customer) on the first successful delivery only, defined as the first send with no prior delivered-outcome audit record for this customer; drop the CC on all subsequent weekly sends. |
 
 ### Decisions Resolved
 
