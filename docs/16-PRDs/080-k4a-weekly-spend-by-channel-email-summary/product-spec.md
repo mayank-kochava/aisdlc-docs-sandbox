@@ -220,7 +220,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 ## 4. Information Requirements
 
 - **Reporting window definition** — the start/end dates each Monday email covers. System-derived from the configured weekly cadence. Matters because every spend total is scoped to this window and the window is stated in the email (FR-004, FR-009).
-- **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. The figures reflect the latest available aggregate at run time, not the prior full week's completed totals (see NFR-016). This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
+- **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. The figures reflect the latest available aggregate at run time, not the prior full week's completed totals (see NFR-016). The email presents these as raw totals only: no validation, anomaly detection, or spend-spike flagging is performed on the figures (e.g. a channel whose spend spiked versus usual is not flagged). This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
 - **Channel scope list** — the fixed set of four marketing channels to include: Email, Paid Search, Paid Social, and Display (the same four the marketing team tracks today). This list does not vary by season or campaign type (see BR-4). Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
 - **Spreadsheet format definition** — the marketing team's existing spreadsheet has exactly two columns: channel name and total spend, with spend in US dollars to two decimal places. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008, BR-2).
 - **Recipient list** — the Meridian Travel marketing team, addressed via the `marketing-team@meridiantravel.example` distribution list. User/customer-supplied configuration. All recipients on the list have equal permission to view the spend figures (no restrictions). Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
@@ -291,7 +291,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 |---|---|---|
 | On-screen / in-product view of the summary in K4A | PM-confirmed email-only; no UI (BR-7) | Future |
 | In-product UI to self-configure the weekly summary (cadence, recipients, channels) | No UI in Phase 1; configuration is set up operationally | Future |
-| Anomaly detection / spend-spike flagging (e.g. alert when a channel is 3× its usual spend) | Not part of the stated MVP behavior (raw totals only) | Future |
+| Anomaly detection / spend-spike flagging (e.g. alert when a channel is 3× its usual spend) | Confirmed raw totals only — no validation or anomaly flagging in MVP | Future |
 | Derived metrics beyond raw channel spend (ROI, CPA, week-over-week deltas) | MVP reproduces the current manual spreadsheet, which is raw channel spend | Future |
 | Downloadable file / attachment version of the summary | Intake confirmed delivery is an in-inbox email, not a downloadable file | Future |
 | Reconciliation of multiple spend data sources into one view | MVP assumes a single authoritative source; multi-source reconciliation is a separate effort | Future |
@@ -329,8 +329,8 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Resolved BR-3 reporting window to preceding Monday–Sunday week as a working assumption, removing the DEC-002 tag.
-- Resolved NFR-012 audit retention to 12 months as a working assumption, removing the DEC-007 tag.
+- Recorded that per-channel spend totals are raw only, with no validation or anomaly flagging, resolving OQ-007.
+- Updated the out-of-scope rationale to reflect the confirmed decision that spend figures are raw only with no anomaly flagging.
 
 
 ---
@@ -348,10 +348,6 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **DEC-006**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
 - **DEC-007**: Assumed: Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-007**: Should the spend numbers be raw only, or is any validation / anomaly flagging expected (e.g. flag a channel whose spend spiked vs usual)?
-
 ### Questions Resolved
 
 - **OQ-001**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
@@ -360,6 +356,7 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-004**: Re-resolved OQ-004 — Monday's email uses the latest available aggregate of spend at run time, not the prior full week's completed totals.
 - **OQ-005**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
 - **OQ-006**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
+- **OQ-007**: Resolved OQ-007: spend numbers are raw totals only — no validation or anomaly/spend-spike flagging is performed.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is fully specified (Monday email, total spend per channel, one line each, matching the existing spreadsheet format, no UI) and the KG shows well-understood existing services (reporting-subscriptions-worker, reporting-api, cost-v2, accounts-api) that already do scheduled report emails and channel-level spend aggregation — this is engineering-led multi-service build, not product discovery; the "4 services" trigger reflects scope, not genuine ambiguity.
