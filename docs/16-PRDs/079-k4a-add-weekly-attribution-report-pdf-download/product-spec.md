@@ -16,19 +16,19 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 
 ### Business Rules
 
-- **BR-01 — Report cadence:** The attribution report is generated on a weekly schedule.
+- **BR-01 — Report cadence:** The attribution report is generated on a weekly schedule, every Monday.
 - **BR-02 — Report format:** The report is delivered as a PDF.
 - **BR-03 — Data scope:** Each report covers the last quarter of attribution data only.
-- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. [DECISION REQUIRED: DEC-001]
+- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. [DECISION REQUIRED]
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
-- **BR-06 — Plan:** Brightway Retail is on the standard plan. Whether weekly PDF generation and storage is included at the standard plan tier, or requires an upgrade / phased delivery, is unresolved. [DECISION REQUIRED: DEC-002]
-- **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED: DEC-003]
-- **BR-08 — Generation model:** Whether each weekly report is pre-generated on the schedule and stored for later retrieval, or generated on-demand when a user clicks download, determines what "weekly" means to the user and shapes retention. The working model for this spec is **pre-generated weekly and stored for retrieval**, so that a download is fast and the "weekly" artifact is a stable, reproducible document. [DECISION REQUIRED: DEC-004]
+- **BR-06 — Plan:** Brightway Retail is on the standard plan. Whether weekly PDF generation and storage is included at the standard plan tier, or requires an upgrade / phased delivery, is unresolved. [DECISION REQUIRED]
+- **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED]
+- **BR-08 — Generation model:** Each weekly report is **pre-generated every Monday on the schedule and stored for later retrieval** (not generated on-demand at click time), so that a download is fast and the "weekly" artifact is a stable, reproducible document.
 - **BR-09 — Finance-grade correctness:** Because these figures feed a year-end close, the attribution numbers in the PDF must match the authoritative attribution data for the same window shown elsewhere in the product. Any discrepancy is treated as a defect.
 
 ### Report Contents (unresolved)
 
-The specific metrics, dimensions, and data points the finance team requires for year-end close are not specified in the request. The report's analytical content cannot be finalized until this is answered. [DECISION REQUIRED: DEC-005]
+The specific metrics, dimensions, and data points the finance team requires for year-end close are not specified in the request. The report's analytical content cannot be finalized until this is answered. [DECISION REQUIRED]
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -202,7 +202,7 @@ The system must track the following business information to support the function
 
 ### Performance & Capacity
 
-- **NFR-001 — Download latency:** Retrieving a stored weekly report (from the entitled user clicking download to delivery start) must meet a p95 latency target measured under expected concurrent K4A finance-user load. Because the pre-generated model (BR-08) serves a stored artifact rather than generating on demand, the target should reflect file retrieval, not generation. Target value: p95 ≤ 3 seconds under expected concurrent download load, pending confirmation; this is an engineering-tunable default.
+- **NFR-001 — Download latency:** Retrieving a stored weekly report (from the entitled user clicking download to delivery start) must meet a p95 latency target measured under expected concurrent K4A finance-user load. Because the generation model (BR-08) serves a pre-generated stored artifact rather than generating on demand, the target should reflect file retrieval, not generation. Target value: p95 ≤ 3 seconds under expected concurrent download load, pending confirmation; this is an engineering-tunable default.
 - **NFR-002 — Shared query-resource protection:** Weekly generation queries the underlying attribution data, which is a shared resource. Generation must run under an explicit rate/concurrency cap so that a generation run does not degrade interactive query traffic. The concrete cap is an engineering decision; generation should be scheduled off-peak where feasible.
 - **NFR-003 — Generation monitoring:** The system must alert when the weekly generation error rate exceeds 1% for 5 minutes sustained, and when any individual generation run fails or is skipped (per FR-003, FR-006). Alerting phrasing follows the "exceeds N% for M minutes, sustained" convention.
 
@@ -227,7 +227,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 - **NFR-012 — Multi-service blast radius / kill-switch:** Because the feature spans multiple services and is HIGH risk, it must sit behind a config-based kill-switch (FR-013) that an on-call engineer can disable without a code deploy or separate approval. New requests stop honoring the feature within an established propagation window (working default: 5 minutes); in-flight runs submitted before the flip complete under prior behavior.
 - **NFR-013 — Rollback:** On a defined failure trigger (e.g. incorrect figures surfaced, sustained generation failures), the feature owner (on-call engineering, escalating to the product owner for customer-facing comms) may roll the feature back via the kill-switch. Already-generated stored reports are not retroactively altered by a rollback; only new generation and download behavior is affected going forward.
 - **NFR-014 — Finance-close correctness (data trust):** The biggest finance-adjacent risk is a PDF whose numbers disagree with the authoritative attribution data. Mitigation: a single authoritative source for the figures and the reconciliation check in NFR-011; a report must not be served if it cannot be reconciled to that source.
-- **NFR-015 — Deadline risk:** The 5-week, before-year-end-close deadline is hard. Mitigation depends on scoping the minimum viable deliverable (a downloadable, correct, last-quarter PDF for the entitled finance team) and deferring everything non-critical to Section 6. Whether the standard plan tier supports weekly generation and storage within the timeline, or requires an upgrade / phased delivery, is unresolved and gates the deadline commitment. [DECISION REQUIRED: DEC-006]
+- **NFR-015 — Deadline risk:** The 5-week, before-year-end-close deadline is hard. Mitigation depends on scoping the minimum viable deliverable (a downloadable, correct, last-quarter PDF for the entitled finance team) and deferring everything non-critical to Section 6. Whether the standard plan tier supports weekly generation and storage within the timeline, or requires an upgrade / phased delivery, is unresolved and gates the deadline commitment. [DECISION REQUIRED]
 - **NFR-016 — Data-not-ready handling:** The weekly cadence can collide with incomplete upstream data. Mitigation: generation never produces a report from incomplete data; it skips/retries, alerts, and leaves the prior report as latest available (FR-003, FR-006).
 
 ---
@@ -237,7 +237,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 ### Phase 1 (this spec) — In Scope
 
 - Weekly generation of a last-quarter attribution report as a PDF.
-- Pre-generation and storage of the weekly report for retrieval (per the working model in BR-08).
+- Pre-generation (every Monday) and storage of the weekly report for retrieval (per BR-08).
 - Download of the latest available report from K4A by the entitled Brightway Retail finance audience.
 - Server-side entitlement enforcement, download audit logging, and a feature kill-switch.
 
@@ -246,7 +246,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 | Item | Rationale |
 |---|---|
 | Push/scheduled delivery of the report (email, notification) to the finance team | The requirement is explicitly *downloadable from K4A*; the intake confirmed this. Push delivery is a separate capability. |
-| On-demand (click-time) generation of the report | The working model is pre-generated-and-stored (BR-08). On-demand generation is an alternative model, not an addition; excluded unless the generation-model decision changes. |
+| On-demand (click-time) generation of the report | The confirmed model is pre-generated-and-stored every Monday (BR-08). On-demand generation is an alternative model, not an addition; it is excluded. |
 | A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only. A dated history view is a larger UI component and not required for year-end close. |
 | Report customization by the user (metric selection, date-range picker, custom branding beyond a standard layout) | The required report contents are not yet specified; a fixed standard layout is Phase 1. User-configurable reporting is future work. |
 | Generalizing the capability to other customers, products, or report types beyond the Brightway Retail attribution report | Phase 1 is scoped to this one customer requirement under a hard deadline. |
@@ -255,7 +255,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 
 ### Deferred / Pending Decisions
 
-The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the report's exact contents, the "last quarter" definition (fixed vs. rolling), the generation model confirmation, the entitlement audience and access source, and the standard-plan capacity/timeline question.
+The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the report's exact contents, the "last quarter" definition (fixed vs. rolling), the entitlement audience and access source, and the standard-plan capacity/timeline question.
 
 ## Appendix: Engineering Reference
 
@@ -272,6 +272,18 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 - **summary-report-cloud** (backend) — Generates summary report data feeding the PDF. *Cross-check only; medium confidence.*
 - **koch-query-api** (backend) — Queries the underlying attribution data for the report. *Cross-check only; medium confidence.*
 - **entitlements-api** (backend) — Gates access to the PDF download feature. *Cross-check only; low confidence — but if finance-only access is a hard requirement (FR-010), its importance exceeds its confidence label.*
+
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Specified the weekly cadence as every Monday in BR-01.
+- Resolved BR-08 generation-model decision to pre-generated-and-stored every Monday and removed the DECISION REQUIRED tag.
+- Updated NFR-001 to reference the resolved pre-generated model rather than a working model.
+- Updated Phase 1 in-scope item to reflect the resolved Monday pre-generation model.
+- Updated out-of-scope rationale for on-demand generation to reflect the now-confirmed pre-generated model.
+- Removed the now-resolved generation-model confirmation from the deferred/pending decisions list.
+
 
 ---
 ## Open Questions & Decisions Register
@@ -293,13 +305,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Should the weekly PDF be pre-generated on a schedule and stored for retrieval, or generated on-demand when finance clicks download? This is the biggest driver of scope (scheduling + storage vs. a simple button) and affects which backend services are actually touched.
 - **OQ-002**: Does "last quarter" mean a fixed set of three calendar months, or a rolling most-recently-completed quarter that shifts each week? This changes the date-filtering logic in the report pipeline.
 - **OQ-003**: Does the report need to be delivered (e.g. emailed/notified) in addition to being downloadable from K4A, or is in-console download sufficient? The current dispatcher role mentions 'delivery' which may differ from what's wanted.
 - **OQ-004**: Should download access be restricted to the finance team specifically, and if so is there an existing entitlement/role that represents them? This determines whether access-gating is in scope.
 - **OQ-005**: What specific metrics, dimensions, and summary sections must the PDF contain for the year-end close, and is the existing summary-report data sufficient or do we need additional attribution queries?
 - **OQ-006**: Does the standard plan cover weekly PDF generation/storage within the 5-week window, or does the scope need to be phased (e.g. download-first, automated weekly cadence later) to hit the deadline?
 - **OQ-007**: Where in the K4A UI should the download live, and does finance need a history/list of past weekly reports or just the latest one?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved DEC-004/OQ-001 — the weekly PDF is pre-generated on a schedule every Monday and stored for download (not generated on-demand).
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is clearly specified (weekly PDF of last-quarter attribution data, downloadable from K4A), and existing services already provide the exact capabilities (reporting-api has a PDF export API, reporting-dispatcher schedules weekly reports, frontend-mos has the download UI), so this is engineering-led design/build across multiple services rather than open-ended product discovery.
