@@ -297,18 +297,11 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-003** | What attribution metrics and dimensions does the finance team need in the report, in what order, and do they need row-level detail or summaries for year-end close? | Product owner (with Brightway Retail finance) | Revenue by channel, conversions by campaign, and ROI by touchpoint, shown as summary tables with the option of row-level detail, ordered revenue-first. |
-
 ### Decisions Resolved
 
 - **DEC-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **DEC-002**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
+- **DEC-003**: Resolved DEC-003 — finance confirmed the report content (same as OQ-003): total attributed revenue and conversions by channel in one table; this matches the fixed Phase-1 content set already specified.
 - **DEC-004**: Resolved OQ-007 and DEC-004 (same question): finance confirmed the PDF needs the Brightway logo only — no disclaimers or audit-oriented formatting for year-end close.
 - **DEC-005**: Assumed: Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them.
 - **DEC-006**: Assumed: Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it.
