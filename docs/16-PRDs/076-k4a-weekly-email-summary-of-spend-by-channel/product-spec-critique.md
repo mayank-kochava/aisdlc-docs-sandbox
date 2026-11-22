@@ -1,4 +1,4 @@
-# Spec Critique: Meridian Travel Weekly Spend-by-Channel Email
+# Spec Critique
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
+- **Critical Issues:** 1
 - **High Issues:** 5
-- **Medium Issues:** 7
-- **Blocking:** No
+- **Medium Issues:** 6
+- **Blocking:** Yes
 
 ---
 
@@ -17,24 +17,21 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-003 (idempotent overwrite) says a re-run "overwrites the prior generation" and "no duplicate email record." But if the first run already **sent** an email to recipients, a re-run overwriting the record does not un-send it. The spec does not define whether a re-run after a successful send re-sends, suppresses, or is even permitted. Recipients could receive two emails for the same week with different numbers. | High | 3 / FR-003 | Add a guard: once a week's email has been delivered successfully, further runs for that week must not re-send unless an explicit re-trigger path is defined. Distinguish "overwrite the generation record" from "re-send to recipients." |
-| CG-002 | FR-013 retry "proceeds to send once the data is available and complete," but there is no defined signal for what "complete" means — the Data-readiness signal (Section 4) is described but no FR defines how completeness is determined (e.g., all expected channels present? a sync-done flag? a row-count threshold?). The retry loop could send on the first partial response it interprets as "available." | High | 3 / FR-012–013 | Add an FR defining the completeness criterion explicitly (what makes data "complete" for a covered week) rather than leaving it implied. |
-| CG-003 | FR-014 "notifies the responsible owner" but "responsible owner" is never defined as a configurable recipient anywhere in Section 4 (recipient list is the marketing team, not an operational owner). A missed-send alert may have no destination. | High | 3 / FR-014 | Add an operational-owner / escalation contact to Information Requirements and reference it in FR-014. |
+| CG-001 | **Direct contradiction between the business rules and the FRs on partial data.** BR-3a states the email **is still sent** with available data plus a caveat note ("the report does not wait for complete data"). The User Flow (Section 2, node F2) matches this — it assembles partial data + a note and sends. But FR-012 states the system **does not send** partial/incomplete totals and instead records a "data-not-ready" failure. FR-014 and NFR-007 ("never sends partial/incomplete spend totals") reinforce the *opposite* of BR-3a. This is a fundamental behavioral contradiction: should partial data be SENT-with-caveat or NEVER sent? Engineering cannot implement both. | Critical | BR-3a vs FR-012/FR-014/NFR-007, Section 2 flow | Pick one policy and make all of BR-3a, the Mermaid flow, FR-012/013/014, and NFR-007 agree. Given the FRs and NFR-007 are internally consistent (fail-closed on correctness), the likely fix is to rewrite BR-3a and the flow's F2 node to match "never send partial — retry within lag window, else missed-send." If the business genuinely wants send-with-caveat, the entire Feature Area E and NFR-007 must be rewritten. |
+| CG-002 | **FR-003 idempotent-overwrite conflicts with the fail-closed/no-unsend posture.** FR-003 says a re-run "overwrites the prior generation for that week rather than producing a duplicate email record." But email is a push channel — once delivered (FR-010/FR-011) it cannot be overwritten or unsent (Section 6 Rollback confirms "already-sent emails cannot be unsent"). "Overwrite the generation record" vs. "re-send a corrected email" is undefined. If a corrected re-run produces new numbers, does a second email go out to recipients or not? | High | FR-003 vs Section 6 Rollback | Clarify that FR-003 idempotency applies to the *generation record / send-attempt* state only, and explicitly state whether a corrected re-run triggers a NEW email to recipients (and if so, how recipients distinguish it from the original). |
 
 ---
 
 ## 2. Testability Review
 
-### Vague Requirements Found
+The FRs are generally well-formed Gherkin. The issues below are measurability/ambiguity gaps, not prose-format violations.
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| FR-009 | "...laid out so the marketing team can copy them directly into their existing spreadsheet without manual reformatting" | "without manual reformatting" is not objectively testable — it depends on DEC-002 (unresolved). No measurable layout contract exists. | Given the assembled content, When the email is formatted, Then each channel appears as one delimited row of exactly two fields (channel name, total spend) using a consistent machine-parseable delimiter and a fixed decimal format, And pasting the body into a spreadsheet produces one row per channel with spend in a numeric column. (Pending DEC-002.) |
-| FR-011 | "the email contains all channel spend totals required for their spreadsheet" | "required for their spreadsheet" is subjective; not a testable completeness assertion. | Given a delivered email, When content is inspected, Then it contains exactly one line for every channel in the configured channel set (BR-6) with a numeric total for each. |
-| NFR-003 | "within the acceptable lag window of the configured send time" | The acceptable lag window is itself undefined (BR-3 data-delay default), so the NFR has no numeric target to test against. | Define the lag window as a concrete value (e.g., Then delivery occurs within N hours of the configured send time) once DEC-001/lag default is set. |
-| NFR-004 | "exceed 1% of scheduled sends over a 15-minute window, sustained" | For a single standard-plan account sending ~once/week, "1% over a 15-minute window" is statistically meaningless (denominator is effectively 0 in any 15-min window). The per-account single-miss alert is the only meaningful part. | Scope the 1%/15-min threshold to fleet-wide sends only, and make the per-account single-miss alert the primary, independently-testable rule. |
-
-*Note: All FR-001 through FR-015 are written in valid Gherkin — no prose FRs found. The vague items above are testability (measurability) issues, not format violations.*
+| FR-009 | "...laid out so the marketing team can copy them directly into their existing spreadsheet **without manual reformatting**" | "Without manual reformatting" is not objectively testable — there is no defined target format (column order, delimiter, currency formatting, header row). | `Given the one-line-per-channel content has been assembled, When the email is formatted, Then the body contains an HTML/plain table with a header row "Channel, Total Spend (USD)", one row per channel in the fixed order Email→paid search→paid social→display, with spend rendered as a numeric value with exactly 2 decimal places and no currency symbol, such that a paste into a spreadsheet lands each value in its own cell.` |
+| FR-013 | "...proceeds to send once the data is available **and complete**" — but "complete" is never defined; FR-012 references a "data-readiness/completeness signal" whose semantics are unspecified. | "Complete" is untestable without a definition of completeness (all 4 channels present? ad-platform sync watermark reached?). | `Given spend data was not ready, When all four fixed channels report a sync-watermark timestamp ≥ the covered week's end, Then the data is treated as complete and the email is sent.` (Define the actual completeness predicate.) |
+| NFR-003 | "...must be generated and delivered **within the acceptable lag window** of the configured send time" | Circular/self-referential — the "acceptable lag window" is itself declared an undefined "engineering/operational default" (FR-013 note, Info Req "Acceptable lag window"). No concrete number anywhere means NFR-003 is untestable. | `Given a normal week with complete data, When the send schedule fires Monday 08:00 ET, Then the email is delivered to all recipients no later than [X hours] after the covered week ends.` Business or eng must supply X. |
+| NFR-004 | "...failures... exceed 1% of scheduled sends over a **15-minute window, sustained**" | For a single standard-plan account sending **once per week**, "1% over a 15-minute window" is nonsensical — there is at most one send per week, so a 15-minute windowed percentage threshold can never meaningfully trigger. The "sustained" qualifier is also undefined. | Drop the percentage/window threshold for this single-account MVP; rely on the "alert on any single missed-send" clause, which is the only testable rule here: `Given a scheduled weekly send, When it results in missed-send, data-not-ready at window-exceed, or delivery-failure, Then an operational alert fires immediately.` |
 
 ---
 
@@ -42,30 +39,26 @@
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard external deadline (5 weeks) | Yes — MVP scope lock (Section 6), reuse-existing-pipeline lever | PASS | Mitigation is a planning action, not a requirement, but appropriate for a schedule risk. |
-| Multi-service blast radius (conflicting service names) | Yes — kill-switch (NFR-012), bounded retries (NFR-005/007), required name reconciliation | PASS | Behaviorally sound. See CG and Section 7 note on the KG discrepancy. |
-| Email delivery integration | Yes — FR-015, NFR-004/005/009/010 | PASS | Distinct delivery-failure condition and recipient confinement defined. |
-| Data freshness / sync-timing | Yes — FR-012–014, NFR-007 | PASS (with CG-002 caveat) | Mitigation exists but hinges on an undefined "complete" criterion — see CG-002. |
-| Double-send after successful delivery (implied by idempotency + delivery) | No | FAIL | Idempotency is defined for the generation record but not for re-delivery to recipients. See CG-001. |
-| Missed-send notification has no destination | No | FAIL | "Responsible owner" is referenced but never defined as tracked info. See CG-003. |
+| Hard external deadline (5 weeks) | Yes — MVP scope + reuse-existing-pipeline direction | PASS | Mitigation is a concrete scope constraint, not just an acknowledgement. |
+| Multi-service blast radius / conflicting service names | Partially — kill-switch, bounded retries, "reconcile names in planning" | FAIL | The mitigation defers the core unknown ("engineering reconciles names") rather than resolving it. No requirement pins down WHICH service is the source of truth for spend, nor what happens if the chosen scheduler/email pipeline already serves other consumers. See CG/edge cases below. |
+| Email delivery system integration | Yes — FR-015, NFR-004/005, NFR-009/010 | PASS | Delivery failure is a distinct, retried, alerted, access-confined condition. |
+| Data freshness / sync-timing | Yes — FR-012–014, NFR-007 | FAIL (tainted) | The mitigation set is *internally contradicted by BR-3a* (CG-001). A mitigation that contradicts its own business rule cannot be relied upon. Must resolve CG-001 before this passes. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Re-send after successful delivery:** A week already emailed successfully, then re-triggered — re-send, suppress, or forbidden? (CG-001)
-2. **Partial channel data:** Some channels synced, others not, for the same week. Is that "incomplete" (fail-closed) or "available" (send)? The completeness definition is missing. (CG-002)
-3. **Channel appears mid-week / new channel not in configured set:** Spend exists for a channel that is not in the configured channel set — is it dropped silently, or flagged? FR-007 only iterates the configured set.
-4. **Channel-set change between runs:** If BR-6's channel set changes between two weekly runs, the two emails become non-comparable. No requirement addresses what happens when configuration changes mid-stream.
-5. **Negative / refunded spend:** Credits, refunds, or negative adjustments producing negative channel totals — are they allowed, floored at zero, or flagged?
-6. **Currency / multi-currency:** Spend is shown as a figure with no currency defined. If the account has spend in multiple currencies, the "total spend" per channel is ambiguous.
-7. **Timezone/DST boundary:** FR-004 resolves the week by the account's timezone; the behavior across a DST transition (a 23- or 25-hour day at the week boundary) is undefined and could drop or double-count an hour of spend.
-8. **Recipient list empty at send time:** FR-010 assumes "one or more recipients are configured." No FR covers the zero-recipient case (a formatted email exists but nobody to send to).
-9. **All recipient addresses invalid / all bounce:** FR-015 covers delivery failure and bounded retry, but not the terminal case where every recipient permanently bounces — does this become a missed-send?
-10. **Account becomes ineligible between config and send:** NFR-008 re-derives eligibility at run time, but no FR defines the user-visible/operational outcome when a previously-eligible account fails the check at send time.
-11. **Kill-switch flipped mid-run:** NFR-012 says an in-flight run completes under prior behavior — but a run that is mid-retry (FR-013) during a kill-switch flip could still send after the operator intended to stop it. Behavior for in-flight *retrying* runs is ambiguous.
-12. **Audit-write failure during a successful send:** NFR-011 makes audit async and alerts on failure — but the send then has no durable audit record. No requirement defines reconciliation of a delivered-but-unaudited send.
-13. **Clock skew / missed trigger:** If the scheduler misses a fire window entirely (outage spanning the send time), is there a catch-up run, or is that week simply missed? FR-001/FR-002 only cover duplicate suppression, not missed triggers.
+1. **Partial-send policy contradiction (see CG-001):** Not an edge case so much as a core-path contradiction, but the "some channels synced, others not" sub-case is entirely undefined once CG-001 is resolved — if the policy becomes "never send partial," is 3-of-4 channels "incomplete"? What if a channel legitimately has zero spend vs. hasn't-synced-yet? FR-008 (zero spend) and FR-012 (data-not-ready) are indistinguishable at the data layer unless a completeness signal separates "real zero" from "not yet reported."
+2. **Currency / multi-currency:** No requirement specifies currency. If Meridian Travel spends in more than one currency across channels, totals are meaningless without a currency column or normalization rule.
+3. **Negative / adjusted spend:** Ad platforms issue refunds/credits producing negative spend. No FR states whether a negative channel total is displayed as-is, floored at zero, or flagged.
+4. **Email rendering fidelity:** FR-009 mandates an in-body table but no requirement covers clients that strip HTML tables (plain-text fallback). "Copy directly into spreadsheet" silently fails in a plain-text client.
+5. **Recipient list empty / all-invalid:** FR-010 says "one or more recipients configured." No FR covers the case where the configured list is empty or every address hard-bounces — is that a delivery-failure, a missed-send, or silent?
+6. **DST / timezone boundary:** Week boundary and send are "Eastern time." The Monday 08:00 ET send and the Monday–Sunday ET week boundary are not tested across the spring-forward / fall-back DST transition, where a "day" is 23 or 25 hours. Contiguity (FR-005) across a DST weekend is unverified.
+7. **Kill-switch flipped mid-week vs. at send time:** NFR-012 says an in-flight run completes under prior behavior. But if the switch is off at the Monday trigger and turned on Tuesday, is the missed Monday send backfilled or permanently skipped? (Section 6 says no backfill — but that's a historical-backfill exclusion, not a kill-switch-recovery rule.)
+8. **Account leaves standard plan mid-cycle:** NFR-008 re-derives eligibility at run time. No FR states the recipient-visible outcome if Meridian Travel is downgraded/suspended between weeks — silent stop, or notify owner?
+9. **Audit-write failure during a successful send:** NFR-011 says audit is async and a write failure alerts but doesn't block delivery. This means an email can reach the customer with NO audit record — acceptable for availability but a traceability gap that should be explicitly acknowledged as an accepted trade-off.
+10. **Duplicate alert storm:** NFR-004 alerts on "any single missed-send" AND FR-012/014/015 each raise operational alerts. For one failed week this could fire multiple overlapping alerts; no de-duplication rule.
+11. **Retry (FR-013) crossing the Monday 08:00 send time:** If retries for last week's data are still running when the NEXT week's trigger fires, FR-002's overlap guard is keyed per-week, so two *different* weeks' runs could execute concurrently and contend on the rate-limited data source (NFR-002). Interaction untested.
 
 ---
 
@@ -73,24 +66,24 @@
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001–FR-015 are all valid Gherkin blocks; no prose FRs. |
-| Document contains only Sections 0–6 | FAIL | The document ends with an **"## Appendix: Engineering Reference"** containing a multi-paragraph narrative "Affected Services" analysis with its own reconciliation-notes prose and findings. This is not a Revision Summary and not a one-line `> **Label:**` metadata trailer — it is exactly the kind of stray multi-paragraph analysis appendix that is outside the sanctioned exceptions and must be removed or relocated to an eng-plan doc. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 contains only bullet-list items; field names/types are explicitly deferred to eng-plan. No attribute tables present. |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-015 are all in fenced Gherkin blocks. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains an `## Appendix: Engineering Reference` section (with "Affected Services," cross-check passes, and "Reconciliation notes for planning" — multi-paragraph narrative analysis with its own findings). This is exactly the kind of stray multi-paragraph KG cross-check analysis appendix that is NOT the sanctioned Revision Summary / one-line metadata trailer exception. The trailing `## Revision Summary` section itself is EXPECTED and correctly NOT flagged. The violation is the Engineering Reference appendix sitting between Section 6 and the Revision Summary. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 (Information Requirements) is a bullet list; field names/types are explicitly deferred to eng-plan, and no attribute tables appear. |
+
+---
+
+## KG Cross-Check Findings (grounding evidence vs. spec claims)
+
+The independent KG cross-check re-found the SAME eight candidate services the spec already records in its own cross-check pass (`k4a-sam-backend`, `sam-report-scheduler`, `sam-performance-reporter`, `reporting-subscriptions-worker`, `summary-report-cloud`, `notifications-api`, `k4a-mcp-server`, `sam-campaign-data-sync`), with matching roles and confidence levels. **No new discrepancy** between the fresh lookup and the spec's recorded evidence — the spec has already honestly surfaced the two-pass naming conflict and flagged it in Section 1 for engineering reconciliation. This is handled correctly as grounding, not silently resolved. The spec makes no hard claims about specific tables/joins/endpoints that contradict the evidence (it deliberately defers all of that). The only KG-related issue is organizational, not factual: per Section 5 Format Compliance, the reconciliation detail belongs in eng-plan, not in an appendix on the product spec.
 
 ---
 
 ## 6. Recommendations
 
-1. **Define post-successful-send re-trigger behavior (CG-001).** Separate "overwrite generation record" from "re-send to recipients" so recipients cannot get two conflicting emails for one week.
-2. **Add an explicit data-completeness criterion (CG-002).** Define what makes a covered week's spend "complete" so the retry loop cannot send on a partial response it misreads as ready.
-3. **Define the "responsible owner" / escalation contact (CG-003)** in Section 4 and wire it into FR-014's missed-send notification.
-4. **Remove or relocate the Engineering Reference appendix** to bring the document back to Sections 0–6 (format FAIL). The KG-reconciliation content belongs in eng-plan, not the spec.
-5. **Add FRs for the missed edge cases**, prioritizing currency ambiguity (#6), DST/timezone boundary (#7), empty-recipient and all-bounce cases (#8, #9), and channel-set-change-between-runs (#4).
-6. **Make NFR-003 and NFR-004 testable** by supplying the concrete lag-window value and scoping the 1%/15-min threshold to fleet-wide rather than single-account math.
-7. **Resolve DEC-001–DEC-006** (especially DEC-001 week boundary and DEC-002 output format) — several FR testability gaps unblock only once these decisions land.
-
----
-
-## 7. KG Cross-Check Note (grounding evidence vs. spec claims)
-
-The spec's own Section 1 "Source-of-truth / service note" and its Engineering Reference appendix already disclose the two-pass naming conflict honestly and state that **no product behavior depends on which service names are real** — which is the correct posture for a product spec. My independent KG lookup re-found the same cross-check set (`k4a-sam-backend`, `sam-report-scheduler`, `sam-performance-reporter`, `reporting-subscriptions-worker`, `summary-report-cloud`, `notifications-api`, `k4a-mcp-server`, `sam-campaign-data-sync`) and found **no contradiction** between the spec's implementation claims and the evidence: the spec makes no concrete claim about specific endpoints, tables, joins, or data flow that the evidence refutes — it explicitly defers all of that to engineering reconciliation. The only action item is the one the spec already flags: engineering must reconcile the report-builder and email-delivery roles (named only in the cross-check pass, not the Context Seed pass) during planning. No new discrepancy to raise beyond what Section 1 already surfaces.
+1. **Resolve CG-001 (Critical) first.** Reconcile BR-3a + the Mermaid F2 node with FR-012/FR-014/NFR-007. The spec currently tells engineering to both send and never-send partial data. Pick one policy and make every section agree before engineering starts.
+2. **Resolve CG-002 / FR-003.** Define precisely whether a corrected idempotent re-run re-sends a new email to recipients, given emails cannot be unsent.
+3. **Define "complete" and the "acceptable lag window" with concrete values.** FR-012/FR-013, NFR-003, and the Info Reqs all lean on these undefined terms; NFR-003 is currently circular and untestable.
+4. **Fix NFR-004's threshold** — a "1% over 15-minute window" rule is meaningless for a once-weekly single-account send; keep only the per-miss immediate alert and add de-duplication.
+5. **Remove the Engineering Reference appendix from the product spec** (Format FAIL) — relocate the affected-services/reconciliation content to eng-plan; keep only the short Section 1 service note pointer.
+6. **Make FR-009 testable** by specifying the concrete table format (column order, headers, numeric formatting, plain-text fallback).
+7. **Add FRs for the missed edge cases**, prioritizing currency (#2), empty/all-bounced recipient list (#5), DST week-boundary/send (#6), and zero-spend-vs-not-synced disambiguation (#1).
