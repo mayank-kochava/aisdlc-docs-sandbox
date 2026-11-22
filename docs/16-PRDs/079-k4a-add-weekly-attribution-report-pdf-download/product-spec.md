@@ -28,7 +28,7 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 
 ### Report Contents
 
-The report contains **total attributed revenue and conversions by channel, presented as one simple table**. This is the resolved analytical content for the finance team's year-end close (resolves DEC-005). No additional attribution dimensions or summary sections are required for Phase 1.
+The report contains **total attributed revenue and conversions by channel, presented as one simple table**. This is the resolved analytical content for the finance team's year-end close (resolves DEC-005). No additional attribution dimensions or summary sections are required for Phase 1. The PDF must display the Brightway logo (per finance's request); see FR-014.
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -105,6 +105,15 @@ When generation runs again for that same window
 Then the system overwrites the existing stored report for that window
   And the system does not create a duplicate report entry for that window
 ```
+
+#### FR-014 — Brightway logo on the report PDF
+```gherkin
+Given a weekly report PDF is generated
+When the system renders the PDF
+Then the Brightway logo is displayed on the report
+  And the logo renders correctly in the stored and downloaded PDF
+```
+*The source, exact placement, and sizing of the logo asset are an engineering/design detail; the business requirement is that the Brightway logo appears on the PDF.*
 
 #### FR-006 — Generation failure does not corrupt the latest available report
 ```gherkin
@@ -188,6 +197,7 @@ I'll now report the business trade-offs I flagged in Sections 0–3.
 
 The system must track the following business information to support the functional requirements above. Types, schemas, and storage mechanisms are deliberately left to engineering planning.
 
+- **Brightway logo asset:** The Brightway logo image displayed on the report PDF (per finance's request, FR-014). *Source: Provided brand asset.* Matters because the PDF must carry the Brightway logo for the finance team.
 - **Attribution report data (last quarter):** The analytical content of the report — total attributed revenue and conversions by channel, covering the last-quarter window, presented as one simple table. *Source: System-derived from the authoritative attribution data pipeline.* Matters because it is the substance the finance team consumes for year-end close. The required metrics and dimension are resolved (total attributed revenue and conversions, broken out by channel; see the Report Contents section in Section 1).
 - **Resolved "last quarter" window:** The concrete start/end boundary that "last quarter" resolves to for a given generation run. *Source: System-derived.* Matters because it defines FR-002's data scope and because the finance team must know exactly which period a given report covers. Depends on the rolling-vs-fixed decision flagged in Section 1 (BR-07).
 - **Generated weekly report artifact (PDF):** The produced PDF file for a given weekly window, plus enough identity to know which window it covers and that it is the latest available. *Source: System-derived.* Matters because it is the downloadable deliverable (FR-001, FR-008) and the stable "weekly" artifact under the pre-generated model (BR-08).
@@ -248,7 +258,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 | Push/scheduled delivery of the report (email, notification) to the finance team | The reviewer confirmed in-console download from K4A is sufficient and no email or notification delivery is needed (resolves OQ-003). Push delivery is a separate capability. |
 | On-demand (click-time) generation of the report | The confirmed model is pre-generated-and-stored every Monday (BR-08). On-demand generation is an alternative model, not an addition; it is excluded. |
 | A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only. A dated history view is a larger UI component and not required for year-end close. |
-| Report customization by the user (metric selection, date-range picker, custom branding beyond a standard layout) | The Phase 1 report contents are fixed (total attributed revenue and conversions by channel, one simple table); user-configurable reporting is future work. |
+| Report customization by the user (metric selection, date-range picker, custom branding beyond the standard layout and the Brightway logo) | The Phase 1 report contents are fixed (total attributed revenue and conversions by channel, one simple table, carrying the Brightway logo per FR-014); user-configurable reporting is future work. |
 | Generalizing the capability to other customers, products, or report types beyond the Brightway Retail attribution report | Phase 1 is scoped to this one customer requirement under a hard deadline. |
 | Formats other than PDF (CSV, XLSX, etc.) | The requirement specifies PDF only. |
 | Self-service entitlement management (finance team members granting themselves or peers access) | Entitlement is assumed to be assigned through existing access mechanisms; a self-service grant flow is out of scope. |
@@ -277,12 +287,10 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Resolved BR-04 access scope to Brightway Retail finance team members only and removed its [DECISION REQUIRED] tag.
-- Removed the entitlement audience from the pending-decisions list and noted it is settled as finance-team-members-only.
-- Resolved the Report Contents section: total attributed revenue and conversions by channel in one simple table, removing the [DECISION REQUIRED] tag.
-- Updated the Information Requirements attribution-data bullet to reflect the resolved report contents.
-- Updated the out-of-scope customization rationale to reflect that report contents are now resolved.
-- Removed report contents from the deferred/pending list and noted it as resolved in Section 6.
+- Noted Brightway logo requirement in the Report Contents section with a pointer to FR-014.
+- Added FR-014 requiring the Brightway logo to appear on the generated report PDF.
+- Added the Brightway logo asset to the Information Requirements list.
+- Clarified the out-of-scope branding row so it excludes the Brightway logo (which is now in scope per FR-014).
 
 
 ---
