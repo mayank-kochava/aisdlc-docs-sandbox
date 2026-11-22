@@ -317,19 +317,12 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-004** | Who exactly on Meridian Travel's marketing team should receive this weekly email? | Product owner (with input from Meridian Travel) | A single configurable recipient list for the Meridian Travel account, seeded with the marketing-team contact(s) the requester provides at launch; supports multiple addresses. |
-
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: "the previous week" is defined as a calendar week Monday through Sunday in Eastern time, and the email is sent approximately one day after the covered week ends.
 - **DEC-002**: Resolved DEC-002 — the spend totals arrive as a plain table in the email body, already reflected in BR-4 and FR-009 (no attachment); no document text contradicted this answer.
 - **DEC-003**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
+- **DEC-004**: DEC-004 resolved: the weekly email recipient is Meridian Travel's marketing team distribution list, marketing-team@meridiantravel.example — matching the value already stated in BR-7, FR-010, and the Recipient-list information requirement.
 - **DEC-005**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **DEC-006**: DEC-006 resolved — audit records of each weekly spend email are retained for one year.
 
