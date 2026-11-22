@@ -21,7 +21,7 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 - **BR-03 — Data scope:** Each report covers the last quarter of attribution data only.
 - **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team members only. Access is restricted to that audience; no other roles or accounts may download or see the report, and users without the entitlement must not be able to retrieve it.
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
-- **BR-06 — Plan:** Brightway Retail is on the standard plan. Whether weekly PDF generation and storage is included at the standard plan tier, or requires an upgrade / phased delivery, is unresolved. [DECISION REQUIRED]
+- **BR-06 — Plan:** Brightway Retail is on the standard plan. Weekly PDF generation and storage is included at the standard plan tier; no upgrade or phased rollout is required to fit the five-week window (resolves DEC-002 / OQ-006).
 - **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED]
 - **BR-08 — Generation model:** Each report is **generated fresh on demand when the finance user clicks download** (not pre-generated on a schedule and stored), covering the last-quarter window at the time of the request.
 - **BR-09 — Finance-grade correctness:** Because these figures feed a year-end close, the attribution numbers in the PDF must match the authoritative attribution data for the same window shown elsewhere in the product. Any discrepancy is treated as a defect.
@@ -206,7 +206,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 - **NFR-012 — Multi-service blast radius / kill-switch:** Because the feature spans multiple services and is HIGH risk, it must sit behind a config-based kill-switch (FR-013) that an on-call engineer can disable without a code deploy or separate approval. New requests stop honoring the feature within an established propagation window (working default: 5 minutes); in-flight runs submitted before the flip complete under prior behavior.
 - **NFR-013 — Rollback:** On a defined failure trigger (e.g. incorrect figures surfaced, sustained generation failures), the feature owner (on-call engineering, escalating to the product owner for customer-facing comms) may roll the feature back via the kill-switch. Already-generated stored reports are not retroactively altered by a rollback; only new generation and download behavior is affected going forward.
 - **NFR-014 — Finance-close correctness (data trust):** The biggest finance-adjacent risk is a PDF whose numbers disagree with the authoritative attribution data. Mitigation: a single authoritative source for the figures and the reconciliation check in NFR-011; a report must not be served if it cannot be reconciled to that source.
-- **NFR-015 — Deadline risk:** The 5-week, before-year-end-close deadline is hard. Mitigation depends on scoping the minimum viable deliverable (a downloadable, correct, last-quarter PDF for the entitled finance team) and deferring everything non-critical to Section 6. Whether the standard plan tier supports weekly generation and storage within the timeline, or requires an upgrade / phased delivery, is unresolved and gates the deadline commitment. [DECISION REQUIRED]
+- **NFR-015 — Deadline risk:** The 5-week, before-year-end-close deadline is hard. Mitigation depends on scoping the minimum viable deliverable (a downloadable, correct, last-quarter PDF for the entitled finance team) and deferring everything non-critical to Section 6. The standard plan tier supports weekly generation and storage within the timeline, so no upgrade or phased delivery is required to hit the deadline (resolves DEC-002 / OQ-006).
 - **NFR-016 — Data-not-ready handling:** The weekly cadence can collide with incomplete upstream data. Mitigation: generation never produces a report from incomplete data; it skips/retries, alerts, and leaves the prior report as latest available (FR-003, FR-006).
 
 ---
@@ -234,7 +234,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 
 ### Deferred / Pending Decisions
 
-The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the "last quarter" definition (fixed vs. rolling), and the standard-plan capacity/timeline question. The report's exact contents are now settled — total attributed revenue and conversions by channel, presented as one simple table (resolves DEC-005). The entitlement audience is now settled — download access is restricted to Brightway Retail finance team members only (no other roles or accounts).
+The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the "last quarter" definition (fixed vs. rolling). The standard-plan capacity/timeline question is now settled — weekly PDF generation and storage is included at the standard plan tier, with no upgrade or phased rollout required (resolves DEC-002 / OQ-006). The report's exact contents are now settled — total attributed revenue and conversions by channel, presented as one simple table (resolves DEC-005). The entitlement audience is now settled — download access is restricted to Brightway Retail finance team members only (no other roles or accounts).
 
 ## Appendix: Engineering Reference
 
@@ -256,15 +256,9 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Reversed BR-08 from pre-generated-and-stored to on-demand generation per the OQ-001/DEC-004 answer.
-- Noted that the report is generated on demand at download time, resolving DEC-004.
-- Rebuilt the user-flow diagram to generate the PDF on demand at download click instead of pre-generating and serving a stored artifact.
-- Reworked FR-001 from scheduled pre-generation to on-demand generation at download time.
-- Reframed FR-003 data-not-ready handling for the on-demand model (no stored prior report to fall back to).
-- Removed FR-004 (no-overlap) and FR-005 (idempotent regeneration) as obsolete under the on-demand model with no scheduled runs or stored artifacts.
-- Reframed FR-006 from protecting a stored latest report to handling on-demand generation failure during download.
-- Simplified FR-008 to on-demand generate-and-deliver and removed FR-009 empty-state (no stored-report concept under on-demand).
-- Updated FR-007 to show the report as downloadable rather than a "latest available weekly" stored artifact.
+- Resolved BR-06: standard plan includes weekly PDF generation/storage, no upgrade or phasing needed.
+- Resolved NFR-015: standard plan supports weekly generation/storage within the deadline, no upgrade/phasing needed.
+- Updated Deferred/Pending Decisions to remove the standard-plan question and record it as settled.
 
 
 ---
@@ -278,7 +272,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | Does Brightway's standard plan include weekly PDF report generation and storage, or does this feature require a plan upgrade or a phased rollout to fit the five-week window? | Product owner / Commercial | Deliver it to Brightway under the standard plan for this engagement to meet the year-end deadline, and flag the entitlement/packaging question separately for the commercial team to resolve before offering it more broadly. |
 | **DEC-003** | Should the report always show the same most recent completed calendar quarter held fixed, or should the window roll forward as newer data completes week to week? | Product owner (with Brightway finance) | Use the most recent completed calendar quarter, held fixed until the next quarter completes, so finance sees a stable close-ready figure that only changes at quarter boundaries. |
 | **DEC-004** | Should each weekly report be generated ahead of time on the schedule and saved for the finance team to pick up, or generated fresh only when they click download? | Product owner | Pre-generate on the weekly schedule and store the report for retrieval, so downloads are fast and each week's document is stable and reproducible. |
 | **DEC-006** | Access: The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. | _(not yet assigned)_ | _(not yet specified)_ |
@@ -286,12 +279,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Decisions Resolved
 
 - **DEC-001**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
+- **DEC-002**: Resolved — Brightway's standard plan includes weekly PDF report generation and storage within the five-week window; no plan upgrade or phased rollout is required. OQ-006 is the same question and is resolved by the same answer.
 - **DEC-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does "last quarter" mean a fixed set of three calendar months, or a rolling most-recently-completed quarter that shifts each week? This changes the date-filtering logic in the report pipeline.
-- **OQ-006**: Does the standard plan cover weekly PDF generation/storage within the 5-week window, or does the scope need to be phased (e.g. download-first, automated weekly cadence later) to hit the deadline?
 - **OQ-007**: Where in the K4A UI should the download live, and does finance need a history/list of past weekly reports or just the latest one?
 
 ### Questions Resolved
@@ -300,6 +293,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Resolved OQ-003 — in-console download from K4A is sufficient; no email or notification delivery is needed.
 - **OQ-004**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
 - **OQ-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
+- **OQ-006**: Resolved — Brightway's standard plan includes weekly PDF report generation and storage within the five-week window; no plan upgrade or phased rollout is required. OQ-006 is the same question and is resolved by the same answer.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is clearly specified (weekly PDF of last-quarter attribution data, downloadable from K4A), and existing services already provide the exact capabilities (reporting-api has a PDF export API, reporting-dispatcher schedules weekly reports, frontend-mos has the download UI), so this is engineering-led design/build across multiple services rather than open-ended product discovery.
