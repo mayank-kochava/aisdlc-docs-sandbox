@@ -1,0 +1,78 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+
+<head>
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8" />
+    <title></title>
+    
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; background: #f6f8fa; margin: 0; padding: 20px; }
+table.diff { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); overflow: hidden; margin-bottom: 24px; }
+table.diff thead th { background: #f1f3f5; color: #24292e; font-weight: 600; padding: 8px 12px; text-align: left; border-bottom: 1px solid #d0d7de; font-size: 12px; }
+table.diff tbody td { padding: 2px 8px; vertical-align: top; border: none; white-space: pre-wrap; word-break: break-word; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; line-height: 1.5; }
+td.diff_header { background: #f6f8fa; color: #57606a; text-align: right; padding: 2px 8px; border-right: 1px solid #d0d7de; user-select: none; width: 40px; font-size: 11px; }
+td.diff_next { background: #f6f8fa; color: #57606a; text-align: center; width: 16px; }
+.diff_add { background: #e6ffec; }
+.diff_chg { background: #fff8c5; }
+.diff_sub { background: #ffebe9; }
+span.diff_add { background: #acf2bd; border-radius: 2px; padding: 0 1px; }
+span.diff_chg { background: #ffd8b5; border-radius: 2px; padding: 0 1px; }
+span.diff_sub { background: #fdb8c0; border-radius: 2px; padding: 0 1px; }
+</style>
+
+</head>
+
+<body><div style="background:#24292e;color:white;padding:16px 24px;margin:-20px -20px 20px -20px;"><h1 style="margin:0;font-size:18px;font-weight:600;">Spec Diff: round 2 &rarr; round 3 (current)</h1><p style="margin:4px 0 0 0;font-size:13px;color:#8b949e;"><span style="color:#3fb950;">&#9632; green = added</span> &nbsp;|&nbsp;<span style="color:#d29922;">&#9632; yellow = changed</span> &nbsp;|&nbsp;<span style="color:#f85149;">&#9632; red = removed</span></p></div>
+    
+    <table class="diff" id="difflib_chg_to2__top"
+           cellspacing="0" cellpadding="0" rules="groups" >
+        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>
+        <colgroup></colgroup> <colgroup></colgroup> <colgroup></colgroup>
+        <thead><tr><th class="diff_next"><br /></th><th colspan="2" class="diff_header">round 2</th><th class="diff_next"><br /></th><th colspan="2" class="diff_header">round 3 (current)</th></tr></thead>
+        <tbody>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_249">249</td><td nowrap="nowrap">|&nbsp;**DEC-009**&nbsp;_(Code-only)_&nbsp;|&nbsp;Does&nbsp;'attributed&nbsp;revenue'&nbsp;exist&nbsp;as&nbsp;data&nbsp;for&nbsp;Brightway's&nbsp;attribution&nbsp;dataset,&nbsp;where&nbsp;does&nbsp;it</td><td class="diff_next"></td><td class="diff_header" id="to2_249">249</td><td nowrap="nowrap">|&nbsp;**DEC-009**&nbsp;_(Code-only)_&nbsp;|&nbsp;Does&nbsp;'attributed&nbsp;revenue'&nbsp;exist&nbsp;as&nbsp;data&nbsp;for&nbsp;Brightway's&nbsp;attribution&nbsp;dataset,&nbsp;where&nbsp;does&nbsp;it</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;live,&nbsp;and&nbsp;what&nbsp;field&nbsp;is&nbsp;'channel'?&nbsp;No&nbsp;revenue&nbsp;column&nbsp;exists&nbsp;in&nbsp;pubsuite-attribution.conversions&nbsp;or&nbsp;aaas-reporting;&nbsp;only</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;live,&nbsp;and&nbsp;what&nbsp;field&nbsp;is&nbsp;'channel'?&nbsp;No&nbsp;revenue&nbsp;column&nbsp;exists&nbsp;in&nbsp;pubsuite-attribution.conversions&nbsp;or&nbsp;aaas-reporting;&nbsp;only</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;summary-report-cloud&nbsp;has&nbsp;event_revenue.&nbsp;A&nbsp;new&nbsp;column&nbsp;won't&nbsp;backfill&nbsp;last&nbsp;quarter.&nbsp;|&nbsp;PM&nbsp;+&nbsp;Data&nbsp;|&nbsp;Use&nbsp;summary-report-clou</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;summary-report-cloud&nbsp;has&nbsp;event_revenue.&nbsp;A&nbsp;new&nbsp;column&nbsp;won't&nbsp;backfill&nbsp;last&nbsp;quarter.&nbsp;|&nbsp;PM&nbsp;+&nbsp;Data&nbsp;|&nbsp;Use&nbsp;summary-report-clou</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">d's&nbsp;existing&nbsp;event_revenue&nbsp;+&nbsp;event_count&nbsp;grouped&nbsp;by&nbsp;network&nbsp;as&nbsp;revenue/channel,&nbsp;IF&nbsp;it&nbsp;covers&nbsp;Brightway's&nbsp;attribution&nbsp;dat</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">d's&nbsp;existing&nbsp;event_revenue&nbsp;+&nbsp;event_count&nbsp;grouped&nbsp;by&nbsp;network&nbsp;as&nbsp;revenue/channel,&nbsp;IF&nbsp;it&nbsp;covers&nbsp;Brightway's&nbsp;attribution&nbsp;dat</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">a;&nbsp;confirm&nbsp;before&nbsp;build.&nbsp;Map&nbsp;'channel'&nbsp;=&nbsp;network.&nbsp;|</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">a;&nbsp;confirm&nbsp;before&nbsp;build.&nbsp;Map&nbsp;'channel'&nbsp;=&nbsp;network.&nbsp;|</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_250">250</td><td nowrap="nowrap">|&nbsp;**DEC-010**&nbsp;_(Code-only)_&nbsp;|&nbsp;Which&nbsp;service&nbsp;is&nbsp;the&nbsp;generation&nbsp;home&nbsp;for&nbsp;PDF&nbsp;rendering&nbsp;+&nbsp;quarter&nbsp;math&nbsp;+&nbsp;logo&nbsp;embed:&nbsp;adapt&nbsp;</td><td class="diff_next"></td><td class="diff_header" id="to2_250">250</td><td nowrap="nowrap">|&nbsp;**DEC-010**&nbsp;_(Code-only)_&nbsp;|&nbsp;Which&nbsp;service&nbsp;is&nbsp;the&nbsp;generation&nbsp;home&nbsp;for&nbsp;PDF&nbsp;rendering&nbsp;+&nbsp;quarter&nbsp;math&nbsp;+&nbsp;logo&nbsp;embed:&nbsp;adapt&nbsp;</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">aaas-reporting&nbsp;(closest&nbsp;semantic&nbsp;fit,&nbsp;but&nbsp;no&nbsp;revenue&nbsp;+&nbsp;hardcoded&nbsp;auth&nbsp;map&nbsp;+&nbsp;untested),&nbsp;extend&nbsp;summary-report-cloud&nbsp;(has&nbsp;</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">aaas-reporting&nbsp;(closest&nbsp;semantic&nbsp;fit,&nbsp;but&nbsp;no&nbsp;revenue&nbsp;+&nbsp;hardcoded&nbsp;auth&nbsp;map&nbsp;+&nbsp;untested),&nbsp;extend&nbsp;summary-report-cloud&nbsp;(has&nbsp;</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">revenue,&nbsp;no&nbsp;on-demand-at-download&nbsp;wiring),&nbsp;or&nbsp;new&nbsp;report&nbsp;type&nbsp;in&nbsp;the&nbsp;dispatcher&nbsp;worker&nbsp;switch?&nbsp;|&nbsp;Backend&nbsp;architect&nbsp;|&nbsp;aaa</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">revenue,&nbsp;no&nbsp;on-demand-at-download&nbsp;wiring),&nbsp;or&nbsp;new&nbsp;report&nbsp;type&nbsp;in&nbsp;the&nbsp;dispatcher&nbsp;worker&nbsp;switch?&nbsp;|&nbsp;Backend&nbsp;architect&nbsp;|&nbsp;aaa</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">s-reporting&nbsp;as&nbsp;primary&nbsp;(on-demand&nbsp;attribution,&nbsp;conversions-by-network,&nbsp;403-capable),&nbsp;with&nbsp;summary-report-cloud&nbsp;as&nbsp;fallba</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">s-reporting&nbsp;as&nbsp;primary&nbsp;(on-demand&nbsp;attribution,&nbsp;conversions-by-network,&nbsp;403-capable),&nbsp;with&nbsp;summary-report-cloud&nbsp;as&nbsp;fallba</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">ck&nbsp;if&nbsp;its&nbsp;event_revenue&nbsp;is&nbsp;the&nbsp;authoritative&nbsp;source.&nbsp;|</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">ck&nbsp;if&nbsp;its&nbsp;event_revenue&nbsp;is&nbsp;the&nbsp;authoritative&nbsp;source.&nbsp;|</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_251">251</td><td nowrap="nowrap">|&nbsp;**DEC-011**&nbsp;_(Code-only)_&nbsp;|&nbsp;Does&nbsp;FR-010/NFR-005&nbsp;require&nbsp;a&nbsp;literal&nbsp;HTTP&nbsp;403,&nbsp;given&nbsp;reporting-api&nbsp;returns&nbsp;200+error-body</td><td class="diff_next"></td><td class="diff_header" id="to2_251">251</td><td nowrap="nowrap">|&nbsp;**DEC-011**&nbsp;_(Code-only)_&nbsp;|&nbsp;Does&nbsp;FR-010/NFR-005&nbsp;require&nbsp;a&nbsp;literal&nbsp;HTTP&nbsp;403,&nbsp;given&nbsp;reporting-api&nbsp;returns&nbsp;200+error-body</td></tr>
+            <tr><td class="diff_next" id="difflib_chg_to2__0"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;and&nbsp;mos-iam-server&nbsp;returns&nbsp;401&nbsp;today?&nbsp;Matching&nbsp;403&nbsp;literally&nbsp;on&nbsp;the&nbsp;K4A&nbsp;path&nbsp;is&nbsp;a&nbsp;behavior&nbsp;change&nbsp;with&nbsp;existing-client&nbsp;</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">&nbsp;and&nbsp;mos-iam-server&nbsp;returns&nbsp;401&nbsp;today?&nbsp;Matching&nbsp;403&nbsp;literally&nbsp;on&nbsp;the&nbsp;K4A&nbsp;path&nbsp;is&nbsp;a&nbsp;behavior&nbsp;change&nbsp;with&nbsp;existing-client&nbsp;</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">risk.&nbsp;|&nbsp;PM&nbsp;+&nbsp;Backend&nbsp;architect&nbsp;|&nbsp;Accept&nbsp;'server-side&nbsp;denial&nbsp;in&nbsp;the&nbsp;path's&nbsp;existing&nbsp;convention'&nbsp;(reporting-api&nbsp;200+error-</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">risk.&nbsp;|&nbsp;PM&nbsp;+&nbsp;Backend&nbsp;architect&nbsp;|&nbsp;Accept&nbsp;'server-side&nbsp;denial&nbsp;in&nbsp;the&nbsp;path's&nbsp;existing&nbsp;convention'&nbsp;(reporting-api&nbsp;200+error-</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">body&nbsp;/&nbsp;mos-iam&nbsp;401)&nbsp;as&nbsp;satisfying&nbsp;the&nbsp;requirement;&nbsp;do&nbsp;not&nbsp;force&nbsp;a&nbsp;true&nbsp;403&nbsp;unless&nbsp;a&nbsp;client&nbsp;contract&nbsp;demands&nbsp;it.&nbsp;|</td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap">body&nbsp;/&nbsp;mos-iam&nbsp;401)&nbsp;as&nbsp;satisfying&nbsp;the&nbsp;requirement;&nbsp;do&nbsp;not&nbsp;force&nbsp;a&nbsp;true&nbsp;403&nbsp;unless&nbsp;a&nbsp;client&nbsp;contract&nbsp;demands&nbsp;it.&nbsp;|</td></tr>
+            <tr><td class="diff_next"><a href="#difflib_chg_to2__top">t</a></td><td class="diff_header" id="from2_252">252</td><td nowrap="nowrap"><span class="diff_sub">|&nbsp;**DEC-012**&nbsp;_(Code-only)_&nbsp;|&nbsp;Which&nbsp;existing&nbsp;entitlement&nbsp;expresses&nbsp;'standard-plan&nbsp;+&nbsp;report-enabled'&nbsp;(BR-5),&nbsp;and&nbsp;is&nbsp;Brigh</span></td><td class="diff_next"><a href="#difflib_chg_to2__top">t</a></td><td class="diff_header" id="to2_252">252</td><td nowrap="nowrap"><span class="diff_add">|&nbsp;**DEC-012**&nbsp;_(Code-only)_&nbsp;|&nbsp;Reviewer&nbsp;deferred&nbsp;this&nbsp;to&nbsp;the&nbsp;engineers&nbsp;to&nbsp;decide;&nbsp;item&nbsp;stays&nbsp;open&nbsp;with&nbsp;owner&nbsp;set&nbsp;to&nbsp;Engin</span></td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_sub">tway&nbsp;actually&nbsp;entitled?&nbsp;No&nbsp;service&nbsp;models&nbsp;plan&nbsp;tiers;&nbsp;gating&nbsp;is&nbsp;APIReportingAccess&nbsp;/&nbsp;org_feature_mapping&nbsp;flags&nbsp;/&nbsp;status=</span></td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_add">eering.&nbsp;|&nbsp;Engineering&nbsp;|&nbsp;Introduce&nbsp;a&nbsp;new&nbsp;per-org&nbsp;feature&nbsp;flag&nbsp;(e.g.&nbsp;weekly_attribution_report)&nbsp;in&nbsp;mos-iam-server&nbsp;org_feat</span></td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_sub">'activated'.&nbsp;|&nbsp;PM&nbsp;+&nbsp;Entitlements&nbsp;|&nbsp;Introduce&nbsp;a&nbsp;new&nbsp;per-org&nbsp;feature&nbsp;flag&nbsp;(e.g.&nbsp;weekly_attribution_report)&nbsp;in&nbsp;mos-iam-serv</span></td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_add">ure_mapping,&nbsp;checked&nbsp;server-side&nbsp;on&nbsp;the&nbsp;download&nbsp;path&nbsp;and&nbsp;surfaced&nbsp;to&nbsp;frontend&nbsp;via&nbsp;featureRollout;&nbsp;enable&nbsp;it&nbsp;for&nbsp;Brightw</span></td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_sub">er&nbsp;org_feature_mapping,&nbsp;checked&nbsp;server-side&nbsp;on&nbsp;the&nbsp;download&nbsp;path&nbsp;and&nbsp;surfaced&nbsp;to&nbsp;frontend&nbsp;via&nbsp;featureRollout;&nbsp;enable&nbsp;it&nbsp;</span></td><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_add">ay.&nbsp;|</span></td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header">></td><td nowrap="nowrap"><span class="diff_sub">for&nbsp;Brightway.&nbsp;|</span></td><td class="diff_next"></td><td class="diff_header"></td><td nowrap="nowrap">&nbsp;</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_253">253</td><td nowrap="nowrap"></td><td class="diff_next"></td><td class="diff_header" id="to2_253">253</td><td nowrap="nowrap"></td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_254">254</td><td nowrap="nowrap">###&nbsp;Open&nbsp;Questions&nbsp;(evidence&nbsp;gaps&nbsp;—&nbsp;needs&nbsp;more&nbsp;input)</td><td class="diff_next"></td><td class="diff_header" id="to2_254">254</td><td nowrap="nowrap">###&nbsp;Open&nbsp;Questions&nbsp;(evidence&nbsp;gaps&nbsp;—&nbsp;needs&nbsp;more&nbsp;input)</td></tr>
+            <tr><td class="diff_next"></td><td class="diff_header" id="from2_255">255</td><td nowrap="nowrap"></td><td class="diff_next"></td><td class="diff_header" id="to2_255">255</td><td nowrap="nowrap"></td></tr>
+        </tbody>
+    </table>
+    <table class="diff" summary="Legends">
+        <tr> <th colspan="2"> Legends </th> </tr>
+        <tr> <td> <table border="" summary="Colors">
+                      <tr><th> Colors </th> </tr>
+                      <tr><td class="diff_add">&nbsp;Added&nbsp;</td></tr>
+                      <tr><td class="diff_chg">Changed</td> </tr>
+                      <tr><td class="diff_sub">Deleted</td> </tr>
+                  </table></td>
+             <td> <table border="" summary="Links">
+                      <tr><th colspan="2"> Links </th> </tr>
+                      <tr><td>(f)irst change</td> </tr>
+                      <tr><td>(n)ext change</td> </tr>
+                      <tr><td>(t)op</td> </tr>
+                  </table></td> </tr>
+    </table>
+</body>
+
+</html>
