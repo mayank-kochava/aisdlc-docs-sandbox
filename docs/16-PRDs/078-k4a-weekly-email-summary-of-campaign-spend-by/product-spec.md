@@ -23,13 +23,13 @@ Automating this into a weekly email summary removes the recurring manual pull an
 ### Business Rules
 
 - **BR-1 — Weekly cadence.** The summary is generated and sent exactly once per calendar week.
-- **BR-2 — Monday alignment.** The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. [DECISION REQUIRED: DEC-001]
+- **BR-2 — Monday alignment.** The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. [DECISION REQUIRED]
 - **BR-3 — Content is per-channel totals only.** Each email contains one line per channel showing that channel's total campaign spend for the reporting period. No period-over-period comparison, campaign counts, or performance notes are included in Phase 1.
 - **BR-4 — Advertiser scope.** The data covers all campaigns belonging to Meridian Travel only. No other advertiser's data appears in this email.
-- **BR-5 — Channel set.** Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. [DECISION REQUIRED: DEC-002]
-- **BR-6 — Recipients.** The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. [DECISION REQUIRED: DEC-003]
-- **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED: DEC-004]
-- **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email behavior (send on schedule with available data and flag the gap, or hold) is a business decision. [DECISION REQUIRED: DEC-005]
+- **BR-5 — Channel set.** The email lists every channel K4A tracks for Meridian Travel: email, paid search, paid social, and display.
+- **BR-6 — Recipients.** The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. [DECISION REQUIRED]
+- **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED]
+- **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email behavior (send on schedule with available data and flag the gap, or hold) is a business decision. [DECISION REQUIRED]
 - **BR-9 — Self-service configuration is out of scope for Phase 1.** Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
 
 ### A note on affected-system evidence
@@ -128,10 +128,10 @@ And spend outside the window is excluded
 
 **FR-008 — Channel set selection**
 ```gherkin
-Given a channel-inclusion rule has been defined for Meridian Travel
+Given all channels K4A tracks for Meridian Travel are included (email, paid search, paid social, and display)
 When the system composes the per-channel list
-Then only the channels permitted by that rule are included
-And if no curated subset is defined, all channels tracked for Meridian Travel are included
+Then every tracked channel for Meridian Travel appears in the list
+And no channel tracked for Meridian Travel is omitted
 ```
 
 **FR-009 — Spend-data retrieval failure does not produce a misleading email**
@@ -237,7 +237,7 @@ Then no email is sent
 And the system records that the run was skipped because the feature was disabled
 ```
 
-I used four `[DECISION REQUIRED: DEC-006]` tags across unique trade-offs in Sections 1–3 (send time/timezone, channel set, recipients, reporting period, and partial-data handling — five distinct decisions). Reporting them now.
+I used `[DECISION REQUIRED]` tags across unique trade-offs in Sections 1–3 (send time/timezone, recipients, reporting period, and partial-data handling). The channel-set question has been resolved: the email lists every channel K4A tracks for Meridian Travel (email, paid search, paid social, and display). Reporting them now.
 
 ## 4. Information Requirements
 
@@ -248,7 +248,7 @@ The system must track the following business information to support the function
 - **Channel attribution** — the channel each spend amount belongs to. External/system-derived from the spend data source. Matters because the entire email is organized as one total per channel (FR-006, FR-011).
 - **Per-channel spend totals (for a reporting period)** — the aggregated figure shown on each line of the email. System-derived from the campaign spend records within the reporting-period window. Matters because this is the core content the recipient consumes (FR-006, FR-011).
 - **Reporting period window** — the start/end boundary that defines which spend is counted. Derived from the reporting-period business rule (BR-7). Matters because it determines what "total spend" means for each run and is stated in the email (FR-007, FR-013).
-- **Channel-inclusion rule** — whether all tracked channels or a curated subset appear. User/business-defined configuration for Meridian Travel (BR-5). Matters because it governs which channels are listed (FR-008).
+- **Channel-inclusion rule** — all channels K4A tracks for Meridian Travel (email, paid search, paid social, and display) are listed; no curated subset applies (BR-5). Matters because it governs which channels are listed (FR-008).
 - **Recipient list** — the addresses the summary is delivered to. User/business-provided configuration for Meridian Travel (BR-6). Matters because delivery must go to exactly these recipients and no one else (FR-015).
 - **Send schedule (time + timezone)** — when the weekly run fires. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
 - **Feature-enabled state (kill-switch)** — whether the feature is active for Meridian Travel. System/operations-controlled configuration. Matters because it gates whether a run starts at all (FR-019, FR-020).
@@ -287,7 +287,7 @@ The system must track the following business information to support the function
 
 ### Risk Mitigation (from the Context Seed risk tier: HIGH)
 
-- **Hard 5-week deadline.** Mitigated by the strict MVP scope (per-channel totals only, single advertiser, no self-service — Section 6), which removes the highest-effort optional capabilities from Phase 1. Mitigated-when: the Section 1 `[DECISION REQUIRED: DEC-007]` items are answered early so engineering is not blocked on product input during the build window.
+- **Hard 5-week deadline.** Mitigated by the strict MVP scope (per-channel totals only, single advertiser, no self-service — Section 6), which removes the highest-effort optional capabilities from Phase 1. Mitigated-when: the Section 1 `[DECISION REQUIRED]` items are answered early so engineering is not blocked on product input during the build window.
 - **Multi-service blast radius.** Mitigated by NFR-002 (bounded query load), NFR-004 (server-side advertiser isolation), NFR-012 (backward compatibility), and the architecture spike that resolves which systems authoritatively own spend data and email delivery before build. Mitigated-when: the ownership ambiguity flagged in Section 1 is resolved and the additive-only property is confirmed.
 - **Scheduled email delivery complexity / integration risk.** Mitigated by NFR-008 (idempotency + overlap guard), NFR-009 (fail-closed on data, bounded retry on delivery, distinct failure reasons), NFR-003 (every failed run alerts), and NFR-010/NFR-011 (kill-switch and rollback). Mitigated-when: a failed or delayed run can never silently drop or send a misleading summary, and the feature can be pulled within 5 minutes without a deploy.
 
@@ -345,7 +345,17 @@ The intake analysis and an independent fresh knowledge-graph lookup surfaced ove
 
 All Section 5 guardrails are stated against the capability (query load, isolation, backward compatibility) rather than any one of these named services, so they remain valid regardless of which candidates the spike selects.
 
-The `[DECISION REQUIRED: DEC-008]` trade-offs in Sections 4–6 were already tagged and reported in Sections 1–3 (send time/timezone, channel set, recipients, reporting period, and partial-data handling). I introduced no new decisions in Sections 4–6; every business trade-off these sections depend on was already flagged upstream. Reporting an empty array accordingly.
+The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and reported in Sections 1–3 (send time/timezone, channel set, recipients, reporting period, and partial-data handling). I introduced no new decisions in Sections 4–6; every business trade-off these sections depend on was already flagged upstream. Reporting an empty array accordingly.
+
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved BR-5: email includes all K4A-tracked channels (email, paid search, paid social, display).
+- Updated FR-008 to reflect that all four tracked channels are always included, with no curated-subset branch.
+- Updated Channel-inclusion rule info item to the resolved all-channels decision.
+- Updated Section 3 tag-count note to reflect the resolved channel-set decision.
+
 
 ---
 ## Open Questions & Decisions Register
@@ -359,7 +369,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What time of day and in which timezone should the weekly summary email be sent on Monday? | Product owner (with Meridian Travel marketing team) | Send at 07:00 in Meridian Travel's primary business timezone on Monday, so the summary is waiting in inboxes before the team starts their week. |
-| **DEC-002** | Should the email list every channel tracked for Meridian Travel, or only a curated subset that Meridian defines? | Product owner (with Meridian Travel marketing team) | Include all channels currently tracked for Meridian Travel, with any channel that has zero spend still shown as a zero line for completeness. |
 | **DEC-003** | Who exactly should receive this email, and should everyone get the same summary or different summaries by team or geography? | Product owner (with Meridian Travel marketing team) | A single shared recipient list for Meridian Travel's marketing team, all receiving the same combined summary, until a need for differentiated summaries is confirmed. |
 | **DEC-004** | What span of time should each weekly email's spend totals cover? | Product owner (with Meridian Travel marketing team) | The prior completed Monday-through-Sunday calendar week, matching the team's existing Monday compilation cadence. |
 | **DEC-005** | When one or more channels have missing or delayed data at send time, should the email go out on schedule with the available channels flagged as incomplete, or should it wait until all channels report? | Product owner (with Meridian Travel marketing team) | Send on schedule with available channels and clearly flag any channel whose data is incomplete or unavailable, rather than holding the whole email. |
@@ -367,15 +376,22 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-007** | Channel set. Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 
+### Decisions Resolved
+
+- **DEC-002**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
+
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Should the email include ALL channels K4A tracks for Meridian Travel, or only a curated subset they define?
 - **OQ-002**: Who are the specific recipients (names/roles), and do they all get the same summary, or should it vary by team/geography?
 - **OQ-003**: What time and timezone should the Monday email send, and is there a preferred delivery window to match their current workflow?
 - **OQ-004**: Should the email include anything beyond total spend per channel (e.g. period-over-period change, campaign count, performance notes), or strictly one spend line per channel?
 - **OQ-005**: When a channel's data is missing or delayed for a given week, should the email send on schedule with partial data, wait until all channels report, or send and flag the gap?
 - **OQ-006**: Does Meridian Travel need self-service control over channels/schedule/recipients, or is a fixed static setup acceptable? (This determines whether a config UI is needed, which conflicts with the current 'no frontend change' assumption.)
 - **OQ-007**: Is this email specific to Meridian Travel only, or should it be built as a reusable per-advertiser weekly summary that other clients could use?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
