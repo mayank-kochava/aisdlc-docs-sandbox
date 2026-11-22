@@ -24,7 +24,7 @@ Meridian Travel's marketing team manually pulls spend-by-channel data every Mond
 - **BR-4 — Spreadsheet-ready output:** The spend totals must be presented as a plain table inside the body of the email (no attachment), laid out so the marketing team can copy it directly into their spreadsheet.
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan; the feature must be deliverable to a standard-plan account.
 - **BR-6 — Channel set:** The breakdown covers a fixed set of four channels — Email, paid search, paid social, and display. One row per channel, every week; the set does not vary seasonally or by campaign.
-- **BR-7 — Recipients:** The specific recipient(s) on Meridian Travel's marketing team who receive the email is a business decision. [DECISION REQUIRED: DEC-004]
+- **BR-7 — Recipients:** The email is sent to Meridian Travel's marketing team distribution list, marketing-team@meridiantravel.example. No one outside this list requires access to the report or to the spend data, so no additional per-user permission or access-control layer is needed beyond confining delivery to this configured recipient list.
 - **BR-8 — Send day/time/timezone:** The weekly email is sent every Monday at 8:00 AM Eastern time.
 
 ## Source-of-truth / service note
@@ -201,7 +201,7 @@ The system must track the following business information to support the Function
 - **Channel set** — The fixed list of channels that appear as rows for the account: Email, paid search, paid social, and display. The set does not vary seasonally or by campaign. Source: Business-defined (BR-6). Matters for FR-007/FR-008 (one line per channel; zero-spend handling).
 - **Total spend by channel** — The aggregated spend figure per channel for the covered week. Source: System-derived from the spend/channel data source. Matters as the core payload of every FR in Feature Area C.
 - **Channel name** — The human-readable label shown on each line. Source: System-derived from the spend/channel dimension data. Matters for FR-007 (each line shows the channel name).
-- **Recipient list** — The marketing-team email recipient(s) for the account. Source: Business-defined configuration (BR-7). Matters for FR-010 delivery.
+- **Recipient list** — The marketing-team email recipient(s) for the account: the distribution list marketing-team@meridiantravel.example. Source: Business-defined configuration (BR-7). Matters for FR-010 delivery.
 - **Send schedule configuration** — The fixed send day, time, and timezone for the account. Source: Business-defined configuration (BR-8). Matters for FR-001 trigger evaluation.
 - **Week-boundary definition** — "Previous week" is defined as a calendar week, Monday through Sunday, anchored to Eastern time (BR-3). Source: Business-defined. Matters for FR-004/FR-005.
 - **Generation run state** — The status of each weekly run (in-progress, succeeded, missed, failed) keyed to account + covered week. Source: System-derived. Matters for FR-002 (no overlap), FR-003 (idempotent overwrite), FR-012/FR-014 (recorded failure/missed-send conditions).
@@ -309,7 +309,8 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Resolved DEC-006 in NFR-011: audit send records retained for one year, removing the inline decision tag.
+- Resolved BR-7 recipients to marketing-team@meridiantravel.example and noted no extra access control is needed.
+- Updated Recipient list Information Requirement with the concrete distribution-list address.
 
 
 ---
@@ -333,10 +334,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-005**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **DEC-006**: DEC-006 resolved — audit records of each weekly spend email are retained for one year.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-006**: Who are the exact recipients, and does recipient management or spend-data visibility need any permission/access control?
-
 ### Questions Resolved
 
 - **OQ-001**: OQ-001 resolved: send whatever spend data is available about one day after the week ends, including a note flagging any channels/data that are missing or incomplete, rather than waiting for complete data.
@@ -344,6 +341,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **OQ-004**: Resolved OQ-004/DEC-002: the email presents spend totals as a plain table inside the email body, with no attachment (no CSV or separate file).
 - **OQ-005**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
+- **OQ-006**: Recipients are the marketing team list marketing-team@meridiantravel.example, and no additional recipient-management or spend-data-visibility access control is needed — nobody else needs access.
 - **OQ-007**: OQ-007 resolved: reuse the existing scheduled-report / report-subscription + email pipeline if it fits, rather than building new scheduler/email orchestration for this deadline.
 
 ---
