@@ -29,7 +29,7 @@ Automating this into a weekly email summary removes the recurring manual pull an
 - **BR-5 — Channel set.** The email lists every channel K4A tracks for Meridian Travel: email, paid search, paid social, and display.
 - **BR-6 — Recipients.** The summary is delivered to the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`. All recipients receive the same summary; there is no differentiation by team or geography.
 - **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED]
-- **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email behavior (send on schedule with available data and flag the gap, or hold) is a business decision. [DECISION REQUIRED]
+- **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email is sent on schedule with the available channels' data, and the channels with missing or delayed data are clearly flagged as incomplete rather than held. The email does not wait for all channels to report.
 - **BR-9 — Self-service configuration is out of scope for Phase 1.** Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
 
 ### A note on affected-system evidence
@@ -50,7 +50,7 @@ flowchart TD
     C --> D{"Spend data retrieved successfully?"}
     D -->|"no (data source unavailable)"| E["Do not send partial/empty summary; record failure and alert operations"]
     D -->|"yes"| F{"All expected channels reported?"}
-    F -->|"no (one or more channels missing/delayed)"| G["Apply partial-data rule (BR-8)"]
+    F -->|"no (one or more channels missing/delayed)"| G["Send on schedule with available channels; flag missing/delayed channels as incomplete (BR-8)"]
     F -->|"yes"| H["Compose email: one line per channel, total spend"]
     G --> H
     H --> I["Send weekly summary email to Meridian marketing recipients"]
@@ -147,8 +147,8 @@ And an operational alert is raised
 ```gherkin
 Given spend data was retrieved but one or more expected channels have missing or delayed data at generation time
 When the system composes the summary
-Then it applies the defined partial-data rule for Meridian Travel
-And the email clearly indicates which channels have incomplete or unavailable data rather than silently showing them as zero spend
+Then it sends the email on schedule with the available channels' spend totals
+And the email clearly flags which channels have incomplete or unavailable data rather than silently showing them as zero spend or holding the send
 ```
 
 ### Feature Area C — Email Composition
@@ -253,7 +253,7 @@ The system must track the following business information to support the function
 - **Send schedule (time + timezone)** — when the weekly run fires: every Monday at 8:00 AM Eastern Time. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
 - **Feature-enabled state (kill-switch)** — whether the feature is active for Meridian Travel. System/operations-controlled configuration. Matters because it gates whether a run starts at all (FR-019, FR-020).
 - **Run record (per advertiser, per reporting week)** — tracks that a run for a given advertiser and reporting week has started/completed, and its outcome. System-derived. Matters because it enforces exactly-once sending, the overlap guard, and idempotency (FR-002, FR-003, FR-004).
-- **Partial-data / channel-availability status** — which channels reported complete data and which were missing or delayed at generation time. System-derived during retrieval. Matters because it drives the partial-data handling and the in-email flagging (FR-010).
+- **Partial-data / channel-availability status** — which channels reported complete data and which were missing or delayed at generation time. System-derived during retrieval. Matters because the email is sent on schedule with available channels while the missing or delayed channels are flagged as incomplete (FR-010, BR-8).
 - **Delivery outcome and failure reason** — whether the email was accepted, and a distinct reason if not (data-retrieval failure, delivery failure, skipped-because-disabled). System-derived. Matters because failures must be recorded distinctly and alerted, never silently dropped (FR-009, FR-017, FR-018, FR-020).
 - **Audit trail of each run** — actor/trigger, advertiser, reporting week, recipients, timestamp, and outcome for each send or skip. System-derived. Matters because this is a recurring, recipient-facing, state-producing operation whose history a stakeholder must be able to trace (see NFR-005).
 
@@ -351,9 +351,10 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Resolved BR-2 send time/timezone to every Monday at 8:00 AM Eastern Time and removed the decision tag.
-- Added the resolved Monday 8:00 AM Eastern send time to the Scope-at-a-glance cadence line.
-- Recorded the resolved Monday 8:00 AM Eastern send time in the Information Requirements send-schedule entry.
+- Resolved BR-8 partial-data handling to send-on-schedule-and-flag, removing the [DECISION REQUIRED] tag.
+- Updated the flow diagram partial-data node to reflect send-on-schedule-and-flag resolution.
+- Updated FR-010 to state the resolved send-on-schedule-and-flag partial-data behavior.
+- Updated the Information Requirements partial-data entry to reflect the send-on-schedule-and-flag resolution.
 
 
 ---
@@ -369,7 +370,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What time of day and in which timezone should the weekly summary email be sent on Monday? | Product owner (with Meridian Travel marketing team) | Send at 07:00 in Meridian Travel's primary business timezone on Monday, so the summary is waiting in inboxes before the team starts their week. |
 | **DEC-004** | What span of time should each weekly email's spend totals cover? | Product owner (with Meridian Travel marketing team) | The prior completed Monday-through-Sunday calendar week, matching the team's existing Monday compilation cadence. |
-| **DEC-005** | When one or more channels have missing or delayed data at send time, should the email go out on schedule with the available channels flagged as incomplete, or should it wait until all channels report? | Product owner (with Meridian Travel marketing team) | Send on schedule with available channels and clearly flag any channel whose data is incomplete or unavailable, rather than holding the whole email. |
 | **DEC-006** | Monday alignment. The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | Channel set. Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
@@ -378,10 +378,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **DEC-002**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 - **DEC-003**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
+- **DEC-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-005**: When a channel's data is missing or delayed for a given week, should the email send on schedule with partial data, wait until all channels report, or send and flag the gap?
 - **OQ-006**: Does Meridian Travel need self-service control over channels/schedule/recipients, or is a fixed static setup acceptable? (This determines whether a config UI is needed, which conflicts with the current 'no frontend change' assumption.)
 - **OQ-007**: Is this email specific to Meridian Travel only, or should it be built as a reusable per-advertiser weekly summary that other clients could use?
 
@@ -391,6 +391,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 - **OQ-003**: OQ-003 resolved: the weekly summary email sends every Monday at 8:00 AM Eastern Time.
 - **OQ-004**: OQ-004 resolved — the email is strictly one spend line per channel with nothing else (no period-over-period change, campaign counts, or performance notes); this matches the position already stated in BR-3, FR-014, and the Section 6 out-of-scope table.
+- **OQ-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
