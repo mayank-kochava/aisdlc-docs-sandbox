@@ -21,7 +21,7 @@ Meridian Travel's marketing team manually pulls spend-by-channel data every Mond
 - **BR-2 — Weekly cadence:** The email is generated and sent once per week, covering the previous week's spend.
 - **BR-3 — Previous-week coverage:** Each email covers the spend data for the week immediately preceding the send. The week boundary is defined as a calendar week, Monday through Sunday, anchored to Eastern time. How long we wait after the week ends for complete ad-platform data before sending remains a business decision. [DECISION REQUIRED: DEC-001]
 - **BR-3a — Partial data is sent with a caveat:** If spend data for the covered week is delayed or incomplete at send time, the email is still sent with whatever data is available, accompanied by a note identifying what is missing — the report does not wait for complete data. The target delivery is roughly one day after the covered week ends.
-- **BR-4 — Spreadsheet-ready output:** The spend totals must be presented in a layout the marketing team can copy directly into their spreadsheet. The exact presentation (inline columnar text, an attached file, or an inline table) is a business/consumer-facing decision. [DECISION REQUIRED: DEC-002]
+- **BR-4 — Spreadsheet-ready output:** The spend totals must be presented as a plain table inside the body of the email (no attachment), laid out so the marketing team can copy it directly into their spreadsheet.
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan; the feature must be deliverable to a standard-plan account.
 - **BR-6 — Channel set:** The specific set of channels included in the breakdown, and whether that set can vary seasonally or by campaign, is a business decision affecting what each email row represents. [DECISION REQUIRED: DEC-003]
 - **BR-7 — Recipients:** The specific recipient(s) on Meridian Travel's marketing team who receive the email is a business decision. [DECISION REQUIRED: DEC-004]
@@ -128,7 +128,7 @@ Then that channel is represented with a total spend of zero rather than omitted
 ```gherkin
 Given the one-line-per-channel content has been assembled
 When the email is formatted for delivery
-Then channel name and total spend are laid out so the marketing team can copy them directly into their existing spreadsheet without manual reformatting
+Then channel name and total spend are presented as a plain table within the email body (no attachment), laid out so the marketing team can copy them directly into their existing spreadsheet without manual reformatting
 ```
 
 ## Feature Area D — Delivery
@@ -309,7 +309,8 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Resolved BR-8 send schedule to every Monday at 8:00 AM Eastern, removing the DEC-005 tag.
+- Resolved BR-4: spend totals are a plain in-email table, no attachment; removed DEC-002 tag.
+- Updated FR-009 to specify a plain in-email table with no attachment.
 
 
 ---
@@ -335,7 +336,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-004**: What format should the email be so it's 'ready for spreadsheet entry' — plain inline table, CSV attachment, or something else?
 - **OQ-005**: Which channels should appear in the breakdown, and is that list fixed or does it vary by campaign/season?
 - **OQ-006**: Who are the exact recipients, and does recipient management or spend-data visibility need any permission/access control?
 - **OQ-007**: Is there an existing scheduled-report / report-subscription + email pipeline we're expected to reuse, or is building new scheduler/email orchestration in scope for this deadline?
@@ -345,6 +345,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: OQ-001 resolved: send whatever spend data is available about one day after the week ends, including a note flagging any channels/data that are missing or incomplete, rather than waiting for complete data.
 - **OQ-002**: 'Previous week' is defined as a calendar week, Monday to Sunday, anchored to Eastern time, which is also the timezone for the week boundary and send time.
 - **OQ-003**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
+- **OQ-004**: Resolved OQ-004/DEC-002: the email presents spend totals as a plain table inside the email body, with no attachment (no CSV or separate file).
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly email, one line per channel, previous week's total spend, spreadsheet-ready) with intake's own clarity marked "clear"; the open questions are routine implementation parameters (week definition, send time, recipients) that engineering can reasonably spec, not genuine product ambiguity—so this is engineering-led multi-service design across the reporting/scheduler/email stack, not Type A discovery.
