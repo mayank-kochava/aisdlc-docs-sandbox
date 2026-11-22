@@ -18,7 +18,7 @@ An automated weekly email delivered every Monday morning removes the manual data
 ### Business Rules
 
 - **BR-1 — Cadence:** The summary is generated and delivered on a weekly cadence, every Monday morning.
-- **BR-2 — Content shape:** The email body shows total campaign spend aggregated per channel, one line per channel, matching the layout the marketing team currently reproduces manually in their spreadsheet. The exact spreadsheet layout (column headers, decimal places, currency symbol, sort order) is not supplied in the input. [DECISION REQUIRED: DEC-001]
+- **BR-2 — Content shape:** The email body shows total campaign spend aggregated per channel, one line per channel, matching the layout the marketing team currently reproduces manually in their spreadsheet. The spreadsheet has exactly two columns: channel name and total spend, with spend shown in US dollars to two decimal places.
 - **BR-3 — Reporting period:** Each Monday email covers the spend for a defined preceding reporting window. The exact window (e.g. the prior Monday–Sunday calendar week) is not supplied in the input. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Channel scope:** The breakdown lists spend per marketing channel across a fixed set of four channels: Email, Paid Search, Paid Social, and Display — the same four the marketing team tracks in their spreadsheet today. This list does not vary by season or campaign type.
 - **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient list (who, how many people, and whether different people have different permission to view spend data) is not supplied in the input. [DECISION REQUIRED: DEC-004]
@@ -124,7 +124,7 @@ And if all attempts are exhausted the run is handled per FR-006 (no email sent, 
 Given per-channel spend totals have been retrieved and are complete
 When the email body is composed
 Then the body contains exactly one line per channel showing that channel's total spend
-And the layout (headers, currency symbol, decimal precision, and sort order) reproduces the format the marketing team currently uses in their manual spreadsheet.
+And the layout reproduces the two-column format the marketing team currently uses in their manual spreadsheet: a channel-name column and a total-spend column, with spend shown in US dollars to two decimal places.
 ```
 
 **FR-009 — Reporting window is stated in the email**
@@ -214,7 +214,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 - **Reporting window definition** — the start/end dates each Monday email covers. System-derived from the configured weekly cadence. Matters because every spend total is scoped to this window and the window is stated in the email (FR-004, FR-009).
 - **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
 - **Channel scope list** — the fixed set of four marketing channels to include: Email, Paid Search, Paid Social, and Display (the same four the marketing team tracks today). This list does not vary by season or campaign type (see BR-4). Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
-- **Spreadsheet format definition** — the headers, currency symbol, decimal precision, and sort order the marketing team currently uses manually. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008); not yet supplied (see BR-2).
+- **Spreadsheet format definition** — the marketing team's existing spreadsheet has exactly two columns: channel name and total spend, with spend in US dollars to two decimal places. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008, BR-2).
 - **Recipient list** — the Meridian Travel marketing team members who receive the email. User/customer-supplied configuration. Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
 - **Plan entitlement status** — the customer's standard plan includes automated weekly report emails (settled; no upsell required). The value is still re-derived at run time from the authoritative subscription/entitlement source as a defensive safeguard that gates every send (FR-014).
 - **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Monday email (FR-013, FR-017).
@@ -320,8 +320,9 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Resolved BR-4 channel scope to the fixed four channels (Email, Paid Search, Paid Social, Display) and removed the DEC-003 tag.
-- Updated Information Requirements channel scope entry to the fixed four channels and removed the unsettled-source language.
+- Resolved BR-2 format with the two-column, dollars-two-decimals answer and removed the DEC-001 tag.
+- Specified FR-008's layout as the two-column, dollars-two-decimals format.
+- Updated the Information Requirements spreadsheet-format entry to the resolved two-column format.
 
 
 ---
@@ -335,7 +336,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | What exactly should the email look like — the column headers, how many decimal places, which currency symbol, and the order the channels are listed in? | Product owner (with Meridian Travel marketing team) | Reproduce the customer's current manual spreadsheet: columns 'Channel' and 'Total Spend', spend shown with a currency symbol and 2 decimal places, channels sorted highest spend first. Confirm against a sample of their actual spreadsheet before launch. |
 | **DEC-002** | Which stretch of time should each Monday email cover — the previous Monday-through-Sunday week, or some other window? | Product owner (with Meridian Travel marketing team) | Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). |
 | **DEC-004** | Who exactly should receive this email, how many people are on that list, and do different recipients have different permission to see spend data? | Product owner (with Meridian Travel marketing team) | Send to a single configured distribution list for Meridian Travel's marketing team; treat all recipients on that list as authorized to view full spend. Collect the actual recipient addresses from the customer before launch. |
 | **DEC-006** | When exactly counts as "Monday morning" for delivery, and in which timezone should it be calculated? | Product owner (with Meridian Travel) | Deliver by 08:00 in Meridian Travel's primary business timezone each Monday; confirm the timezone with the customer. |
@@ -343,12 +343,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Decisions Resolved
 
+- **DEC-001**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
 - **DEC-003**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
 - **DEC-005**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-003**: What does the current manual spreadsheet look like exactly — column headers, sort order, currency symbol, decimal places, and any derived/calculated columns beyond raw spend per channel?
 - **OQ-004**: How fresh does the spend data need to be in Monday's email — previous-day, prior full week, or latest available aggregate?
 - **OQ-005**: What timezone defines "Monday morning" for delivery, and is there a specific send time the marketing team expects?
 - **OQ-006**: Who exactly should receive the email (named recipients or a distribution list), how many people, and are there any permission restrictions on who can see spend figures?
@@ -358,6 +358,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 - **OQ-002**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
+- **OQ-003**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is fully specified (Monday email, total spend per channel, one line each, matching the existing spreadsheet format, no UI) and the KG shows well-understood existing services (reporting-subscriptions-worker, reporting-api, cost-v2, accounts-api) that already do scheduled report emails and channel-level spend aggregation — this is engineering-led multi-service build, not product discovery; the "4 services" trigger reflects scope, not genuine ambiguity.
