@@ -361,14 +361,6 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
-
 ### Decisions Resolved
 
 - **DEC-001**: DEC-001 resolved: the weekly summary email is sent every Monday at 8:00 AM Eastern Time, which is already the value stated throughout the document (BR-2, Scope at a glance, Send schedule).
@@ -378,6 +370,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 - **DEC-006**: Resolved DEC-006 — the weekly summary send time and timezone is confirmed as every Monday at 8:00 AM Eastern Time.
 - **DEC-007**: Resolved DEC-007 — the email lists every channel K4A tracks for Meridian Travel (email, paid search, paid social, and display), not a curated subset.
+- **DEC-008**: Resolved DEC-008 (Recipients): delivered to the Meridian Travel marketing team list, with the same summary for everyone — no differentiation by team or geography (already reflected in BR-6, FR-015, and Section 4).
 
 ### Questions Resolved
 
