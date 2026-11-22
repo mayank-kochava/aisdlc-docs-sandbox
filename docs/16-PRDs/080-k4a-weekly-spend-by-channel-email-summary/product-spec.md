@@ -21,7 +21,7 @@ An automated weekly email delivered every Monday morning removes the manual data
 - **BR-2 — Content shape:** The email body shows total campaign spend aggregated per channel, one line per channel, matching the layout the marketing team currently reproduces manually in their spreadsheet. The spreadsheet has exactly two columns: channel name and total spend, with spend shown in US dollars to two decimal places.
 - **BR-3 — Reporting period:** Each Monday email covers the spend for a defined preceding reporting window. The exact window (e.g. the prior Monday–Sunday calendar week) is not supplied in the input. [DECISION REQUIRED: DEC-002]
 - **BR-4 — Channel scope:** The breakdown lists spend per marketing channel across a fixed set of four channels: Email, Paid Search, Paid Social, and Display — the same four the marketing team tracks in their spreadsheet today. This list does not vary by season or campaign type.
-- **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team. The specific recipient list (who, how many people, and whether different people have different permission to view spend data) is not supplied in the input. [DECISION REQUIRED: DEC-004]
+- **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team via the `marketing-team@meridiantravel.example` distribution list. There are no per-recipient permission restrictions on viewing spend data — everyone on that list sees the full spend figures.
 - **BR-6 — Plan entitlement:** Meridian Travel is on the standard plan, and automated weekly report emails are included in the standard plan — no plan change, add-on, or upsell is required before building. The run-time entitlement check (FR-014) is retained as a defensive safeguard that re-derives entitlement on each run, but the business answer is settled: the standard plan entitles this feature.
 - **BR-7 — Delivery channel:** Delivery is email only. There is no on-screen view or in-product UI for this feature (PM-confirmed in intake).
 - **BR-8 — Spend data integrity:** The spend figures are customer-facing billing/spend numbers. The per-channel totals in the email must match the authoritative spend figures the customer sees elsewhere; shipping numbers that disagree with the customer's other spend views is a defect, not a cosmetic issue.
@@ -223,7 +223,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 - **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. The figures reflect the latest available aggregate at run time, not the prior full week's completed totals (see NFR-016). This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
 - **Channel scope list** — the fixed set of four marketing channels to include: Email, Paid Search, Paid Social, and Display (the same four the marketing team tracks today). This list does not vary by season or campaign type (see BR-4). Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
 - **Spreadsheet format definition** — the marketing team's existing spreadsheet has exactly two columns: channel name and total spend, with spend in US dollars to two decimal places. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008, BR-2).
-- **Recipient list** — the Meridian Travel marketing team members who receive the email. User/customer-supplied configuration. Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
+- **Recipient list** — the Meridian Travel marketing team, addressed via the `marketing-team@meridiantravel.example` distribution list. User/customer-supplied configuration. All recipients on the list have equal permission to view the spend figures (no restrictions). Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
 - **Plan entitlement status** — the customer's standard plan includes automated weekly report emails (settled; no upsell required). The value is still re-derived at run time from the authoritative subscription/entitlement source as a defensive safeguard that gates every send (FR-014).
 - **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Monday email (FR-013, FR-017).
 - **Delivery timestamp** — when a summary was accepted for delivery. System-derived. Matters for the success record and operator verification (FR-013).
@@ -295,7 +295,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 | Derived metrics beyond raw channel spend (ROI, CPA, week-over-week deltas) | MVP reproduces the current manual spreadsheet, which is raw channel spend | Future |
 | Downloadable file / attachment version of the summary | Intake confirmed delivery is an in-inbox email, not a downloadable file | Future |
 | Reconciliation of multiple spend data sources into one view | MVP assumes a single authoritative source; multi-source reconciliation is a separate effort | Future |
-| Self-service, per-recipient permission tiers for viewing spend data | Recipient permission levels unsettled (BR-5); MVP uses a single configured recipient list | Future |
+| Self-service, per-recipient permission tiers for viewing spend data | No per-recipient permission tiers required (all recipients see full spend, per BR-5); MVP uses a single configured recipient list | Future |
 | Rollout to customers beyond Meridian Travel / plans beyond standard | This work item is scoped to one customer on the standard plan | Future |
 
 ---
@@ -329,8 +329,9 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Updated NFR-016 to specify latest-available-aggregate freshness instead of prior-full-week totals, per OQ-004 resolution.
-- Updated the Per-channel spend totals information requirement to reflect latest-available-aggregate freshness per OQ-004.
+- Resolved BR-5 recipients to the marketing-team@meridiantravel.example list with no permission restrictions, removing the DEC-004 tag.
+- Updated Recipient list information requirement with the marketing-team@meridiantravel.example list and no permission restrictions.
+- Updated out-of-scope rationale for per-recipient permission tiers to reflect that no tiers are required per the resolved BR-5.
 
 
 ---
@@ -345,19 +346,18 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-002** | Which stretch of time should each Monday email cover — the previous Monday-through-Sunday week, or some other window? | Product owner (with Meridian Travel marketing team) | Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). |
-| **DEC-004** | Who exactly should receive this email, how many people are on that list, and do different recipients have different permission to see spend data? | Product owner (with Meridian Travel marketing team) | Send to a single configured distribution list for Meridian Travel's marketing team; treat all recipients on that list as authorized to view full spend. Collect the actual recipient addresses from the customer before launch. |
 | **DEC-007** | How long must we retain the audit records of each weekly run's outcome, and does the customer's spend-data handling agreement require a longer period? | Compliance/Security with Product owner | Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer. |
 
 ### Decisions Resolved
 
 - **DEC-001**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
 - **DEC-003**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
+- **DEC-004**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
 - **DEC-005**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 - **DEC-006**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-006**: Who exactly should receive the email (named recipients or a distribution list), how many people, and are there any permission restrictions on who can see spend figures?
 - **OQ-007**: Should the spend numbers be raw only, or is any validation / anomaly flagging expected (e.g. flag a channel whose spend spiked vs usual)?
 
 ### Questions Resolved
@@ -367,6 +367,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
 - **OQ-004**: Re-resolved OQ-004 — Monday's email uses the latest available aggregate of spend at run time, not the prior full week's completed totals.
 - **OQ-005**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
+- **OQ-006**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is fully specified (Monday email, total spend per channel, one line each, matching the existing spreadsheet format, no UI) and the KG shows well-understood existing services (reporting-subscriptions-worker, reporting-api, cost-v2, accounts-api) that already do scheduled report emails and channel-level spend aggregation — this is engineering-led multi-service build, not product discovery; the "4 services" trigger reflects scope, not genuine ambiguity.
