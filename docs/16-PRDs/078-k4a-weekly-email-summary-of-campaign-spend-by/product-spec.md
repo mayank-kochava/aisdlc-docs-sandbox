@@ -30,7 +30,7 @@ Automating this into a weekly email summary removes the recurring manual pull an
 - **BR-6 — Recipients.** The summary is delivered to the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`. All recipients receive the same summary; there is no differentiation by team or geography.
 - **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED]
 - **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email is sent on schedule with the available channels' data, and the channels with missing or delayed data are clearly flagged as incomplete rather than held. The email does not wait for all channels to report.
-- **BR-9 — Self-service configuration is out of scope for Phase 1.** Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
+- **BR-9 — Self-service configuration is out of scope for Phase 1.** The requester confirmed a fixed static setup is acceptable and no self-service UI is needed for now. Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
 
 ### A note on affected-system evidence
 
@@ -351,10 +351,7 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Resolved BR-8 partial-data handling to send-on-schedule-and-flag, removing the [DECISION REQUIRED] tag.
-- Updated the flow diagram partial-data node to reflect send-on-schedule-and-flag resolution.
-- Updated FR-010 to state the resolved send-on-schedule-and-flag partial-data behavior.
-- Updated the Information Requirements partial-data entry to reflect the send-on-schedule-and-flag resolution.
+- Updated BR-9 to note the requester confirmed a fixed setup with no self-service UI is acceptable (resolves OQ-006).
 
 
 ---
@@ -382,7 +379,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-006**: Does Meridian Travel need self-service control over channels/schedule/recipients, or is a fixed static setup acceptable? (This determines whether a config UI is needed, which conflicts with the current 'no frontend change' assumption.)
 - **OQ-007**: Is this email specific to Meridian Travel only, or should it be built as a reusable per-advertiser weekly summary that other clients could use?
 
 ### Questions Resolved
@@ -392,6 +388,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: OQ-003 resolved: the weekly summary email sends every Monday at 8:00 AM Eastern Time.
 - **OQ-004**: OQ-004 resolved — the email is strictly one spend line per channel with nothing else (no period-over-period change, campaign counts, or performance notes); this matches the position already stated in BR-3, FR-014, and the Section 6 out-of-scope table.
 - **OQ-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
+- **OQ-006**: OQ-006 resolved — requester confirmed a fixed static setup with no self-service UI is acceptable for Phase 1; no config UI is needed and the 'no frontend change' assumption holds.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
