@@ -127,6 +127,14 @@ Then the body contains exactly one line per channel showing that channel's total
 And the layout reproduces the two-column format the marketing team currently uses in their manual spreadsheet: a channel-name column and a total-spend column, with spend shown in US dollars to two decimal places.
 ```
 
+**FR-009a — Meridian logo at the top of the email**
+```gherkin
+Given a summary email is being composed for a customer
+When the email body is rendered
+Then the Meridian Travel logo appears at the top of the email, above the spend-by-channel content
+And the logo renders correctly in the recipients' email clients (e.g. a hosted image with appropriate alt text) without breaking the two-column spend layout below it.
+```
+
 **FR-009 — Reporting window is stated in the email**
 ```gherkin
 Given the email body is being composed for a reporting window
@@ -321,10 +329,7 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Added NFR-016 fixing spend data freshness to the prior full week (resolves OQ-004).
-- Noted in the Per-channel spend totals information requirement that figures are the prior full week's completed totals.
-- Resolved NFR-001: defined delivery as Monday 8am US Eastern and removed the DEC-006 tag.
-- Updated BR-1 cadence to state Monday 8am US Eastern.
+- Added FR-009a requiring the Meridian Travel logo at the top of the email.
 
 
 ---
