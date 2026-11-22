@@ -220,7 +220,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 ## 4. Information Requirements
 
 - **Reporting window definition** — the start/end dates each Monday email covers. System-derived from the configured weekly cadence. Matters because every spend total is scoped to this window and the window is stated in the email (FR-004, FR-009).
-- **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. The figures reflect the prior full week's completed totals, not previous-day or latest-available partial aggregates (see NFR-016). This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
+- **Per-channel spend totals** — total campaign spend aggregated for each marketing channel over the reporting window. System-derived from the authoritative spend/cost data source. The figures reflect the latest available aggregate at run time, not the prior full week's completed totals (see NFR-016). This is the core payload of the email; it must match the customer's other spend views (FR-004, FR-005).
 - **Channel scope list** — the fixed set of four marketing channels to include: Email, Paid Search, Paid Social, and Display (the same four the marketing team tracks today). This list does not vary by season or campaign type (see BR-4). Matters because it determines which lines appear and distinguishes a zero-spend channel from a missing one (FR-010).
 - **Spreadsheet format definition** — the marketing team's existing spreadsheet has exactly two columns: channel name and total spend, with spend in US dollars to two decimal places. User/customer-supplied (from Meridian Travel's existing spreadsheet). Matters because the email must reproduce this layout (FR-008, BR-2).
 - **Recipient list** — the Meridian Travel marketing team members who receive the email. User/customer-supplied configuration. Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
@@ -235,7 +235,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 ### Performance & Capacity
 
 - **NFR-001 — Delivery timeliness.** Each Monday email must be generated and dispatched by the expected send time of 08:00 (8am) US Eastern time on Monday. "Monday morning" is defined as Monday 8am Eastern, and the delivery window is calculated in the US Eastern timezone (observing daylight-saving transitions).
-- **NFR-016 — Spend data freshness.** Monday's email reflects the prior full week of spend; the figures retrieved must be the completed totals for that preceding full week (not previous-day or latest-available partial aggregates). The spend data source must have finalized totals for the full preceding week before the run composes the email.
+- **NFR-016 — Spend data freshness.** Monday's email reflects the latest available aggregate of spend at run time; the figures retrieved must be the most recent aggregated totals the spend data source can provide when the run composes the email, rather than being held back to the completed totals of the prior full week. The run does not wait for a full preceding week to be finalized before composing the email.
 - **NFR-002 — Spend data query latency.** Retrieval of per-channel spend totals for a reporting window must complete with a p95 latency target measured as a defined number of concurrent summary runs executing together. This is a low-frequency weekly batch path, not interactive traffic; engineering sets the concrete p95 target and concurrency count during planning. The query must respect any rate cap protecting the shared spend/cost data source so the weekly run does not degrade other consumers of that source.
 - **NFR-003 — Monitoring & alerting.** Operational monitoring must alert when the run failure rate exceeds 1% for 5 minutes sustained, and when any single customer's weekly run fails to produce a delivered email by the end of the Monday delivery window. Alerts route to the owning on-call rotation.
 
@@ -329,7 +329,8 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Added FR-009a requiring the Meridian Travel logo at the top of the email.
+- Updated NFR-016 to specify latest-available-aggregate freshness instead of prior-full-week totals, per OQ-004 resolution.
+- Updated the Per-channel spend totals information requirement to reflect latest-available-aggregate freshness per OQ-004.
 
 
 ---
@@ -364,7 +365,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
 - **OQ-002**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
 - **OQ-003**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
-- **OQ-004**: Resolved OQ-004 — Monday's email uses the prior full week's completed spend totals, not previous-day or latest-available partial aggregates.
+- **OQ-004**: Re-resolved OQ-004 — Monday's email uses the latest available aggregate of spend at run time, not the prior full week's completed totals.
 - **OQ-005**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
 
 ---
