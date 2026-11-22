@@ -27,7 +27,7 @@ Automating this into a weekly email summary removes the recurring manual pull an
 - **BR-3 — Content is per-channel totals only.** Each email contains one line per channel showing that channel's total campaign spend for the reporting period. No period-over-period comparison, campaign counts, or performance notes are included in Phase 1.
 - **BR-4 — Advertiser scope.** The data covers all campaigns belonging to Meridian Travel only. No other advertiser's data appears in this email.
 - **BR-5 — Channel set.** The email lists every channel K4A tracks for Meridian Travel: email, paid search, paid social, and display.
-- **BR-6 — Recipients.** The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. [DECISION REQUIRED]
+- **BR-6 — Recipients.** The summary is delivered to the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`. All recipients receive the same summary; there is no differentiation by team or geography.
 - **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED]
 - **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email behavior (send on schedule with available data and flag the gap, or hold) is a business decision. [DECISION REQUIRED]
 - **BR-9 — Self-service configuration is out of scope for Phase 1.** Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
@@ -249,7 +249,7 @@ The system must track the following business information to support the function
 - **Per-channel spend totals (for a reporting period)** — the aggregated figure shown on each line of the email. System-derived from the campaign spend records within the reporting-period window. Matters because this is the core content the recipient consumes (FR-006, FR-011).
 - **Reporting period window** — the start/end boundary that defines which spend is counted. Derived from the reporting-period business rule (BR-7). Matters because it determines what "total spend" means for each run and is stated in the email (FR-007, FR-013).
 - **Channel-inclusion rule** — all channels K4A tracks for Meridian Travel (email, paid search, paid social, and display) are listed; no curated subset applies (BR-5). Matters because it governs which channels are listed (FR-008).
-- **Recipient list** — the addresses the summary is delivered to. User/business-provided configuration for Meridian Travel (BR-6). Matters because delivery must go to exactly these recipients and no one else (FR-015).
+- **Recipient list** — the addresses the summary is delivered to: the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`, with all recipients receiving the same summary (BR-6). User/business-provided configuration for Meridian Travel. Matters because delivery must go to exactly these recipients and no one else (FR-015).
 - **Send schedule (time + timezone)** — when the weekly run fires. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
 - **Feature-enabled state (kill-switch)** — whether the feature is active for Meridian Travel. System/operations-controlled configuration. Matters because it gates whether a run starts at all (FR-019, FR-020).
 - **Run record (per advertiser, per reporting week)** — tracks that a run for a given advertiser and reporting week has started/completed, and its outcome. System-derived. Matters because it enforces exactly-once sending, the overlap guard, and idempotency (FR-002, FR-003, FR-004).
@@ -302,7 +302,7 @@ The following are explicitly **NOT** included in Phase 1, to prevent scope creep
 | Any on-screen K4A interface change | Out of scope | Requester confirmed the deliverable is email only; nothing renders on screen in K4A. |
 | Self-service configuration (recipients, channel set, or schedule edited by the marketing team) | Future phase | Phase 1 is a fixed operational setup for Meridian Travel (BR-9). Would introduce a UI and role-based access-control surface not required now. |
 | Content beyond per-channel totals (period-over-period comparison, campaign counts, performance notes) | Future phase | Requester confirmed total spend per channel, one line per channel, is sufficient for Phase 1 (FR-014). |
-| Differentiated summaries by team or geography | Future phase | Phase 1 delivers one summary to one configured recipient list. Whether differentiation is ever needed depends on the recipients decision (BR-6). |
+| Differentiated summaries by team or geography | Future phase | Phase 1 delivers one identical summary to the Meridian Travel marketing team list (BR-6); differentiation by team or geography is not needed in Phase 1. |
 | Additional advertisers beyond Meridian Travel | Future phase | This requirement is scoped to the single advertiser Meridian Travel on the standard plan. Generalizing to other advertisers is a later effort. |
 | Secure time-limited download link / attachment delivery of the summary | Out of scope | Phase 1 delivers in-email per-channel totals only; no file export is requested. |
 
@@ -351,10 +351,9 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Resolved BR-5: email includes all K4A-tracked channels (email, paid search, paid social, display).
-- Updated FR-008 to reflect that all four tracked channels are always included, with no curated-subset branch.
-- Updated Channel-inclusion rule info item to the resolved all-channels decision.
-- Updated Section 3 tag-count note to reflect the resolved channel-set decision.
+- Resolved BR-6 with the confirmed recipient (marketing-team@meridiantravel.example) and single-summary-for-all, removing the decision tag.
+- Updated Recipient list information requirement with the confirmed marketing-team address and single-summary scope.
+- Updated the differentiated-summaries out-of-scope row to reflect the resolved single-summary recipients decision.
 
 
 ---
@@ -369,7 +368,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What time of day and in which timezone should the weekly summary email be sent on Monday? | Product owner (with Meridian Travel marketing team) | Send at 07:00 in Meridian Travel's primary business timezone on Monday, so the summary is waiting in inboxes before the team starts their week. |
-| **DEC-003** | Who exactly should receive this email, and should everyone get the same summary or different summaries by team or geography? | Product owner (with Meridian Travel marketing team) | A single shared recipient list for Meridian Travel's marketing team, all receiving the same combined summary, until a need for differentiated summaries is confirmed. |
 | **DEC-004** | What span of time should each weekly email's spend totals cover? | Product owner (with Meridian Travel marketing team) | The prior completed Monday-through-Sunday calendar week, matching the team's existing Monday compilation cadence. |
 | **DEC-005** | When one or more channels have missing or delayed data at send time, should the email go out on schedule with the available channels flagged as incomplete, or should it wait until all channels report? | Product owner (with Meridian Travel marketing team) | Send on schedule with available channels and clearly flag any channel whose data is incomplete or unavailable, rather than holding the whole email. |
 | **DEC-006** | Monday alignment. The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
@@ -379,10 +377,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Decisions Resolved
 
 - **DEC-002**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
+- **DEC-003**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: Who are the specific recipients (names/roles), and do they all get the same summary, or should it vary by team/geography?
 - **OQ-003**: What time and timezone should the Monday email send, and is there a preferred delivery window to match their current workflow?
 - **OQ-004**: Should the email include anything beyond total spend per channel (e.g. period-over-period change, campaign count, performance notes), or strictly one spend line per channel?
 - **OQ-005**: When a channel's data is missing or delayed for a given week, should the email send on schedule with partial data, wait until all channels report, or send and flag the gap?
@@ -392,6 +390,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
+- **OQ-002**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
