@@ -245,7 +245,7 @@ The system must track the following business information to support the Function
 
 Addressing each risk from the Context Seed:
 
-- **Hard external deadline (5 weeks, before summer campaign):** Mitigated by strict MVP scope (Section 6) — only total spend per channel, one line per channel, as confirmed at intake. The strongest de-risking lever is confirming early whether an existing scheduled-report/subscription + email pipeline can be reused rather than built new; that reconciliation is an engineering planning task flagged in Section 1's service note.
+- **Hard external deadline (5 weeks, before summer campaign):** Mitigated by strict MVP scope (Section 6) — only total spend per channel, one line per channel, as confirmed at intake. The direction is to reuse whatever existing scheduled-report/subscription + email pipeline already exists if it fits the requirement, rather than building new scheduler/email orchestration; engineering confirms during planning whether the existing pipeline fits and only builds net-new orchestration where it genuinely does not. That fit assessment is an engineering planning task tied to the service-name reconciliation flagged in Section 1's service note.
 - **Multi-service blast radius (4 candidate services, two conflicting name sets):** Mitigated by the kill-switch (NFR-012), bounded retries with distinct failure conditions (NFR-005, NFR-007), and by requiring engineering to reconcile the candidate service names before build. Product behavior in this spec does not depend on which names are real.
 - **Email delivery system integration:** Mitigated by treating delivery failure as a distinct, retried, alerted condition (FR-015, NFR-004/NFR-005), confining delivery to configured recipients (NFR-010), and not logging raw recipient addresses (NFR-009).
 - **Data freshness / sync-timing risk (spend may be synced from ad platforms):** Mitigated by the data-not-ready detection and lag-window handling (FR-012–FR-014, NFR-007) — the system never sends partial numbers and records a missed-send rather than deliver wrong data.
@@ -309,11 +309,7 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Resolved BR-6: channel set is the fixed four channels (Email, paid search, paid social, display).
-- Updated FR-007 to name the fixed four-channel set.
-- Updated FR-008 and its note to reflect the fixed channel set rather than an open decision.
-- Updated Information Requirements channel-set entry to the fixed four-channel list.
-- Updated Out-of-Scope row to reflect the now-fixed channel set.
+- Resolved OQ-007 in the deadline risk-mitigation bullet: reuse existing scheduled-report pipeline if it fits.
 
 
 ---
@@ -340,7 +336,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-006**: Who are the exact recipients, and does recipient management or spend-data visibility need any permission/access control?
-- **OQ-007**: Is there an existing scheduled-report / report-subscription + email pipeline we're expected to reuse, or is building new scheduler/email orchestration in scope for this deadline?
 
 ### Questions Resolved
 
@@ -349,6 +344,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-003**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **OQ-004**: Resolved OQ-004/DEC-002: the email presents spend totals as a plain table inside the email body, with no attachment (no CSV or separate file).
 - **OQ-005**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
+- **OQ-007**: OQ-007 resolved: reuse the existing scheduled-report / report-subscription + email pipeline if it fits, rather than building new scheduler/email orchestration for this deadline.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly email, one line per channel, previous week's total spend, spreadsheet-ready) with intake's own clarity marked "clear"; the open questions are routine implementation parameters (week definition, send time, recipients) that engineering can reasonably spec, not genuine product ambiguity—so this is engineering-led multi-service design across the reporting/scheduler/email stack, not Type A discovery.
