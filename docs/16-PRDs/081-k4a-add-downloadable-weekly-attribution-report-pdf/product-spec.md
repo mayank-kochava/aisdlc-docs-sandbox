@@ -26,19 +26,19 @@ Brightway Retail's finance team currently has no self-service way to obtain a we
 
 ### Delivery model
 
-The intake Q&A left open whether the PDF is produced on a fixed weekly schedule (e.g. every Monday) or generated on-demand at the moment of download, and the requester deferred this to engineering ("Unknown, for engineering to confirm"). Whether a customer sees a fixed weekly drop day or an always-current on-demand file is a customer-visible behavior difference, not purely an internal mechanism. [DECISION REQUIRED: DEC-001]
+The PDF is produced on a fixed weekly schedule — generated every Monday — and stored so the finance team can download the current stored report on-demand from K4A. This is a scheduled-generation model (not generated at the moment of download); the download serves the most recently generated Monday report.
 
 ### Quarter window definition
 
-"Last quarter only" is not yet pinned to a specific period definition — a rolling trailing window versus a calendar quarter versus a fiscal quarter produces materially different report contents for the finance team. [DECISION REQUIRED: DEC-002]
+"Last quarter only" is not yet pinned to a specific period definition — a rolling trailing window versus a calendar quarter versus a fiscal quarter produces materially different report contents for the finance team. [DECISION REQUIRED]
 
 ### Report contents
 
-The specific attribution metrics and dimensions the finance team needs (e.g. revenue by channel, conversion by campaign, ROI by touchpoint), their order, and whether row-level detail or summaries are required for year-end close, are not yet specified. [DECISION REQUIRED: DEC-003]
+The specific attribution metrics and dimensions the finance team needs (e.g. revenue by channel, conversion by campaign, ROI by touchpoint), their order, and whether row-level detail or summaries are required for year-end close, are not yet specified. [DECISION REQUIRED]
 
 ### Branding / compliance in the PDF
 
-Whether the PDF requires specific branding, disclaimers, or audit-oriented formatting for year-end close purposes is not yet specified. [DECISION REQUIRED: DEC-004]
+Whether the PDF requires specific branding, disclaimers, or audit-oriented formatting for year-end close purposes is not yet specified. [DECISION REQUIRED]
 
 ## KG cross-check note
 
@@ -46,7 +46,7 @@ An independent knowledge-graph lookup for this work item surfaced a meaningful d
 
 ## Scope reconciliation note
 
-Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Whether a report preview and a delivery-status indicator are also wanted (beyond a bare download action) is treated as out of scope for Phase 1 unless confirmed. Whether finance needs any user-facing download surface at all, versus delivery through a non-UI path, is a customer-facing scope question. [DECISION REQUIRED: DEC-005]
+Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Whether a report preview and a delivery-status indicator are also wanted (beyond a bare download action) is treated as out of scope for Phase 1 unless confirmed. Whether finance needs any user-facing download surface at all, versus delivery through a non-UI path, is a customer-facing scope question. [DECISION REQUIRED]
 
 ---
 
@@ -212,7 +212,7 @@ The system must track the following business information to support the Function
 - **NFR-005 — Server-side access enforcement:** Access to the report is enforced server-side on every download/retrieval request and is never satisfied by UI-hiding alone; an ineligible role or account is rejected with a 403 regardless of what the K4A UI presents (see FR-010). Role and account eligibility are re-derived from the authoritative source on every request, never cached client-side or trusted from a client-supplied claim; if the auth system is unreachable, the request fails closed.
 - **NFR-006 — Secure, time-limited delivery:** The PDF is delivered via a time-limited secure link rather than a permanently public URL or raw attachment; the link is unusable after its validity window expires (see FR-011). The concrete link lifetime is an engineering decision; default to a short validity window (e.g. 15 minutes) sufficient to complete a download, tunable by engineering.
 - **NFR-007 — No sensitive data in logs:** Raw attribution report content and any user-identifying data must never be written to application logs. Attribution data is finance-relevant business data; log identifiers and status, not report payloads.
-- **NFR-008 — Audit trail for access and generation:** Record an immutable, append-only audit entry for each report download/retrieval and each generation outcome, capturing actor identity (user ID + account ID), resource identity (report week/window), action, timestamp, and outcome/status. Audit writes are asynchronous and must not block the primary operation, but an audit-write failure must fire an immediate operational alert rather than fail silently. Minimum retention: 12 months. Because this report is produced specifically to support year-end financial close, a longer retention tied to Brightway Retail's audit cycle may be required. [DECISION REQUIRED: DEC-006]
+- **NFR-008 — Audit trail for access and generation:** Record an immutable, append-only audit entry for each report download/retrieval and each generation outcome, capturing actor identity (user ID + account ID), resource identity (report week/window), action, timestamp, and outcome/status. Audit writes are asynchronous and must not block the primary operation, but an audit-write failure must fire an immediate operational alert rather than fail silently. Minimum retention: 12 months. Because this report is produced specifically to support year-end financial close, a longer retention tied to Brightway Retail's audit cycle may be required. [DECISION REQUIRED]
 
 ### Operability & Rollout
 
@@ -230,7 +230,7 @@ The system must track the following business information to support the Function
 
 | Context Seed Risk | Mitigation — what must be true |
 |---|---|
-| Hard 5-week deadline (year-end close) | Scope is held to the Phase-1 MVP in Section 6; open delivery-architecture and content decisions are flagged as `[DECISION REQUIRED: DEC-007]` with working defaults so engineering is never blocked waiting on them. |
+| Hard 5-week deadline (year-end close) | Scope is held to the Phase-1 MVP in Section 6; open delivery-architecture and content decisions are flagged as `[DECISION REQUIRED]` with working defaults so engineering is never blocked waiting on them. |
 | Multi-service backend + frontend blast radius | Backward compatibility (NFR-010) protects existing consumers of the shared report services; kill-switch (NFR-009) and rollback plan bound production exposure. |
 | Unresolved delivery architecture (on-demand vs fixed weekly schedule) | The delivery-model decision is surfaced in Section 1 for a product call; FR-001–FR-003 are written to hold for either model, and the possibility of reusing an existing weekly-cadence scheduling mechanism (per KG cross-check) is routed to engineering design to avoid building new scheduling. |
 | Data freshness / completeness uncertainty | FR-006 mandates explicit incomplete-data handling with a default (freshness timestamp + visible warning) until the content decision lands. |
@@ -281,6 +281,13 @@ Additional services surfaced by an independent KG cross-check (reconcile during 
 
 Note: the cross-check did not re-confirm **pubsuite-attribution** as a data source at the Context Seed's stated confidence; engineering should verify the authoritative attribution data source during design.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Resolved the delivery-model decision: generate every Monday and store for on-demand download, removing the [DECISION REQUIRED] tag.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -292,17 +299,19 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Should the weekly attribution PDF arrive on a fixed day each week, or should it always be the latest version generated whenever the finance team downloads it? | Product owner (with requester Mayank Ukey and Brightway Retail finance) | Generate on a fixed weekly schedule (every Monday) and make the most recent generated PDF available on-demand for download — this satisfies both 'weekly' and 'on-demand from K4A' without requiring real-time generation at click time. |
 | **DEC-002** | When the report says it covers the last quarter, does that mean a rolling trailing window, the most recent completed calendar quarter, or the customer's fiscal quarter? | Product owner (with Brightway Retail finance, since it drives year-end close numbers) | Most recent completed calendar quarter, built against a configurable window so the definition can change without re-architecture. |
 | **DEC-003** | What attribution metrics and dimensions does the finance team need in the report, in what order, and do they need row-level detail or summaries for year-end close? | Product owner (with Brightway Retail finance) | Revenue by channel, conversions by campaign, and ROI by touchpoint, shown as summary tables with the option of row-level detail, ordered revenue-first. |
 | **DEC-004** | Does the PDF need any specific branding, disclaimers, or audit-oriented formatting to be acceptable for the finance team's year-end close? | Product owner (with Compliance and Brightway Retail finance) | Include the Kochava/K4A logo, the account name, a generation timestamp, and the covered-period range, with no additional legal disclaimers until finance specifies otherwise. |
 | **DEC-005** | Does the finance team need a user-facing download affordance inside the K4A console, or should the report reach them through a non-console path such as a link or email? | Product owner (with requester Mayank Ukey) | Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them. |
 | **DEC-006** | For a financial report produced to support Brightway Retail's year-end close, how long must we keep the record of who generated and downloaded each report before we're allowed to delete it? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it. |
-| **DEC-007** | The intake Q&A left open whether the PDF is produced on a fixed weekly schedule (e.g. every Monday) or generated on-demand at the moment of download, and the requester deferred this to engineering ("Unknown, for engineering to confirm"). Whether a customer sees a fixed weekly drop day or an always-current on-demand file is a customer-visible behavior difference, not purely an internal mechanism. | _(not yet assigned)_ | _(not yet specified)_ |
+
+### Decisions Resolved
+
+- **DEC-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **DEC-007**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: Is the PDF generated on a fixed weekly schedule, or on-demand when the user downloads it? This is the central unresolved architecture decision and it changes the scope of the scheduling/delivery and frontend work.
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
 - **OQ-003**: What specific attribution metrics and dimensions does the finance team need in the PDF (e.g. revenue by channel, conversion by campaign, ROI by touchpoint), and in what layout/order?
 - **OQ-004**: Should the report always cover a rolling 13-week window, or snap to calendar/fiscal quarter boundaries? 'Last quarter' is ambiguous.
@@ -310,6 +319,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-006**: Does finance need access to previous weeks' PDF reports (history), or only the current week's report?
 - **OQ-007**: Are there branding, compliance, or audit requirements for the PDF (logos, disclaimers, row-level detail vs. summary) needed for year-end close?
 - **OQ-008**: If generated on-demand, what's the acceptable latency between data collection and the PDF being downloadable, and how should users know fresh data is available?
+
+### Questions Resolved
+
+- **OQ-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement clarity is "clear" and UX need is "none" — the desired behavior (weekly attribution PDF, last-quarter data, on-demand download from K4A) is confirmed; the open questions are routine engineering/design decisions (schedule vs. on-demand, metrics layout, data freshness) rather than genuine product ambiguity, so the multi-service (4-6 services, backend+frontend) build is engineering-led design, not discovery.
