@@ -13,13 +13,13 @@ Meridian Travel's marketing team pulls campaign spend data manually every week, 
 
 ### Value
 
-An automated weekly email delivered every Monday morning removes the manual data pull entirely. The marketing team receives total campaign spend broken down by channel — one line per channel — in the same format they produce manually today. This saves recurring manual effort, reduces transcription error on customer-facing spend figures, and must be live before the summer campaign launch (hard external deadline, approximately 5 weeks).
+An automated weekly email delivered every Tuesday morning removes the manual data pull entirely. The marketing team receives total campaign spend broken down by channel — one line per channel — in the same format they produce manually today. This saves recurring manual effort, reduces transcription error on customer-facing spend figures, and must be live before the summer campaign launch (hard external deadline, approximately 5 weeks).
 
 ### Business Rules
 
-- **BR-1 — Cadence:** The summary is generated and delivered on a weekly cadence, every Monday at 8am US Eastern time ("Monday morning").
+- **BR-1 — Cadence:** The summary is generated and delivered on a weekly cadence, every Tuesday at 9am US Eastern time.
 - **BR-2 — Content shape:** The email body shows total campaign spend aggregated per channel, one line per channel, matching the layout the marketing team currently reproduces manually in their spreadsheet. The spreadsheet has exactly two columns: channel name and total spend, with spend shown in US dollars to two decimal places.
-- **BR-3 — Reporting period:** Each Monday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the day before send). This is a working assumption adopted in the absence of a confirmed window from the customer, not a customer-confirmed value.
+- **BR-3 — Reporting period:** Each Tuesday email covers the immediately preceding Monday-through-Sunday calendar week (the 7 days ending the Sunday before send). This is a working assumption adopted in the absence of a confirmed window from the customer, not a customer-confirmed value.
 - **BR-4 — Channel scope:** The breakdown lists spend per marketing channel across a fixed set of four channels: Email, Paid Search, Paid Social, and Display — the same four the marketing team tracks in their spreadsheet today. This list does not vary by season or campaign type.
 - **BR-5 — Recipients:** The email is sent to the Meridian Travel marketing team via the `marketing-team@meridiantravel.example` distribution list. There are no per-recipient permission restrictions on viewing spend data — everyone on that list sees the full spend figures.
 - **BR-6 — Plan entitlement:** Meridian Travel is on the standard plan, and automated weekly report emails are included in the standard plan — no plan change, add-on, or upsell is required before building. The run-time entitlement check (FR-014) is retained as a defensive safeguard that re-derives entitlement on each run, but the business answer is settled: the standard plan entitles this feature.
@@ -36,9 +36,9 @@ Two independent codebase knowledge-graph lookups disagree on which backend servi
 
 ```mermaid
 flowchart TD
-    A["Weekly schedule fires (system-triggered)"] --> B{"Is it Monday morning?"}
+    A["Weekly schedule fires (system-triggered)"] --> B{"Is it Tuesday morning?"}
     B -->|"no"| Z["Wait for next scheduled run"]
-    B -->|"yes (Monday)"| C{"Is customer entitled on their plan?"}
+    B -->|"yes (Tuesday)"| C{"Is customer entitled on their plan?"}
     C -->|"no (not entitled)"| D["Skip send and record entitlement-blocked outcome"]
     C -->|"yes (entitled)"| E["Request spend-by-channel totals for the reporting window"]
     E --> F{"Spend data available and complete?"}
@@ -57,17 +57,17 @@ flowchart TD
 
 ### Feature Area A — Scheduling & Trigger
 
-**FR-001 — Weekly Monday trigger**
+**FR-001 — Weekly Tuesday trigger**
 ```gherkin
 Given the weekly spend-summary feature is enabled for the customer
-When the scheduled weekly run fires on Monday morning
+When the scheduled weekly run fires on Tuesday morning
 Then the system begins generating the spend-by-channel summary for that customer's defined reporting window
-And a run that fires on any day other than Monday morning does not generate or send the summary.
+And a run that fires on any day other than Tuesday morning does not generate or send the summary.
 ```
 
 **FR-002 — Single run per week (no duplicate sends)**
 ```gherkin
-Given a Monday summary run for a customer has already started or completed for the current week
+Given a Tuesday summary run for a customer has already started or completed for the current week
 When the scheduler attempts to start another run for the same customer and the same weekly reporting window
 Then the system does not start a second concurrent run and does not send a duplicate email
 And the attempt is recorded as a rejected/skipped duplicate rather than producing a second email.
@@ -170,7 +170,7 @@ And delivery targets only the configured recipients for that customer.
 
 **FR-011a — CC the VP on the first send only**
 ```gherkin
-Given this is the first weekly summary email ever sent to the Meridian Travel marketing team recipient list (no prior successful delivery has been recorded for this customer)
+Given this is the first weekly summary email ever sent to the Meridian Travel marketing team recipient list (no prior successful delivery has been recorded for this customer) [DECISION REQUIRED: DEC-008]
 When the summary email is sent
 Then the Meridian Travel marketing VP is added as a CC recipient on that first send only
 And every subsequent weekly send goes to the configured marketing team recipient list without the VP CC
@@ -190,7 +190,7 @@ And if delivery still fails after retries, the failure is recorded and an operat
 Given a summary email has been accepted for delivery to the recipient list
 When the delivery succeeds
 Then the system records the successful outcome, the customer, the reporting window, and the send timestamp
-So that an operator can later verify the marketing team received the Monday email.
+So that an operator can later verify the marketing team received the Tuesday email.
 ```
 
 ### Feature Area E — Entitlement & Access Control
@@ -243,7 +243,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 - **Recipient list** — the Meridian Travel marketing team, addressed via the `marketing-team@meridiantravel.example` distribution list. User/customer-supplied configuration. All recipients on the list have equal permission to view the spend figures (no restrictions). Matters for delivery targeting and for scoping who may view spend data (FR-011, BR-5).
 - **Marketing VP CC address** — the email address of the Meridian Travel marketing VP, CC'd on the first send only (FR-011a). User/customer-supplied configuration; not yet provided ([DECISION REQUIRED]). Matters because the VP sees the full spend figures on that first send, so the same restricted-data treatment applies.
 - **Plan entitlement status** — the customer's standard plan includes automated weekly report emails (settled; no upsell required). The value is still re-derived at run time from the authoritative subscription/entitlement source as a defensive safeguard that gates every send (FR-014).
-- **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Monday email (FR-013, FR-017).
+- **Run outcome record** — the terminal result of each weekly run (delivered / entitlement-blocked / failed, with the distinct failure condition). System-derived during execution. Matters for operability, audit, and verifying the team received the Tuesday email (FR-013, FR-017).
 - **Delivery timestamp** — when a summary was accepted for delivery. System-derived. Matters for the success record and operator verification (FR-013).
 
 ---
@@ -252,10 +252,10 @@ Now reporting the decisions I flagged in Sections 0–3.
 
 ### Performance & Capacity
 
-- **NFR-001 — Delivery timeliness.** Each Monday email must be generated and dispatched by the expected send time of 08:00 (8am) US Eastern time on Monday. "Monday morning" is defined as Monday 8am Eastern, and the delivery window is calculated in the US Eastern timezone (observing daylight-saving transitions).
-- **NFR-016 — Spend data freshness.** Monday's email reflects the latest available aggregate of spend at run time; the figures retrieved must be the most recent aggregated totals the spend data source can provide when the run composes the email, rather than being held back to the completed totals of the prior full week. The run does not wait for a full preceding week to be finalized before composing the email.
+- **NFR-001 — Delivery timeliness.** Each Tuesday email must be generated and dispatched by the expected send time of 09:00 (9am) US Eastern time on Tuesday. The delivery window is calculated in the US Eastern timezone (observing daylight-saving transitions).
+- **NFR-016 — Spend data freshness.** Tuesday's email reflects the latest available aggregate of spend at run time; the figures retrieved must be the most recent aggregated totals the spend data source can provide when the run composes the email, rather than being held back to the completed totals of the prior full week. The run does not wait for a full preceding week to be finalized before composing the email.
 - **NFR-002 — Spend data query latency.** Retrieval of per-channel spend totals for a reporting window must complete with a p95 latency target measured as a defined number of concurrent summary runs executing together. This is a low-frequency weekly batch path, not interactive traffic; engineering sets the concrete p95 target and concurrency count during planning. The query must respect any rate cap protecting the shared spend/cost data source so the weekly run does not degrade other consumers of that source.
-- **NFR-003 — Monitoring & alerting.** Operational monitoring must alert when the run failure rate exceeds 1% for 5 minutes sustained, and when any single customer's weekly run fails to produce a delivered email by the end of the Monday delivery window. Alerts route to the owning on-call rotation.
+- **NFR-003 — Monitoring & alerting.** Operational monitoring must alert when the run failure rate exceeds 1% for 5 minutes sustained, and when any single customer's weekly run fails to produce a delivered email by the end of the Tuesday delivery window. Alerts route to the owning on-call rotation.
 
 ### Security, Access & Data Sensitivity
 
@@ -299,7 +299,7 @@ Now reporting the decisions I flagged in Sections 0–3.
 
 ### In Scope (Phase 1 / MVP)
 
-- Automated weekly email, every Monday morning, to the Meridian Travel marketing team.
+- Automated weekly email, every Tuesday morning, to the Meridian Travel marketing team.
 - Total campaign spend per channel, one line per channel, in the format matching the team's current manual spreadsheet.
 - Plan-entitlement check, bounded dependency retries, block-on-incomplete-data, kill-switch, run audit, and monitoring/alerting as specified in Sections 3 and 5.
 
@@ -347,8 +347,19 @@ Two independent knowledge-graph lookups were run and they do not fully agree. Th
 
 _Applied reviewer's request._
 
-- Added FR-011a: CC the marketing VP on the first send only, with VP address from configuration.
-- Added Information Requirement for the marketing VP CC address used on the first send.
+- Updated Value section to reflect Tuesday delivery per OQ-005 resolution.
+- Updated BR-1 cadence to Tuesday 9am US Eastern per OQ-005 resolution.
+- Updated BR-3 to reference Tuesday email and the Sunday before send.
+- Updated flow diagram trigger gate from Monday morning to Tuesday morning.
+- Updated FR-001 title and trigger day from Monday to Tuesday.
+- Updated FR-002 to reference Tuesday summary run.
+- Updated FR-013 to reference the Tuesday email.
+- Updated NFR-001 delivery timeliness to Tuesday 9am US Eastern.
+- Updated NFR-016 to reference Tuesday's email.
+- Updated NFR-003 delivery window reference from Monday to Tuesday.
+- Updated Section 6 In Scope to reference Tuesday morning delivery.
+- Updated Information Requirements run-outcome bullet to reference the Tuesday email.
+- Cited DEC-008 on the FR-011a first-send definition (no change to its tracked status).
 
 
 ---
@@ -371,7 +382,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-003**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
 - **DEC-004**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
 - **DEC-005**: OQ-001/DEC-005 resolved: automated weekly report emails are included in the customer's standard plan — no plan change, add-on, or upsell required before building.
-- **DEC-006**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
+- **DEC-006**: Tuesday 9am Eastern
 - **DEC-007**: Assumed: Retain run audit records for 12 months unless a billing/spend-data agreement with the customer requires longer.
 
 ### Questions Resolved
@@ -380,7 +391,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-002**: Channel scope is the fixed four channels — Email, Paid Search, Paid Social, and Display — matching what marketing tracks today, with no seasonal/campaign variation; the same answer resolves DEC-003 via OQ-002.
 - **OQ-003**: OQ-003 and DEC-001 both resolved: the manual spreadsheet / email format is exactly two columns — channel name and total spend — with spend shown in US dollars to two decimal places; no derived/calculated columns.
 - **OQ-004**: Re-resolved OQ-004 — Monday's email uses the latest available aggregate of spend at run time, not the prior full week's completed totals.
-- **OQ-005**: Delivery is defined as Monday 8am US Eastern; this settles both OQ-005 and DEC-006 (the same question in other words).
+- **OQ-005**: Tuesday 9am Eastern
 - **OQ-006**: Resolved OQ-006 and the equivalent DEC-004: the email goes to the marketing-team@meridiantravel.example distribution list with no per-recipient permission restrictions on viewing spend data.
 - **OQ-007**: Resolved OQ-007: spend numbers are raw totals only — no validation or anomaly/spend-spike flagging is performed.
 
