@@ -245,7 +245,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 
 | Item | Rationale |
 |---|---|
-| Push/scheduled delivery of the report (email, notification) to the finance team | The requirement is explicitly *downloadable from K4A*; the intake confirmed this. Push delivery is a separate capability. |
+| Push/scheduled delivery of the report (email, notification) to the finance team | The reviewer confirmed in-console download from K4A is sufficient and no email or notification delivery is needed (resolves OQ-003). Push delivery is a separate capability. |
 | On-demand (click-time) generation of the report | The confirmed model is pre-generated-and-stored every Monday (BR-08). On-demand generation is an alternative model, not an addition; it is excluded. |
 | A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only. A dated history view is a larger UI component and not required for year-end close. |
 | Report customization by the user (metric selection, date-range picker, custom branding beyond a standard layout) | The required report contents are not yet specified; a fixed standard layout is Phase 1. User-configurable reporting is future work. |
@@ -266,7 +266,7 @@ _The sections below are derived automatically from the codebase knowledge graph,
 Two knowledge-graph lookups were run; the services below combine both, flagged by agreement. The original three-service analysis and an independent cross-check agree on the first three; the cross-check additionally surfaced four more. Engineering should reconcile the two lists during planning.
 
 - **reporting-api** (backend) — Provides attribution report data and the PDF export path. *Agreed by both lookups; high confidence.*
-- **reporting-dispatcher** (backend) — Schedules and delivers the weekly report. *Agreed by both lookups.*
+- **reporting-dispatcher** (backend) — Schedules the weekly report generation job. Note: "delivery" here means producing and storing the weekly artifact for in-console download only — the reviewer confirmed no email/notification push delivery is in scope (OQ-003). *Agreed by both lookups.*
 - **frontend-mos** (frontend) — K4A UI: the download link and report delivery interface. *Agreed by both lookups.*
 - **reporting-subscriptions-worker** (backend) — Processes recurring weekly report subscriptions; may overlap with reporting-dispatcher as the owner of the "weekly" trigger. *Cross-check only; medium confidence — reconcile against reporting-dispatcher.*
 - **summary-report-cloud** (backend) — Generates summary report data feeding the PDF. *Cross-check only; medium confidence.*
@@ -277,12 +277,8 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Specified the weekly cadence as every Monday in BR-01.
-- Resolved BR-08 generation-model decision to pre-generated-and-stored every Monday and removed the DECISION REQUIRED tag.
-- Updated NFR-001 to reference the resolved pre-generated model rather than a working model.
-- Updated Phase 1 in-scope item to reflect the resolved Monday pre-generation model.
-- Updated out-of-scope rationale for on-demand generation to reflect the now-confirmed pre-generated model.
-- Removed the now-resolved generation-model confirmation from the deferred/pending decisions list.
+- Updated the out-of-scope push-delivery rationale to cite the reviewer's confirmation that in-console download is sufficient (resolves OQ-003).
+- Clarified the reporting-dispatcher appendix role so its "delivery" wording means in-console download only, per the OQ-003 resolution.
 
 
 ---
@@ -306,7 +302,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does "last quarter" mean a fixed set of three calendar months, or a rolling most-recently-completed quarter that shifts each week? This changes the date-filtering logic in the report pipeline.
-- **OQ-003**: Does the report need to be delivered (e.g. emailed/notified) in addition to being downloadable from K4A, or is in-console download sufficient? The current dispatcher role mentions 'delivery' which may differ from what's wanted.
 - **OQ-004**: Should download access be restricted to the finance team specifically, and if so is there an existing entitlement/role that represents them? This determines whether access-gating is in scope.
 - **OQ-005**: What specific metrics, dimensions, and summary sections must the PDF contain for the year-end close, and is the existing summary-report data sufficient or do we need additional attribution queries?
 - **OQ-006**: Does the standard plan cover weekly PDF generation/storage within the 5-week window, or does the scope need to be phased (e.g. download-first, automated weekly cadence later) to hit the deadline?
@@ -315,6 +310,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved DEC-004/OQ-001 — the weekly PDF is pre-generated on a schedule every Monday and stored for download (not generated on-demand).
+- **OQ-003**: Resolved OQ-003 — in-console download from K4A is sufficient; no email or notification delivery is needed.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is clearly specified (weekly PDF of last-quarter attribution data, downloadable from K4A), and existing services already provide the exact capabilities (reporting-api has a PDF export API, reporting-dispatcher schedules weekly reports, frontend-mos has the download UI), so this is engineering-led design/build across multiple services rather than open-ended product discovery.
