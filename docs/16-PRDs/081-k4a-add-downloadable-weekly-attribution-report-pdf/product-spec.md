@@ -48,7 +48,7 @@ An independent knowledge-graph lookup for this work item surfaced a meaningful d
 
 ## Scope reconciliation note
 
-Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Whether a report preview and a delivery-status indicator are also wanted (beyond a bare download action) is treated as out of scope for Phase 1 unless confirmed. Whether finance needs any user-facing download surface at all, versus delivery through a non-UI path, is a customer-facing scope question. [DECISION REQUIRED]
+Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Working assumption (DEC-005/OQ-002, pending finance confirmation): Phase 1 provides a download action in the K4A console UI; a report preview and a delivery-status indicator are treated as out of scope for Phase 1 unless finance asks for them.
 
 ---
 
@@ -215,7 +215,7 @@ The system must track the following business information to support the Function
 - **NFR-005 — Server-side access enforcement:** Access to the report is enforced server-side on every download/retrieval request and is never satisfied by UI-hiding alone; an ineligible role or account is rejected with a 403 regardless of what the K4A UI presents (see FR-010). Role and account eligibility are re-derived from the authoritative source on every request, never cached client-side or trusted from a client-supplied claim; if the auth system is unreachable, the request fails closed.
 - **NFR-006 — Secure, time-limited delivery:** The PDF is delivered via a time-limited secure link rather than a permanently public URL or raw attachment; the link is unusable after its validity window expires (see FR-011). The concrete link lifetime is an engineering decision; default to a short validity window (e.g. 15 minutes) sufficient to complete a download, tunable by engineering.
 - **NFR-007 — No sensitive data in logs:** Raw attribution report content and any user-identifying data must never be written to application logs. Attribution data is finance-relevant business data; log identifiers and status, not report payloads.
-- **NFR-008 — Audit trail for access and generation:** Record an immutable, append-only audit entry for each report download/retrieval and each generation outcome, capturing actor identity (user ID + account ID), resource identity (report week/window), action, timestamp, and outcome/status. Audit writes are asynchronous and must not block the primary operation, but an audit-write failure must fire an immediate operational alert rather than fail silently. Minimum retention: 12 months. Because this report is produced specifically to support year-end financial close, a longer retention tied to Brightway Retail's audit cycle may be required. [DECISION REQUIRED]
+- **NFR-008 — Audit trail for access and generation:** Record an immutable, append-only audit entry for each report download/retrieval and each generation outcome, capturing actor identity (user ID + account ID), resource identity (report week/window), action, timestamp, and outcome/status. Audit writes are asynchronous and must not block the primary operation, but an audit-write failure must fire an immediate operational alert rather than fail silently. Working assumption (DEC-006, pending confirmation): retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it.
 
 ### Operability & Rollout
 
@@ -289,7 +289,8 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Recorded the accepted on-demand generation latency (a minute or two) and freshness/in-progress signalling in the Delivery model, resolving OQ-008.
+- Resolved DEC-005/OQ-002 with the stated working assumption and removed the [DECISION REQUIRED] tag in the Scope reconciliation note.
+- Resolved DEC-006 with the stated audit-retention working assumption (12 months min, extend to 24 months per Brightway Retail's cycle) and removed the [DECISION REQUIRED] tag in NFR-008.
 
 
 ---
@@ -304,14 +305,14 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-003** | What attribution metrics and dimensions does the finance team need in the report, in what order, and do they need row-level detail or summaries for year-end close? | Product owner (with Brightway Retail finance) | Revenue by channel, conversions by campaign, and ROI by touchpoint, shown as summary tables with the option of row-level detail, ordered revenue-first. |
-| **DEC-005** | Does the finance team need a user-facing download affordance inside the K4A console, or should the report reach them through a non-console path such as a link or email? | Product owner (with requester Mayank Ukey) | Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them. |
-| **DEC-006** | For a financial report produced to support Brightway Retail's year-end close, how long must we keep the record of who generated and downloaded each report before we're allowed to delete it? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it. |
 
 ### Decisions Resolved
 
 - **DEC-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **DEC-002**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
 - **DEC-004**: Resolved OQ-007 and DEC-004 (same question): finance confirmed the PDF needs the Brightway logo only — no disclaimers or audit-oriented formatting for year-end close.
+- **DEC-005**: Assumed: Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them.
+- **DEC-006**: Assumed: Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it.
 - **DEC-007**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 
 ### Open Questions (evidence gaps — needs more input)
