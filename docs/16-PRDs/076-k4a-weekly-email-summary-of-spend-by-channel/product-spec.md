@@ -19,7 +19,7 @@ Meridian Travel's marketing team manually pulls spend-by-channel data every Mond
 
 - **BR-1 — One line per channel:** The weekly email contains exactly one line per channel, each showing that channel's total spend for the covered week. No breakdown by campaign, geography, or date range is included — the intake confirmed total spend per channel is sufficient (answered by Mayank Ukey).
 - **BR-2 — Weekly cadence:** The email is generated and sent once per week, covering the previous week's spend.
-- **BR-3 — Previous-week coverage:** Each email covers the spend data for the week immediately preceding the send. The precise week boundary definition (calendar week Mon–Sun vs. rolling 7 days) is a business decision. [DECISION REQUIRED: DEC-001]
+- **BR-3 — Previous-week coverage:** Each email covers the spend data for the week immediately preceding the send. The week boundary is defined as a calendar week, Monday through Sunday, anchored to Eastern time. How long we wait after the week ends for complete ad-platform data before sending remains a business decision. [DECISION REQUIRED: DEC-001]
 - **BR-3a — Partial data is sent with a caveat:** If spend data for the covered week is delayed or incomplete at send time, the email is still sent with whatever data is available, accompanied by a note identifying what is missing — the report does not wait for complete data. The target delivery is roughly one day after the covered week ends.
 - **BR-4 — Spreadsheet-ready output:** The spend totals must be presented in a layout the marketing team can copy directly into their spreadsheet. The exact presentation (inline columnar text, an attached file, or an inline table) is a business/consumer-facing decision. [DECISION REQUIRED: DEC-002]
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan; the feature must be deliverable to a standard-plan account.
@@ -86,7 +86,7 @@ And no channel's spend is double-counted
 ```gherkin
 Given a generation run has started for Meridian Travel
 When the run determines which period to cover
-Then it resolves the "previous week" to a single, unambiguous start date and end date based on the account's configured week-boundary definition and timezone
+Then it resolves the "previous week" to a single, unambiguous start date and end date as the preceding calendar week (Monday through Sunday) anchored to Eastern time
 And only spend falling within that resolved range is included
 ```
 
@@ -197,13 +197,13 @@ Now reporting the business trade-offs I flagged in Sections 0–3.
 The system must track the following business information to support the Functional Requirements. Field names, types, and storage shapes are deliberately left to eng-plan.
 
 - **Account / customer identity** — Which account the weekly summary belongs to (e.g., Meridian Travel) and its plan tier (standard). Source: System-derived from existing account records. Matters because eligibility (BR-5) and recipient/configuration scoping are per-account.
-- **Covered-week date range** — The resolved start and end dates for the "previous week" a given email covers. Source: System-derived from the configured week-boundary definition and timezone (BR-3). Matters for FR-004/FR-005 (unambiguous, contiguous, non-overlapping coverage) and for idempotency keying in FR-003.
+- **Covered-week date range** — The resolved start and end dates for the "previous week" a given email covers, derived as the preceding calendar week (Monday through Sunday) in Eastern time. Source: System-derived from the week-boundary definition (BR-3). Matters for FR-004/FR-005 (unambiguous, contiguous, non-overlapping coverage) and for idempotency keying in FR-003.
 - **Channel set** — The list of channels that should appear as rows for the account, and whether that set varies seasonally/by campaign. Source: Business-defined configuration (BR-6). Matters for FR-007/FR-008 (one line per channel; zero-spend handling).
 - **Total spend by channel** — The aggregated spend figure per channel for the covered week. Source: System-derived from the spend/channel data source. Matters as the core payload of every FR in Feature Area C.
 - **Channel name** — The human-readable label shown on each line. Source: System-derived from the spend/channel dimension data. Matters for FR-007 (each line shows the channel name).
 - **Recipient list** — The marketing-team email recipient(s) for the account. Source: Business-defined configuration (BR-7). Matters for FR-010 delivery.
 - **Send schedule configuration** — The fixed send day, time, and timezone for the account. Source: Business-defined configuration (BR-8). Matters for FR-001 trigger evaluation.
-- **Week-boundary definition** — Whether "previous week" is a calendar week (Mon–Sun) or a rolling 7 days for the account. Source: Business-defined configuration (BR-3). Matters for FR-004/FR-005.
+- **Week-boundary definition** — "Previous week" is defined as a calendar week, Monday through Sunday, anchored to Eastern time (BR-3). Source: Business-defined. Matters for FR-004/FR-005.
 - **Generation run state** — The status of each weekly run (in-progress, succeeded, missed, failed) keyed to account + covered week. Source: System-derived. Matters for FR-002 (no overlap), FR-003 (idempotent overwrite), FR-012/FR-014 (recorded failure/missed-send conditions).
 - **Acceptable lag window** — The maximum tolerated delay between week-end and delivery before a send is abandoned. Source: Operational default unless the business specifies one (see BR-3 data-delay resolution). Matters for FR-013/FR-014 retry vs. missed-send decision.
 - **Data-readiness / completeness signal** — Whether the spend data for the covered week is complete at run time. Source: System-derived from the spend data source. Matters for FR-012/FR-013 (don't send partial data).
@@ -309,8 +309,10 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Added BR-3a: send partial data ~1 day after week-end with a note on what's missing.
-- Replaced the fail-closed data-delay branch in the flow diagram with assembling available data plus a missing-data note.
+- Resolved the week-boundary portion of BR-3 to calendar week Mon–Sun Eastern time; left the data-lag wait portion of DEC-001 open.
+- Updated FR-004 to resolve the previous week as the preceding Mon–Sun calendar week in Eastern time.
+- Updated the Covered-week date range information item to the Mon–Sun Eastern-time definition.
+- Updated the Week-boundary definition information item to the decided Mon–Sun Eastern-time value.
 
 
 ---
@@ -333,7 +335,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-002**: What exactly does 'previous week' mean — calendar week (Mon–Sun), rolling 7 days, or something else — and in what timezone should the week boundary and send time be anchored?
 - **OQ-003**: On what day and time should the weekly email go out?
 - **OQ-004**: What format should the email be so it's 'ready for spreadsheet entry' — plain inline table, CSV attachment, or something else?
 - **OQ-005**: Which channels should appear in the breakdown, and is that list fixed or does it vary by campaign/season?
@@ -343,6 +344,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: OQ-001 resolved: send whatever spend data is available about one day after the week ends, including a note flagging any channels/data that are missing or incomplete, rather than waiting for complete data.
+- **OQ-002**: 'Previous week' is defined as a calendar week, Monday to Sunday, anchored to Eastern time, which is also the timezone for the week boundary and send time.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The requirement is clearly specified (weekly email, one line per channel, previous week's total spend, spreadsheet-ready) with intake's own clarity marked "clear"; the open questions are routine implementation parameters (week definition, send time, recipients) that engineering can reasonably spec, not genuine product ambiguity—so this is engineering-led multi-service design across the reporting/scheduler/email stack, not Type A discovery.
