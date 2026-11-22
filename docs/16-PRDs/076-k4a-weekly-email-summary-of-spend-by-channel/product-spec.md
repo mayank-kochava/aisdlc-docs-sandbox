@@ -19,7 +19,7 @@ Meridian Travel's marketing team manually pulls spend-by-channel data every Mond
 
 - **BR-1 — One line per channel:** The weekly email contains exactly one line per channel, each showing that channel's total spend for the covered week. No breakdown by campaign, geography, or date range is included — the intake confirmed total spend per channel is sufficient (answered by Mayank Ukey).
 - **BR-2 — Weekly cadence:** The email is generated and sent once per week, covering the previous week's spend.
-- **BR-3 — Previous-week coverage:** Each email covers the spend data for the week immediately preceding the send. The week boundary is defined as a calendar week, Monday through Sunday, anchored to Eastern time. How long we wait after the week ends for complete ad-platform data before sending remains a business decision. [DECISION REQUIRED: DEC-001]
+- **BR-3 — Previous-week coverage:** Each email covers the spend data for the week immediately preceding the send. The week boundary is defined as a calendar week, Monday through Sunday, anchored to Eastern time. The report is sent approximately one day after the covered week ends; the system does not wait beyond that for complete ad-platform data (see BR-3a).
 - **BR-3a — Partial data is sent with a caveat:** If spend data for the covered week is delayed or incomplete at send time, the email is still sent with whatever data is available, accompanied by a note identifying what is missing — the report does not wait for complete data. The target delivery is roughly one day after the covered week ends.
 - **BR-4 — Spreadsheet-ready output:** The spend totals must be presented as a plain table inside the body of the email (no attachment), laid out so the marketing team can copy it directly into their spreadsheet.
 - **BR-5 — Account eligibility:** Meridian Travel is on the standard plan; the feature must be deliverable to a standard-plan account.
@@ -309,8 +309,7 @@ Two automated knowledge-graph passes produced overlapping, partially-conflicting
 
 _Applied reviewer's request._
 
-- Resolved BR-7 recipients to marketing-team@meridiantravel.example and noted no extra access control is needed.
-- Updated Recipient list Information Requirement with the concrete distribution-list address.
+- Resolved DEC-001 in BR-3: send ~1 day after week ends; removed the inline decision tag.
 
 
 ---
@@ -324,12 +323,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | How should "the previous week" be defined for Meridian Travel's report, and how long after the week ends are we willing to wait for complete ad-platform data before sending? | Product owner (with input from Meridian Travel) | Previous week = calendar week Monday through Sunday, in Meridian Travel's local timezone. Accept up to 24 hours of lag for data completeness before sending; if still incomplete after that window, skip the send and notify rather than send partial data. |
 | **DEC-002** | What format should the spend totals arrive in so the team can drop them straight into their spreadsheet? | Product owner (with input from Meridian Travel) | An inline plain-text table in the email body with two columns (channel name, total spend), tab/column aligned for direct copy-paste into a spreadsheet. Revisit a CSV attachment only if copy-paste proves unreliable. |
 | **DEC-004** | Who exactly on Meridian Travel's marketing team should receive this weekly email? | Product owner (with input from Meridian Travel) | A single configurable recipient list for the Meridian Travel account, seeded with the marketing-team contact(s) the requester provides at launch; supports multiple addresses. |
 
 ### Decisions Resolved
 
+- **DEC-001**: DEC-001 resolved: "the previous week" is defined as a calendar week Monday through Sunday in Eastern time, and the email is sent approximately one day after the covered week ends.
 - **DEC-003**: Channel set is a fixed list of four channels — Email, paid search, paid social, and display — that does not vary by season or campaign; this also settles DEC-003, which asks the same question.
 - **DEC-005**: Send schedule resolved: the weekly email goes out every Monday at 8:00 AM Eastern time; settles OQ-003 and the equivalent DEC-005.
 - **DEC-006**: DEC-006 resolved — audit records of each weekly spend email are retained for one year.
