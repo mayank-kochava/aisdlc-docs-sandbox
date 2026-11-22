@@ -1,3 +1,10 @@
+# Spec Critique
+
+---
+id: product-spec-critique
+title: Product Specification Critique
+---
+
 # Spec Critique: Meridian Travel Weekly Spend Summary Email
 
 **Spec Version:** product-spec.md
@@ -17,11 +24,9 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-016/NFR-009 cap delivery retries at 3 bounded attempts, but no FR defines what "transient" vs "permanent" means. A hard bounce (invalid recipient address) is permanent and will burn all 3 retries pointlessly, then alert. There is no requirement distinguishing a 4xx permanent delivery rejection from a 5xx/timeout transient one. | High | 3 (FR-016), 5 (NFR-009) | Add an FR: permanent delivery rejections (e.g. invalid-address, hard bounce) are NOT retried, recorded with a distinct reason, and alerted immediately without consuming the transient-retry budget. |
-| CG-002 | FR-002 (exactly-once) and FR-004 (idempotency) rely on a "reporting week" natural key, but BR-7 (reporting period) is `[DECISION REQUIRED]` and unresolved. If the period is "prior 7 calendar days" rather than "Monday–Sunday," the "reporting week" key is ambiguous and the exactly-once guard cannot be tested or built deterministically. | High | 1 (BR-7), 3 (FR-002/004) | Resolve BR-7 before FR-002/004 are testable; define the exact string/field that constitutes the idempotency key once the period is chosen. |
-| CG-003 | FR-016 says "retry up to 3 attempts" but FR-003 (overlap guard) + NFR-001 give no bound on total wall-clock time. If delivery retries with exponential backoff push the send past the Monday delivery window, no requirement defines whether a late-but-successful send is acceptable or should be treated as a failed run. | Medium | 3, 5 | Define a hard deadline: if a run cannot deliver before time T, treat as failed-run and alert even if a retry might eventually succeed. |
-
-No issue rises to Critical: the fail-closed posture (FR-009, NFR-004, NFR-009) and no-silent-drop requirements (FR-017) mean no identified gap causes silent data loss or advertiser data leakage. The gaps above degrade testability/behavior, not safety.
+| CG-001 | Audit-write failure posture conflicts with send path. NFR-005 says the audit write is asynchronous so it "never blocks the send," but an audit-write failure "must raise an immediate operational alert." There is no FR describing what the system does if a send succeeds but the audit entry never lands — can a run be re-triggered and double-send because no run record exists? The exactly-once guarantee (FR-002/FR-004) depends on a run record that NFR-005 allows to silently not exist. | High | 5 (NFR-005), 3 (FR-002/004) | Add an FR defining behavior when the run record / audit write fails: must the run be treated as not-sent (risking duplicate) or sent (risking lost audit)? Define the ordering and the dedupe key's durability guarantee. |
+| CG-002 | "All channels missing" is undefined. FR-009 covers data-source-unavailable (fail closed, no email). FR-010 covers "one or more channels missing/delayed" (send with available). But the boundary case where retrieval *succeeds* yet *every* channel is missing/zero is unspecified — does it send an all-flagged-incomplete email, or is that treated as FR-009? | High | 3 (FR-009/FR-010), flowchart node F | Define the all-channels-missing / all-zero case explicitly: send a fully-flagged email, suppress, or alert. |
+| CG-003 | Partial-send is irreversible and un-retracted. When FR-010 sends a partial email at 08:00 and the missing channel's data arrives at 08:05, the VP has already received an understated total with no correction mechanism. No FR defines whether a corrected/follow-up summary is ever issued. This is the original business risk (manual copy *errors*) reintroduced as *systematic understatement*. | High | 3 (FR-010), BR-8 | Add an FR stating whether late-arriving channel data triggers a correction email or is simply absorbed into no further action; make the non-correction explicit if that is the decision. |
 
 ---
 
@@ -31,12 +36,11 @@ No issue rises to Critical: the fail-closed posture (FR-009, NFR-004, NFR-009) a
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-001 | "must complete well within its weekly cadence" / "with margin for the bounded retries" | "Well within" and "margin" are not measurable; no concrete deadline. | Given a weekly run starts, When it executes query+aggregate+compose+send, Then it completes and delivers no later than [X hours] before the configured Monday delivery time. (X must be set.) |
-| FR-012 | "structured so it can be forwarded as-is or copied into a spreadsheet without manual reformatting" | "Without manual reformatting" is subjective and untestable without a defined format (columns? CSV? plain table?). | Given the email is composed, When a recipient copies the spend block into a spreadsheet, Then each channel lands in its own row and spend in its own numeric column with no merged cells or embedded markup. Define the exact content structure. |
-| FR-019 / NFR-010 | "change propagates to new runs within 5 minutes" | Testable, but "new runs" for a once-a-week job means this can only be exercised ~weekly; needs a stated verification method (e.g. flag-read timing independent of schedule). | Given the kill-switch is flipped off at time T, When the flag store is read by the scheduler, Then the scheduler observes the off state by T+5min, verified independently of the weekly trigger. |
-| FR-008 | "if no curated subset is defined, all channels tracked for Meridian Travel are included" | "Channels tracked" is undefined — tracked where, as of when? A channel with zero spend this period: included with 0, or omitted? | Given no curated subset is defined, When composing the channel list, Then include every channel with ≥1 campaign for Meridian Travel; AND specify whether a zero-spend channel appears as a 0 line or is omitted (currently undefined). |
-
-All FRs ARE written in Gherkin — this section flags vagueness inside otherwise-Gherkin FRs plus the prose NFRs, not format violations (see Section 5).
+| NFR-001 | "must complete well within its weekly cadence… lands within the team's Monday workflow window… with margin" | "Well within," "workflow window," and "margin" are not measurable. No testable deadline exists. | Given a weekly run fires at 08:00 ET Monday, When the run executes, Then the email must be accepted by the delivery path no later than 08:30 ET the same Monday (including all FR-016 retries). |
+| FR-012 | "structured so it can be forwarded as-is or copied into a spreadsheet without manual reformatting" | "Forward-and-paste-friendly" is subjective; no test can assert "friendly." No defined format (plain-text table? HTML table? TSV?). | Given the composed email, When a recipient copies the spend block and pastes into a spreadsheet, Then each channel lands in its own row and the total in its own numeric cell, with an explicit column delimiter (define: tab-separated / HTML `<table>`). |
+| FR-016 | "bounded exponential backoff up to 3 attempts" | "Exponential backoff" has no base/ceiling defined; 3 attempts total-or-additional is ambiguous. | Given a transient delivery failure, When retrying, Then attempt 2 occurs after N seconds and attempt 3 after 2N seconds (define N), for a maximum of 3 total attempts, after which FR-017 applies. |
+| FR-019 / NFR-010 | "propagates to new runs within 5 minutes" | Testable, but "new runs" for a once-weekly job means the 5-minute window is only exercised if a run fires inside it — essentially untestable in production cadence. | Clarify that the 5-minute propagation is asserted against the flag-read point, not run cadence: Given the flag is flipped off, When a run is scheduled ≥5 minutes later, Then it does not start. |
+| NFR-002 | "must not issue unbounded or concurrent-heavy queries… a single sequential aggregation query path per run is sufficient" | "Concurrent-heavy" and "sufficient" are not assertions. | Given a single weekly run, When it queries spend, Then it issues at most one aggregation query against the shared data source and no concurrent queries. |
 
 ---
 
@@ -44,28 +48,30 @@ All FRs ARE written in Gherkin — this section flags vagueness inside otherwise
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard 5-week deadline | Yes — MVP scope cut + early decision resolution | PASS | Mitigation is a real scope action, not just a note. Contingent on `[DECISION REQUIRED]` items being answered early (dependency, not a gap). |
-| Multi-service blast radius | Yes — NFR-002, NFR-004, NFR-012 + architecture spike | PASS | Guardrails correctly stated against capability, not named services. Spike is a real planned action. |
-| Scheduled email delivery complexity | Yes — NFR-008/009/003/010/011 | PASS | Idempotency, fail-closed, bounded retry, kill-switch all concretely specified. |
-| Legacy/shared data-source dependency (ownership unresolved) | Partial — NFR-002 bounds load, NFR-004 fail-closed | PASS (with caveat) | Mitigated for safety, but no FR defines behavior if the eventually-selected data source has a DIFFERENT scoping model than assumed. NFR-004's "fail closed if scoping cannot be confirmed" covers this adequately. |
-| Permanent vs transient delivery failure | No specific requirement | FAIL | Spec treats all delivery failures as transient-retryable (see CG-001). A permanent bounce has no dedicated handling. Add the FR proposed in CG-001. |
+| Hard 5-week deadline | Yes — MVP scope cut + early decision resolution | PASS | Concrete and tied to Section 6. |
+| Multi-service blast radius | Partial — NFR-002/004/012 + architecture spike | PASS (with caveat) | Guardrails are stated against the capability, which is correct. But the spike is a *dependency*, not a mitigation the spec controls; if ownership is unresolved at build start, no FR describes a fallback. Acceptable but note residual risk. |
+| Scheduled email delivery complexity | Yes — NFR-008/009, NFR-003, kill-switch/rollback | PASS | Well covered. |
+| Legacy/unresolved data-source ownership (Section 1) | Partial — NFR-004 fail-closed, NFR-002 bounded load | PARTIAL / FAIL | The spec acknowledges the *authoritative spend data owner is unresolved* but ships no fallback requirement for what the run does if the selected source turns out to lack tenant-scoping or spend-by-channel granularity. NFR-004 says "fail closed if scoping cannot be confirmed" — good — but there is no FR covering a source that returns spend *without* channel attribution (FR-006/FR-008 assume channel is always present). |
+| Audit-write failure (NFR-005) | Acknowledged but mitigation is only "alert" | FAIL | Raising an alert is detection, not mitigation. See CG-001: the durability of the exactly-once dedupe key is not guaranteed if the audit/run record can silently fail. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Hard bounce / invalid recipient address:** No FR distinguishes a permanent delivery rejection from a transient one; FR-016 would waste the retry budget (see CG-001).
-2. **Zero-spend channel:** FR-008/FR-011 don't state whether a channel with $0 spend this period appears as a "0" line or is omitted. Ambiguous for both composition and test.
-3. **All channels zero / no spend at all:** If Meridian Travel had zero spend across every channel in the period, does an email still send (an all-zero summary) or is that treated like missing data? FR-009 only covers retrieval *failure*, not legitimately-empty results.
-4. **Partial-data rule undefined at build time:** BR-8 is `[DECISION REQUIRED]`, yet FR-010 depends on it. Until resolved, "the email clearly indicates incomplete channels" cannot be fully tested (what does "hold" vs "send-and-flag" produce?).
-5. **Clock change / DST and timezone:** BR-2 timezone is `[DECISION REQUIRED]`. Spring-forward/fall-back could cause a run to fire twice or skip; no FR addresses scheduler behavior across a DST boundary.
-6. **New channel appears mid-period:** A channel with first-ever spend during the reporting window — is it auto-included (FR-008 "all tracked") even if the curated subset predates it? Undefined.
-7. **Audit-write failure vs send success:** NFR-005 says audit is async and an audit-write failure alerts — but if the email sent successfully and the audit write then fails, FR-018 ("records the successful send") is violated while the recipient already has the email. No FR reconciles "delivered but unaudited."
-8. **Recipient list empty or misconfigured:** FR-015 assumes a configured recipient list exists. If the fixed operational setup has an empty/invalid list, no FR defines whether the run fails-closed, alerts, or sends to no one silently.
-9. **Scheduler fires while a run is mid-DST-delayed:** Interaction of FR-002 (once per week) and FR-003 (overlap guard) with a run that spans unusually long is covered conceptually but not bounded in time (see CG-003).
-10. **Kill-switch flipped mid-run:** NFR-010 says an in-progress run "may complete under prior behavior." This means the email can still go out seconds after an on-call tries to stop it. Acceptable per spec, but no FR records that a completed-after-disable send occurred, which could confuse incident forensics.
-11. **Currency / formatting of spend figures:** No requirement specifies currency, decimal precision, or thousands formatting for the per-channel totals — directly affects FR-012's "paste into spreadsheet" testability.
-12. **Duplicate channel names from different sources:** FR-006 guarantees "each channel appears at most once," but if the eventually-selected data source names the same channel differently (e.g. "Paid Search" vs "Search - Paid"), de-duplication logic is unspecified.
+1. **All channels missing but retrieval succeeded:** Falls between FR-009 and FR-010 — undefined (see CG-002).
+2. **Late-arriving channel data after a partial send:** No correction path (see CG-003).
+3. **Zero spend vs. missing data ambiguity:** A channel with a legitimate $0 spend for the week is behaviorally indistinguishable from a missing channel unless the flag in FR-010 explicitly separates "reported zero" from "did not report." Not stated.
+4. **Negative or adjusted spend (refunds/credits):** FR-006/FR-007 assume spend is additive and non-negative. No handling for a negative per-channel total or a mid-week spend correction/reversal.
+5. **DST transition on 8:00 AM Eastern:** BR-2 says "Eastern Time." On the spring-forward / fall-back Mondays, "8:00 AM Eastern" is unambiguous, but the reporting-period boundary (BR-7, Mon–Sun) crosses a DST change twice a year — spend records near the boundary may be double-counted or dropped depending on timezone handling. Not addressed.
+6. **Reporting-period boundary timezone:** FR-007/BR-7 say "Monday to Sunday" but never state the timezone of that window. If spend is timestamped in UTC and the window is Eastern, boundary spend is misallocated. Undefined.
+7. **New channel introduced mid-period:** FR-008 lists four fixed channels. If K4A begins tracking a fifth channel for Meridian, BR-5/FR-008's enumerated set silently excludes it. No "all currently-tracked channels" dynamic behavior is tested.
+8. **Recipient list empty or all addresses invalid/hard-bounce:** FR-015 assumes a configured list exists. No behavior for an empty recipient config, or when every recipient hard-bounces (vs. transient failure in FR-016).
+9. **Partial recipient delivery:** FR-016/FR-017 treat delivery as all-or-nothing. If 3 of 5 recipients accept and 2 bounce, is that "success" (FR-018) or "failure" (FR-017)? Undefined.
+10. **Kill-switch flipped mid-run:** NFR-010 says an in-progress run "may complete under prior behavior." This means an email can still be sent *after* an on-call engineer disabled the feature during an incident — directly contradicting the incident-mitigation intent. Worth an explicit decision.
+11. **Scheduler misses the trigger entirely (job host down at 08:00):** FR-001 covers the trigger firing; nothing covers a *missed* fire. Is there catch-up, or is the week simply skipped silently? NFR-003 alerts on *failed* runs, but a run that never started may not register as failed.
+12. **Advertiser has zero campaigns:** FR-005 retrieves "all campaigns belonging to Meridian Travel." If there are none, the downstream aggregation (FR-006) produces an empty result — intersects with CG-002 but is a distinct trigger.
+13. **Clock skew / duplicate reporting-week key across year boundary:** The dedupe key is "advertiser + reporting week" (NFR-008). ISO week numbering across a year boundary (week 52/53 → week 1) can collide if the key isn't year-qualified. Not specified.
+14. **Audit retention vs. deletion request:** NFR-005 mandates append-only 12-month retention and NFR-006 handles recipient addresses as user-identifying data. A data-subject deletion request for a recipient address stored in an immutable audit trail is an unaddressed conflict.
 
 ---
 
@@ -73,25 +79,21 @@ All FRs ARE written in Gherkin — this section flags vagueness inside otherwise
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-020 are all in proper Gherkin blocks. NFRs are intentionally prose per the template and are not FRs. |
-| Document contains only Sections 0–6 | FAIL | The document contains a trailing **"## Appendix: Engineering Reference"** with a multi-paragraph narrative "Affected Services" analysis, confidence ratings, and a "Key discrepancies for the spike to resolve" findings list. This is a multi-paragraph narrative KG cross-check appendix with its own prose findings — exactly the stray-appendix shape the base skill flags, NOT a one-line labeled metadata trailer and NOT a Revision Summary. It must be removed or relocated out of the spec body. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 contains only bullet-list items. No attribute tables or type declarations present. |
-
-Note on the Appendix (SR-001, feeding the FAIL above): the appendix is substantive narrative content (service candidates, confidence tiers, discrepancy analysis), not a sanctioned trailing Revision Summary or a run of short `> **Label:** ...` metadata blockquote lines. Section 1 already summarizes the ownership ambiguity adequately for product review; the detailed service evidence belongs in a separate engineering planning artifact, not inside the spec's numbered-section body.
-
-### KG Cross-Check (against independent evidence)
-
-No contradiction found between the spec's implementation claims and the independent KG lookup. The spec's embedded "fresh knowledge-graph lookup" list matches the independent cross-check evidence (k4a-sam-backend, sam-report-scheduler, sam-performance-reporter, sam-campaign-data-sync, k4a-sam-campaign-data-sync, reporting-subscriptions-worker, reporting-dispatcher, notifications-api, cost-v2, frontend-mos) with the same confidence tiers. Importantly, the spec does **not** assert a resolved data flow, join, or existing endpoint/table — it explicitly flags ownership as unresolved and defers to an architecture spike. Because it makes no concrete implementation-reality claim, there is nothing for the KG evidence to contradict. This is handled correctly; the only issue is the *placement* of the evidence (Section 5 FAIL above), not its accuracy.
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-020 are all in Gherkin blocks. NFRs are intentionally prose, which is acceptable. |
+| Document contains only Sections 0–6 | FAIL | The document contains an **"## Appendix: Engineering Reference"** between Section 6 and the Revision Summary. This is a multi-paragraph narrative appendix (Affected Services, "Key discrepancies for the spike to resolve") with its own prose findings — exactly the kind of stray analysis appendix the format rule is meant to catch, not a sanctioned one-line metadata trailer. The trailing **"## Revision Summary"** is expected and correct (not flagged). |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a bullet list of business information items with no attribute tables or type declarations. |
 
 ---
 
 ## 6. Recommendations
 
-1. **Remove or relocate the "Appendix: Engineering Reference"** out of the spec body to restore Sections 0–6 compliance (Format FAIL). Section 1 already captures the ownership ambiguity sufficiently.
-2. **Add a permanent-vs-transient delivery-failure FR** (CG-001 / Risk Audit FAIL): permanent rejections (hard bounce/invalid address) are not retried, are recorded distinctly, and alert immediately.
-3. **Resolve BR-7 (reporting period)** before FR-002/004/007 are treated as testable — it defines the idempotency key and the meaning of "total spend" (CG-002).
-4. **Define zero-spend and all-zero behavior** (edge cases 2 & 3): whether a $0 channel renders a line and whether a legitimately-empty period sends an email at all.
-5. **Make NFR-001 measurable**: set a concrete deadline (hours before Monday delivery) and define whether a late-but-successful send counts as a failed run (CG-003).
-6. **Specify FR-012's exact content structure** (columns, currency, precision) so "paste into spreadsheet" is testable (edge case 11).
-7. **Address scheduler DST/timezone behavior** once BR-2 is resolved (edge case 5), and reconcile the "delivered-but-unaudited" case between FR-018 and NFR-005 (edge case 7).
-8. **Define empty/invalid recipient-list handling** for FR-015 (edge case 8).
+1. **Resolve the audit/run-record durability gap (CG-001, Risk Audit FAIL).** Define exactly-once behavior when the audit/run record write fails, so the dedupe guarantee can't silently break and double-send.
+2. **Define the all-channels-missing / all-zero boundary (CG-002) and distinguish "reported $0" from "missing" (Edge Case 3).** These two gaps together determine whether an empty or understated email ever reaches the VP.
+3. **Decide and document the late-data correction policy (CG-003).** State explicitly whether a corrected follow-up is ever sent, or that understated partials stand.
+4. **Pin timezone on the reporting-period window and handle DST (Edge Cases 5, 6).** State the window timezone and boundary rule; this directly affects numeric correctness.
+5. **Make NFR-001 and FR-012 testable.** Add a concrete delivery deadline and a defined machine-parseable content format (TSV/HTML table).
+6. **Move the Engineering Reference appendix out of the spec body** (or into a linked companion doc) to satisfy the Sections 0–6 format rule.
+7. **Define partial-recipient and empty-recipient delivery semantics (Edge Cases 8, 9).**
+8. **Clarify the kill-switch-mid-run behavior (Edge Case 10)** so incident responders know an email can still land after they disable the feature.
+9. **Add missed-trigger / catch-up behavior (Edge Case 11)** so a never-started run is observable, not silent.
+10. **KG cross-check note:** The spec's own Section 1 and appendix already acknowledge the ownership ambiguity across the two lookups, and the independent KG evidence matches the spec's reproduced "fresh lookup" list (k4a-sam-backend, sam-report-scheduler, sam-performance-reporter, sam-campaign-data-sync, k4a-sam-campaign-data-sync, reporting-subscriptions-worker, reporting-dispatcher, notifications-api, cost-v2, frontend-mos) — **no contradiction found** between the spec's stated implementation reality and the KG evidence; the spec correctly refrains from asserting a single owner and defers to the architecture spike. This is handled correctly and is not a defect.

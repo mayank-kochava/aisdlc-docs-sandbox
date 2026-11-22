@@ -383,4 +383,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-007**: Resolved OQ-007 — the weekly summary email is built just for Meridian Travel for now, not as a reusable per-advertiser summary for other clients.
 
 ---
-> **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
+> **Classification:** Type B (confirmed)
