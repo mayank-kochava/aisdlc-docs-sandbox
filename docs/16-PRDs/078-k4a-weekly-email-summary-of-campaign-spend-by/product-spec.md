@@ -28,7 +28,7 @@ Automating this into a weekly email summary removes the recurring manual pull an
 - **BR-4 — Advertiser scope.** The data covers all campaigns belonging to Meridian Travel only. No other advertiser's data appears in this email.
 - **BR-5 — Channel set.** The email lists every channel K4A tracks for Meridian Travel: email, paid search, paid social, and display.
 - **BR-6 — Recipients.** The summary is delivered to the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`. All recipients receive the same summary; there is no differentiation by team or geography.
-- **BR-7 — Reporting period.** The window of spend each email covers (e.g. the prior 7 calendar days, or the prior Monday–Sunday week) is a business decision that determines what "total spend" means. [DECISION REQUIRED]
+- **BR-7 — Reporting period.** Each email covers the previous calendar week, Monday to Sunday. This window determines what "total spend" means for each run.
 - **BR-8 — Partial-data handling.** When one or more channels have missing or delayed data at send time, the email is sent on schedule with the available channels' data, and the channels with missing or delayed data are clearly flagged as incomplete rather than held. The email does not wait for all channels to report.
 - **BR-9 — Self-service configuration is out of scope for Phase 1.** The requester confirmed a fixed static setup is acceptable and no self-service UI is needed for now. Recipients, channel selection, and schedule are configured as a fixed setup for Meridian Travel; the team cannot self-edit them in Phase 1 (see Section 6).
 
@@ -247,7 +247,7 @@ The system must track the following business information to support the function
 - **Campaign spend records** — the per-campaign spend that rolls up into channel totals. Sourced from the authoritative spend-by-channel data system (external to this feature; exact owner unresolved — see Section 1 and the appendix). Matters because it is the raw input to the aggregation in FR-006.
 - **Channel attribution** — the channel each spend amount belongs to. External/system-derived from the spend data source. Matters because the entire email is organized as one total per channel (FR-006, FR-011).
 - **Per-channel spend totals (for a reporting period)** — the aggregated figure shown on each line of the email. System-derived from the campaign spend records within the reporting-period window. Matters because this is the core content the recipient consumes (FR-006, FR-011).
-- **Reporting period window** — the start/end boundary that defines which spend is counted. Derived from the reporting-period business rule (BR-7). Matters because it determines what "total spend" means for each run and is stated in the email (FR-007, FR-013).
+- **Reporting period window** — the start/end boundary that defines which spend is counted: the previous calendar week, Monday to Sunday (BR-7). Matters because it determines what "total spend" means for each run and is stated in the email (FR-007, FR-013).
 - **Channel-inclusion rule** — all channels K4A tracks for Meridian Travel (email, paid search, paid social, and display) are listed; no curated subset applies (BR-5). Matters because it governs which channels are listed (FR-008).
 - **Recipient list** — the addresses the summary is delivered to: the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`, with all recipients receiving the same summary (BR-6). User/business-provided configuration for Meridian Travel. Matters because delivery must go to exactly these recipients and no one else (FR-015).
 - **Send schedule (time + timezone)** — when the weekly run fires: every Monday at 8:00 AM Eastern Time. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
@@ -351,7 +351,8 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Folded OQ-007 resolution into Section 6: confirmed single-advertiser (Meridian Travel only) scope, not a reusable per-advertiser product.
+- Resolved BR-7: reporting period is the previous calendar week, Monday to Sunday (DEC-004).
+- Updated Information Requirements reporting-period window to state the Monday-to-Sunday previous-week boundary.
 
 
 ---
@@ -366,7 +367,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | What time of day and in which timezone should the weekly summary email be sent on Monday? | Product owner (with Meridian Travel marketing team) | Send at 07:00 in Meridian Travel's primary business timezone on Monday, so the summary is waiting in inboxes before the team starts their week. |
-| **DEC-004** | What span of time should each weekly email's spend totals cover? | Product owner (with Meridian Travel marketing team) | The prior completed Monday-through-Sunday calendar week, matching the team's existing Monday compilation cadence. |
 | **DEC-006** | Monday alignment. The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-007** | Channel set. Whether the email lists every channel K4A tracks for Meridian Travel, or only a curated subset Meridian defines, is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-008** | Recipients. The specific recipients (names/roles) and whether all recipients receive the same summary or differentiated summaries by team/geography is a business decision. | _(not yet assigned)_ | _(not yet specified)_ |
@@ -375,6 +375,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **DEC-002**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 - **DEC-003**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
+- **DEC-004**: Resolved DEC-004 (BR-7 reporting period): each weekly email covers the previous calendar week, Monday to Sunday.
 - **DEC-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 
 ### Questions Resolved
