@@ -254,5 +254,5 @@ _Each carries an **Owner** and a **Provisional Value** engineering may build aga
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-009** _(Code-only)_: Which repository hosts the k8s deploy manifests (replica counts, HPA) for the chosen cloud-worker generation home? Investigation confirmed these live in the external ko-k8s-apps repo, not in any investigated service checkout — needs that repo examined before deploy-topology / single-replica-background-tier decisions can be made.
-- **OQ-010** _(Code-only)_: Is audit-api (via its ingest endpoint) the intended home for the NFR-008 audit trail of report access/generation, or is in-service structured logging sufficient? audit-api fits the who-did-what → BigQuery pattern but is not an attribution data source; the async-write-with-alert-on-failure owner is undecided.
+- **OQ-010** _(Code-only)_: Use audit-api through its ingest endpoint for the report access and generation audit trail (NFR-008).
 - **OQ-011** _(Code-only)_: Is the FR-006 incomplete-week data-quality warning truly Phase-1? No completeness check exists anywhere and it is in tension with a 'most recent completed calendar quarter' window; if deferrable it meaningfully reduces Phase-1 scope against the 5-week deadline.
