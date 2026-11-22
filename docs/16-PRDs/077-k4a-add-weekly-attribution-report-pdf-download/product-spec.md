@@ -17,7 +17,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 
 ### Business Rules
 
-- **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. [DECISION REQUIRED]
+- **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. The report is part of the standard plan: no gating, upgrade, or special entitlement is required, and a standard-plan account is entitled to it by default. Brightway can use it without any entitlement change.
 - **BR-2 — Cadence:** The report is generated on a permanently recurring weekly schedule (confirmed by the requester: weekly, every week, not just through year-end close). It is not a one-time year-end export, and the weekly cadence does not stop after year-end close — durable scheduling is in scope rather than a lighter-weight interim solution.
 - **BR-3 — Report period:** Each report covers the last quarter (Q4) only. The reporting window is a trailing-quarter window, not a configurable range in this phase.
 - **BR-4 — Format:** The report is delivered as a downloadable PDF. The specific visual appearance and generation method are engineering decisions, deferred to downstream planning.
@@ -156,7 +156,7 @@ The system must track the following business information to support the Function
 - **Report availability state** — whether a generated report currently exists and is downloadable for an account, including which one is the latest available. *System-derived.* Supports FR-006, FR-007, FR-008, and the "prior report remains available" guarantee in FR-003.
 - **Generated PDF artifact** — the rendered last-quarter (Q4) attribution report delivered to the finance user. *System-derived* (built from attribution data). Supports FR-008.
 - **Attribution report content** — the underlying attribution metrics and data points that populate the report for the trailing-quarter window. *External/upstream* (sourced from the attribution data service, which backend owns this is unresolved per the Section 1 service-ownership note). Supports FR-001, FR-002. The exact metrics, data points, and grouping are unspecified (see BR-6, already flagged in Section 1).
-- **Account entitlement state** — whether a given account is entitled to the weekly attribution report feature. *System-derived / external* (from the authoritative entitlement source). Supports FR-006, FR-009. Whether a standard-plan account is entitled by default is unresolved (see BR-1, already flagged in Section 1).
+- **Account entitlement state** — whether a given account is entitled to the weekly attribution report feature. *System-derived / external* (from the authoritative entitlement source). Supports FR-006, FR-009. Standard-plan accounts are entitled to the report by default (see BR-1); entitlement is still re-derived and enforced server-side on every download request (NFR-004).
 - **Requesting user and account identity** — the user and account making a download request, used to authorize the request server-side on every call. *System-derived* (from the authenticated session). Supports FR-008, FR-009.
 - **Generation failure condition** — the named, distinct failure state for a cycle (e.g. data assembly failure vs. render failure), feeding the operational alert. *System-derived.* Supports FR-003, FR-010.
 - **Schedule configuration** — the weekly cadence and generation time for the recurring job. *System-derived / configured.* Supports FR-001. The specific time of day the report is generated is an engineering/operational default (see NFR-009); the cadence itself is weekly and confirmed (BR-2).
@@ -225,13 +225,15 @@ _The sections below are derived automatically from the codebase knowledge graph,
 - **frontend-mos** (frontend) — K4A console UI: add the PDF download button/flow for attribution reports.
 - **pubsuite-attribution** (backend) — Provide attribution data for the K4A weekly report content.
 
-> **Cross-check discrepancy (for planning):** An independent KG lookup additionally surfaced **summary-report-cloud** (builds attribution summary report data), **koch-query-api** (queries attribution data, low confidence), and **entitlements-api** (gates access to the report feature, low confidence), none of which appear in the primary affected-services list; and did not re-find **pubsuite-attribution**. Which backend owns report-content data (pubsuite-attribution vs. summary-report-cloud vs. koch-query-api) is not settled by the evidence and must be resolved during planning. entitlements-api is relevant because Brightway is a standard-plan customer and the feature may be plan-gated (see BR-1 / NFR-004).
+> **Cross-check discrepancy (for planning):** An independent KG lookup additionally surfaced **summary-report-cloud** (builds attribution summary report data), **koch-query-api** (queries attribution data, low confidence), and **entitlements-api** (gates access to the report feature, low confidence), none of which appear in the primary affected-services list; and did not re-find **pubsuite-attribution**. Which backend owns report-content data (pubsuite-attribution vs. summary-report-cloud vs. koch-query-api) is not settled by the evidence and must be resolved during planning. entitlements-api remains relevant only for server-side enforcement (NFR-004): the report is part of the standard plan and is not plan-gated (see BR-1), so no gating change is needed for Brightway, but entitlement is still verified server-side on each download.
 
 ## Revision Summary
 
 _Applied reviewer's request._
 
-- Updated BR-2 to state the weekly cadence is permanently recurring, not limited to year-end close, per reviewer answer to OQ-001.
+- Resolved BR-1: report is part of the standard plan, no gating or special entitlement needed.
+- Updated Account entitlement state info requirement: standard-plan accounts entitled by default, enforcement still applies.
+- Updated appendix cross-check note: report is not plan-gated, entitlements-api relevant only for enforcement.
 
 
 ---
@@ -245,7 +247,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Is the weekly attribution report included in the standard plan, or is it a gated feature that this standard-plan customer would need an upgrade or special entitlement to access? | Product owner | Treat the report as available to the requesting standard-plan account for this engagement (grant an explicit entitlement to Brightway Retail), while still enforcing the entitlement check server-side so access can be scoped later. |
 | **DEC-002** | What is Brightway Retail's actual year-end close date that the first report must be ready before? | Product owner | Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer. |
 | **DEC-003** | What specific attribution metrics and data points must the report contain, and how should they be grouped for the finance team's year-end close? | Product owner | Include the core attribution metrics already surfaced in the K4A attribution view for the quarter (installs, attributed conversions/events, spend, and cost-per-action by publisher/campaign), grouped by publisher then campaign, pending finance confirmation of their close checklist. |
 | **DEC-004** | Does the finance team need to be actively notified (for example by email or an in-app alert) when each week's report is ready, or is on-demand download from the console enough? | Product owner | Ship on-demand download in the console for Phase 1 with no active delivery/notification, and revisit email delivery as a fast-follow if finance asks for it. |
@@ -256,11 +257,15 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-010** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-011** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-012** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+
+### Decisions Resolved
+
+- **DEC-001**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does the finance team need the report actively delivered (email/notification when ready) or only on-demand download from the console? This decides whether the subscriptions/delivery workflow is in scope.
-- **OQ-003**: Is this attribution report a plan-gated/premium feature? The customer is on the standard plan, so if entitlements apply we may need to grant access or adjust gating before they can use it.
 - **OQ-004**: What exactly should 'last quarter' resolve to each week — a fixed Q4 window, or a rolling trailing-quarter that shifts with each weekly run?
 - **OQ-005**: If a weekly report generation fails, who should be notified and what's the fallback the finance team should see?
 - **OQ-006**: What specific attribution metrics/data points must the PDF contain and how should they be grouped for year-end close?
@@ -270,6 +275,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 — the report is a permanently recurring weekly report (weekly, every week), not a cadence limited to year-end close, so durable scheduling is in scope.
+- **OQ-003**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
 
 ---
 > **Classification:** Type A
