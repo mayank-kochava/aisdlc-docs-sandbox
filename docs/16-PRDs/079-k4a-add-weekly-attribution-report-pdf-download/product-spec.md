@@ -19,16 +19,16 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 - **BR-01 — Report cadence:** The attribution report is generated on a weekly schedule, every Monday.
 - **BR-02 — Report format:** The report is delivered as a PDF.
 - **BR-03 — Data scope:** Each report covers the last quarter of attribution data only.
-- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. [DECISION REQUIRED]
+- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team members only. Access is restricted to that audience; no other roles or accounts may download or see the report, and users without the entitlement must not be able to retrieve it.
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
 - **BR-06 — Plan:** Brightway Retail is on the standard plan. Whether weekly PDF generation and storage is included at the standard plan tier, or requires an upgrade / phased delivery, is unresolved. [DECISION REQUIRED]
 - **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED]
 - **BR-08 — Generation model:** Each weekly report is **pre-generated every Monday on the schedule and stored for later retrieval** (not generated on-demand at click time), so that a download is fast and the "weekly" artifact is a stable, reproducible document.
 - **BR-09 — Finance-grade correctness:** Because these figures feed a year-end close, the attribution numbers in the PDF must match the authoritative attribution data for the same window shown elsewhere in the product. Any discrepancy is treated as a defect.
 
-### Report Contents (unresolved)
+### Report Contents
 
-The specific metrics, dimensions, and data points the finance team requires for year-end close are not specified in the request. The report's analytical content cannot be finalized until this is answered. [DECISION REQUIRED]
+The report contains **total attributed revenue and conversions by channel, presented as one simple table**. This is the resolved analytical content for the finance team's year-end close (resolves DEC-005). No additional attribution dimensions or summary sections are required for Phase 1.
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -188,7 +188,7 @@ I'll now report the business trade-offs I flagged in Sections 0–3.
 
 The system must track the following business information to support the functional requirements above. Types, schemas, and storage mechanisms are deliberately left to engineering planning.
 
-- **Attribution report data (last quarter):** The analytical content of the report — the metrics, dimensions, and data points covering the last-quarter window. *Source: System-derived from the authoritative attribution data pipeline.* Matters because it is the substance the finance team consumes for year-end close. The exact set of metrics and dimensions the finance team requires is not yet specified (see the unresolved report-contents decision flagged in Section 1); the system must still track whatever that resolved set turns out to be.
+- **Attribution report data (last quarter):** The analytical content of the report — total attributed revenue and conversions by channel, covering the last-quarter window, presented as one simple table. *Source: System-derived from the authoritative attribution data pipeline.* Matters because it is the substance the finance team consumes for year-end close. The required metrics and dimension are resolved (total attributed revenue and conversions, broken out by channel; see the Report Contents section in Section 1).
 - **Resolved "last quarter" window:** The concrete start/end boundary that "last quarter" resolves to for a given generation run. *Source: System-derived.* Matters because it defines FR-002's data scope and because the finance team must know exactly which period a given report covers. Depends on the rolling-vs-fixed decision flagged in Section 1 (BR-07).
 - **Generated weekly report artifact (PDF):** The produced PDF file for a given weekly window, plus enough identity to know which window it covers and that it is the latest available. *Source: System-derived.* Matters because it is the downloadable deliverable (FR-001, FR-008) and the stable "weekly" artifact under the pre-generated model (BR-08).
 - **Latest-available-report pointer:** Which stored report is currently the latest available for the customer. *Source: System-derived.* Matters because FR-003 and FR-006 require the prior report to remain the served one when a run is skipped or fails.
@@ -248,14 +248,14 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 | Push/scheduled delivery of the report (email, notification) to the finance team | The reviewer confirmed in-console download from K4A is sufficient and no email or notification delivery is needed (resolves OQ-003). Push delivery is a separate capability. |
 | On-demand (click-time) generation of the report | The confirmed model is pre-generated-and-stored every Monday (BR-08). On-demand generation is an alternative model, not an addition; it is excluded. |
 | A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only. A dated history view is a larger UI component and not required for year-end close. |
-| Report customization by the user (metric selection, date-range picker, custom branding beyond a standard layout) | The required report contents are not yet specified; a fixed standard layout is Phase 1. User-configurable reporting is future work. |
+| Report customization by the user (metric selection, date-range picker, custom branding beyond a standard layout) | The Phase 1 report contents are fixed (total attributed revenue and conversions by channel, one simple table); user-configurable reporting is future work. |
 | Generalizing the capability to other customers, products, or report types beyond the Brightway Retail attribution report | Phase 1 is scoped to this one customer requirement under a hard deadline. |
 | Formats other than PDF (CSV, XLSX, etc.) | The requirement specifies PDF only. |
 | Self-service entitlement management (finance team members granting themselves or peers access) | Entitlement is assumed to be assigned through existing access mechanisms; a self-service grant flow is out of scope. |
 
 ### Deferred / Pending Decisions
 
-The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the report's exact contents, the "last quarter" definition (fixed vs. rolling), the entitlement audience and access source, and the standard-plan capacity/timeline question.
+The following are unresolved and tracked in the Decisions register (flagged in Sections 1 and 5). They do not expand Phase 1 scope but must be answered before build can finalize: the "last quarter" definition (fixed vs. rolling), and the standard-plan capacity/timeline question. The report's exact contents are now settled — total attributed revenue and conversions by channel, presented as one simple table (resolves DEC-005). The entitlement audience is now settled — download access is restricted to Brightway Retail finance team members only (no other roles or accounts).
 
 ## Appendix: Engineering Reference
 
@@ -277,8 +277,12 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Updated the out-of-scope push-delivery rationale to cite the reviewer's confirmation that in-console download is sufficient (resolves OQ-003).
-- Clarified the reporting-dispatcher appendix role so its "delivery" wording means in-console download only, per the OQ-003 resolution.
+- Resolved BR-04 access scope to Brightway Retail finance team members only and removed its [DECISION REQUIRED] tag.
+- Removed the entitlement audience from the pending-decisions list and noted it is settled as finance-team-members-only.
+- Resolved the Report Contents section: total attributed revenue and conversions by channel in one simple table, removing the [DECISION REQUIRED] tag.
+- Updated the Information Requirements attribution-data bullet to reflect the resolved report contents.
+- Updated the out-of-scope customization rationale to reflect that report contents are now resolved.
+- Removed report contents from the deferred/pending list and noted it as resolved in Section 6.
 
 
 ---
@@ -292,18 +296,19 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Beyond Brightway's finance team, who exactly should be allowed to download this attribution report, and should any other roles or accounts be able to see it? | Product owner | Restrict download to users on the Brightway Retail account who hold a finance/reporting entitlement; no other accounts can see or retrieve the report. |
 | **DEC-002** | Does Brightway's standard plan include weekly PDF report generation and storage, or does this feature require a plan upgrade or a phased rollout to fit the five-week window? | Product owner / Commercial | Deliver it to Brightway under the standard plan for this engagement to meet the year-end deadline, and flag the entitlement/packaging question separately for the commercial team to resolve before offering it more broadly. |
 | **DEC-003** | Should the report always show the same most recent completed calendar quarter held fixed, or should the window roll forward as newer data completes week to week? | Product owner (with Brightway finance) | Use the most recent completed calendar quarter, held fixed until the next quarter completes, so finance sees a stable close-ready figure that only changes at quarter boundaries. |
 | **DEC-004** | Should each weekly report be generated ahead of time on the schedule and saved for the finance team to pick up, or generated fresh only when they click download? | Product owner | Pre-generate on the weekly schedule and store the report for retrieval, so downloads are fast and each week's document is stable and reproducible. |
-| **DEC-005** | What specific metrics, dimensions, and data points must the attribution report contain for the finance team's year-end close? | Product owner (with Brightway finance) | Include the core attribution figures finance already relies on elsewhere in K4A for the quarter (installs, attributed conversions/events, and attributed revenue by network/campaign), as a summary plus a per-campaign breakdown, pending finance confirmation of their exact close requirements. |
 | **DEC-006** | Access: The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. | _(not yet assigned)_ | _(not yet specified)_ |
+
+### Decisions Resolved
+
+- **DEC-001**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
+- **DEC-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does "last quarter" mean a fixed set of three calendar months, or a rolling most-recently-completed quarter that shifts each week? This changes the date-filtering logic in the report pipeline.
-- **OQ-004**: Should download access be restricted to the finance team specifically, and if so is there an existing entitlement/role that represents them? This determines whether access-gating is in scope.
-- **OQ-005**: What specific metrics, dimensions, and summary sections must the PDF contain for the year-end close, and is the existing summary-report data sufficient or do we need additional attribution queries?
 - **OQ-006**: Does the standard plan cover weekly PDF generation/storage within the 5-week window, or does the scope need to be phased (e.g. download-first, automated weekly cadence later) to hit the deadline?
 - **OQ-007**: Where in the K4A UI should the download live, and does finance need a history/list of past weekly reports or just the latest one?
 
@@ -311,6 +316,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved DEC-004/OQ-001 — the weekly PDF is pre-generated on a schedule every Monday and stored for download (not generated on-demand).
 - **OQ-003**: Resolved OQ-003 — in-console download from K4A is sufficient; no email or notification delivery is needed.
+- **OQ-004**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
+- **OQ-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is clearly specified (weekly PDF of last-quarter attribution data, downloadable from K4A), and existing services already provide the exact capabilities (reporting-api has a PDF export API, reporting-dispatcher schedules weekly reports, frontend-mos has the download UI), so this is engineering-led design/build across multiple services rather than open-ended product discovery.
