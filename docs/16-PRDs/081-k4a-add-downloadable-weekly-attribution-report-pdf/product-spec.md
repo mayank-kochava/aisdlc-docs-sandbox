@@ -38,7 +38,7 @@ The report presents total attributed revenue and conversions by channel, laid ou
 
 ### Branding / compliance in the PDF
 
-The PDF must display the Brightway logo (confirmed by finance). Whether the PDF requires any further branding, disclaimers, or audit-oriented formatting for year-end close purposes beyond the Brightway logo is not yet specified. [DECISION REQUIRED: DEC-004]
+The PDF must display the Brightway logo (confirmed by finance). Finance has confirmed the PDF requires the Brightway logo only — no disclaimers or other audit-oriented formatting are needed for year-end close.
 
 ## KG cross-check note
 
@@ -257,7 +257,7 @@ The system must track the following business information to support the Function
 | Historical access to prior weeks' PDFs | Confirmed with finance: they need the current week's report only, with no access to prior weeks' PDFs; multi-week retention/browsing is out of scope for Phase 1. | Future |
 | Automatic push/email delivery on a fixed day | Deadline-scoped MVP is on-demand download from K4A; a fixed-schedule push depends on the unresolved delivery-model decision. | Future |
 | Configurable/custom metrics, dimensions, and report layout | Phase 1 ships a fixed content set — total attributed revenue and conversions by channel as one simple table (see Section 1 Report contents); configurable/custom metrics, dimensions, and layout are deferred. | Future |
-| Custom branding, disclaimers, or audit formatting in the PDF beyond the Brightway logo | The Brightway logo is confirmed in scope for Phase 1 (see Section 1 Branding / compliance); any further disclaimers or audit formatting are unconfirmed for year-end close. | Future |
+| Custom branding, disclaimers, or audit formatting in the PDF beyond the Brightway logo | Finance confirmed the PDF needs the Brightway logo only, with no disclaimers or audit formatting for year-end close (see Section 1 Branding / compliance); any further branding/disclaimers are out of scope. | Future |
 | Non–standard-plan or multi-account rollout beyond Brightway Retail | Requirement is scoped to Brightway Retail on the standard plan. | Future |
 
 ---
@@ -287,9 +287,8 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved OQ-005 in the FR-006 note: incomplete weeks are included with a visible data-quality warning.
-- Updated Section 2 flowchart node to reflect the resolved data-quality-warning handling for incomplete weeks.
-- Updated Risk Mitigation row to reflect the resolved data-quality-warning handling for incomplete weeks.
+- Resolved DEC-004/OQ-007: PDF requires Brightway logo only, no disclaimers or audit formatting; removed the DECISION REQUIRED tag.
+- Updated Section 6 out-of-scope row to reflect finance's confirmation of logo-only, no disclaimers.
 
 
 ---
@@ -304,7 +303,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-003** | What attribution metrics and dimensions does the finance team need in the report, in what order, and do they need row-level detail or summaries for year-end close? | Product owner (with Brightway Retail finance) | Revenue by channel, conversions by campaign, and ROI by touchpoint, shown as summary tables with the option of row-level detail, ordered revenue-first. |
-| **DEC-004** | Does the PDF need any specific branding, disclaimers, or audit-oriented formatting to be acceptable for the finance team's year-end close? | Product owner (with Compliance and Brightway Retail finance) | Include the Kochava/K4A logo, the account name, a generation timestamp, and the covered-period range, with no additional legal disclaimers until finance specifies otherwise. |
 | **DEC-005** | Does the finance team need a user-facing download affordance inside the K4A console, or should the report reach them through a non-console path such as a link or email? | Product owner (with requester Mayank Ukey) | Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them. |
 | **DEC-006** | For a financial report produced to support Brightway Retail's year-end close, how long must we keep the record of who generated and downloaded each report before we're allowed to delete it? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it. |
 
@@ -312,12 +310,12 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **DEC-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 - **DEC-002**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
+- **DEC-004**: Resolved OQ-007 and DEC-004 (same question): finance confirmed the PDF needs the Brightway logo only — no disclaimers or audit-oriented formatting for year-end close.
 - **DEC-007**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-- **OQ-007**: Are there branding, compliance, or audit requirements for the PDF (logos, disclaimers, row-level detail vs. summary) needed for year-end close?
 - **OQ-008**: If generated on-demand, what's the acceptable latency between data collection and the PDF being downloadable, and how should users know fresh data is available?
 
 ### Questions Resolved
@@ -327,6 +325,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
 - **OQ-005**: Resolved OQ-005 — weeks with incomplete or still-processing attribution data are included in the report with a visible data-quality warning for each affected week (not excluded, not merely timestamped).
 - **OQ-006**: OQ-006 resolved: finance needs only the current week's report, no access to previous weeks' PDF history.
+- **OQ-007**: Resolved OQ-007 and DEC-004 (same question): finance confirmed the PDF needs the Brightway logo only — no disclaimers or audit-oriented formatting for year-end close.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement clarity is "clear" and UX need is "none" — the desired behavior (weekly attribution PDF, last-quarter data, on-demand download from K4A) is confirmed; the open questions are routine engineering/design decisions (schedule vs. on-demand, metrics layout, data freshness) rather than genuine product ambiguity, so the multi-service (4-6 services, backend+frontend) build is engineering-led design, not discovery.
