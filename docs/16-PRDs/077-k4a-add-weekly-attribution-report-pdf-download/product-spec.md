@@ -21,7 +21,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 - **BR-2 — Cadence:** The report is generated on a weekly schedule only through Brightway Retail's year-end close, not a permanently recurring report (resolved: weekly cadence is needed through year-end close and then stops, not every week indefinitely). It is not a one-time year-end export, but the weekly cadence is time-bounded to the year-end-close period — a lighter-weight interim scheduling solution is in scope rather than durable, indefinitely-recurring scheduling.
 - **BR-3 — Report period:** Each report covers the most recent completed quarter only, recalculated on every weekly run so the window shifts to whichever quarter most recently closed as of that run (confirmed by the requester). The reporting window is a rolling trailing-quarter window, not a fixed calendar quarter and not a configurable range in this phase.
 - **BR-4 — Format:** The report is delivered as a downloadable PDF. The Brightway Retail logo must appear on the PDF (confirmed by the finance team). Other aspects of the visual appearance and the generation method are engineering decisions, deferred to downstream planning.
-- **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. [DECISION REQUIRED]
+- **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. **Working assumption (not confirmed):** target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline; the exact calendar close date must still be confirmed with the customer.
 - **BR-6 — Report content:** The report contains total attributed revenue and conversions broken down by channel, presented as one simple table (confirmed by the finance team). No additional metrics, groupings, or supplementary tables are in scope for this phase.
 - **BR-7 — Delivery model:** Whether the finance team needs active delivery (e.g. an email or in-app notification when a new weekly report is ready) or whether on-demand download in the console is sufficient is not specified in the input. [DECISION REQUIRED]
 - **BR-8 — Benchmarking:** Whether the report includes only Brightway Retail's own data or must compare against other customers / industry benchmarks is not specified in the input. [DECISION REQUIRED]
@@ -244,9 +244,7 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Updated Out-of-Scope rationale to record the finance team's confirmation that no filtering/column customization is needed (resolves OQ-007).
-- Updated Out-of-Scope rationale to record the finance team's confirmation that no custom date-range regeneration is needed (resolves OQ-007).
-- Updated the UX-scope risk-mitigation row to record that the finance team confirmed no filtering/customization is needed (resolves OQ-007).
+- Replaced the [DECISION REQUIRED] tag on BR-5 with the reviewer's stated working assumption for the availability-gate target, marked as an unconfirmed assumption.
 
 
 ---
@@ -260,29 +258,30 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | What is Brightway Retail's actual year-end close date that the first report must be ready before? | Product owner | Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer. |
 | **DEC-004** | Does the finance team need to be actively notified (for example by email or an in-app alert) when each week's report is ready, or is on-demand download from the console enough? | Product owner | Ship on-demand download in the console for Phase 1 with no active delivery/notification, and revisit email delivery as a fast-follow if finance asks for it. |
 | **DEC-005** | Should the report show only Brightway Retail's own data, or does it need to compare against other customers or industry benchmarks? | Product owner | Scope the report to Brightway Retail's own data only, with no cross-customer or industry benchmarking in Phase 1. |
 | **DEC-006** | Does this report need to be delivered to the finance team automatically each week — for example by email or an in-app alert when a new one is ready — or is it enough for them to download it on demand from the console? | Product owner | On-demand download in the console only for Phase 1; add active delivery (email/in-app notification) in a later phase if the finance team confirms they need it. |
 | **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-010** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-012** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-013** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-014** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-016** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-018** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-019** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-020** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-021** | Delivery model: Whether the finance team needs active delivery (e.g. an email or in-app notification when a new weekly report is ready) or whether on-demand download in the console is sufficient is not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
 - **DEC-001**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
+- **DEC-002**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-003**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
 - **DEC-007**: Resolved DEC-007: the finance report and its access records must be retained for two years; no specific format mandate applies.
 - **DEC-008**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
+- **DEC-010**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-011**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
+- **DEC-012**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
+- **DEC-013**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
+- **DEC-014**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-015**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
+- **DEC-016**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 - **DEC-017**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
+- **DEC-018**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
+- **DEC-019**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
+- **DEC-020**: Assumed: Target the first successful weekly report to be available no later than 4 weeks from kickoff, leaving a 1-week buffer before the stated ~5-week deadline, and confirm the exact calendar date with the customer.
 
 ### Open Questions (evidence gaps — needs more input)
 
