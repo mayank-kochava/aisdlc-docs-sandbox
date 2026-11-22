@@ -109,9 +109,11 @@ Then the system does not present a partial file as a successful download
 ```gherkin
 Given a user is authenticated in K4A
   And the user is entitled to the Brightway Retail attribution report
-When the user navigates to the report area
-Then the system shows the attribution report as downloadable
+When the user navigates to the K4A reports page
+Then the system shows a download button for the attribution report on the reports page
+  And no history or list of past weekly reports is shown (only the latest report is downloadable)
 ```
+*Per the resolved OQ-007: the download lives as a download button on the K4A reports page; finance does not need a history/list of past weekly reports, only the latest one.*
 
 #### FR-008 — Download the last-quarter attribution PDF
 ```gherkin
@@ -226,7 +228,7 @@ The Context Seed classifies this as HIGH risk (hard 5-week deadline, multi-servi
 |---|---|
 | Push/scheduled delivery of the report (email, notification) to the finance team | The reviewer confirmed in-console download from K4A is sufficient and no email or notification delivery is needed (resolves OQ-003). Push delivery is a separate capability. |
 | On-demand (click-time) generation of the report | The confirmed model is pre-generated-and-stored every Monday (BR-08). On-demand generation is an alternative model, not an addition; it is excluded. |
-| A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only. A dated history view is a larger UI component and not required for year-end close. |
+| A historical archive / multi-week report list with browsable history | Phase 1 serves the *latest available* weekly report only, via a download button on the K4A reports page (resolves OQ-007). A dated history view is a larger UI component and not required for year-end close. |
 | Report customization by the user (metric selection, date-range picker, custom branding beyond the standard layout and the Brightway logo) | The Phase 1 report contents are fixed (total attributed revenue and conversions by channel, one simple table, carrying the Brightway logo per FR-014); user-configurable reporting is future work. |
 | Generalizing the capability to other customers, products, or report types beyond the Brightway Retail attribution report | Phase 1 is scoped to this one customer requirement under a hard deadline. |
 | Formats other than PDF (CSV, XLSX, etc.) | The requirement specifies PDF only. |
@@ -256,9 +258,8 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Resolved BR-06: standard plan includes weekly PDF generation/storage, no upgrade or phasing needed.
-- Resolved NFR-015: standard plan supports weekly generation/storage within the deadline, no upgrade/phasing needed.
-- Updated Deferred/Pending Decisions to remove the standard-plan question and record it as settled.
+- Resolved OQ-007 in FR-007: download button on the K4A reports page, no history/list shown.
+- Noted OQ-007 resolution (latest only, download button on reports page) in the out-of-scope history-archive row.
 
 
 ---
@@ -285,7 +286,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does "last quarter" mean a fixed set of three calendar months, or a rolling most-recently-completed quarter that shifts each week? This changes the date-filtering logic in the report pipeline.
-- **OQ-007**: Where in the K4A UI should the download live, and does finance need a history/list of past weekly reports or just the latest one?
 
 ### Questions Resolved
 
@@ -294,6 +294,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
 - **OQ-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
 - **OQ-006**: Resolved — Brightway's standard plan includes weekly PDF report generation and storage within the five-week window; no plan upgrade or phased rollout is required. OQ-006 is the same question and is resolved by the same answer.
+- **OQ-007**: Resolved OQ-007 — the download lives as a download button on the K4A reports page, and finance needs only the latest report with no history/list of past weekly reports.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is clearly specified (weekly PDF of last-quarter attribution data, downloadable from K4A), and existing services already provide the exact capabilities (reporting-api has a PDF export API, reporting-dispatcher schedules weekly reports, frontend-mos has the download UI), so this is engineering-led design/build across multiple services rather than open-ended product discovery.
