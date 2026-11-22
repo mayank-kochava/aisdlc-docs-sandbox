@@ -28,6 +28,8 @@ Brightway Retail's finance team currently has no self-service way to obtain a we
 
 The PDF is generated fresh on demand at the moment the finance team downloads it from K4A (resolved OQ-001/DEC-001/DEC-007). This is an on-demand generation model: the report is not pre-generated or stored ahead on a schedule; each download triggers generation of the report over the current last-quarter window.
 
+An on-demand generation latency of a minute or two between the user's request and the PDF being downloadable is acceptable (resolved OQ-008). Because generation is not instantaneous, the user must be shown an in-progress state while the report is being generated and a clear ready state when the fresh PDF is available to download.
+
 ### Quarter window definition
 
 "Last quarter only" means the most recent completed calendar quarter, computed at the moment of generation so the window always reflects the latest completed quarter at download time.
@@ -287,8 +289,7 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved DEC-004/OQ-007: PDF requires Brightway logo only, no disclaimers or audit formatting; removed the DECISION REQUIRED tag.
-- Updated Section 6 out-of-scope row to reflect finance's confirmation of logo-only, no disclaimers.
+- Recorded the accepted on-demand generation latency (a minute or two) and freshness/in-progress signalling in the Delivery model, resolving OQ-008.
 
 
 ---
@@ -316,7 +317,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-- **OQ-008**: If generated on-demand, what's the acceptable latency between data collection and the PDF being downloadable, and how should users know fresh data is available?
 
 ### Questions Resolved
 
@@ -326,6 +326,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-005**: Resolved OQ-005 — weeks with incomplete or still-processing attribution data are included in the report with a visible data-quality warning for each affected week (not excluded, not merely timestamped).
 - **OQ-006**: OQ-006 resolved: finance needs only the current week's report, no access to previous weeks' PDF history.
 - **OQ-007**: Resolved OQ-007 and DEC-004 (same question): finance confirmed the PDF needs the Brightway logo only — no disclaimers or audit-oriented formatting for year-end close.
+- **OQ-008**: OQ-008 resolved: an acceptable latency of a minute or two between data collection and the PDF being downloadable is acceptable, with users signalled when fresh/in-progress data is available.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement clarity is "clear" and UX need is "none" — the desired behavior (weekly attribution PDF, last-quarter data, on-demand download from K4A) is confirmed; the open questions are routine engineering/design decisions (schedule vs. on-demand, metrics layout, data freshness) rather than genuine product ambiguity, so the multi-service (4-6 services, backend+frontend) build is engineering-led design, not discovery.
