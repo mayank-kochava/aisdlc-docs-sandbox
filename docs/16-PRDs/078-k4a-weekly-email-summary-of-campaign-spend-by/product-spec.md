@@ -381,7 +381,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-004**: Should the email include anything beyond total spend per channel (e.g. period-over-period change, campaign count, performance notes), or strictly one spend line per channel?
 - **OQ-005**: When a channel's data is missing or delayed for a given week, should the email send on schedule with partial data, wait until all channels report, or send and flag the gap?
 - **OQ-006**: Does Meridian Travel need self-service control over channels/schedule/recipients, or is a fixed static setup acceptable? (This determines whether a config UI is needed, which conflicts with the current 'no frontend change' assumption.)
 - **OQ-007**: Is this email specific to Meridian Travel only, or should it be built as a reusable per-advertiser weekly summary that other clients could use?
@@ -391,6 +390,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-001**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 - **OQ-002**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 - **OQ-003**: OQ-003 resolved: the weekly summary email sends every Monday at 8:00 AM Eastern Time.
+- **OQ-004**: OQ-004 resolved — the email is strictly one spend line per channel with nothing else (no period-over-period change, campaign counts, or performance notes); this matches the position already stated in BR-3, FR-014, and the Section 6 out-of-scope table.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
