@@ -19,7 +19,7 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 - **BR-01 — Report cadence:** The attribution report is generated on a weekly schedule, every Monday.
 - **BR-02 — Report format:** The report is delivered as a PDF.
 - **BR-03 — Data scope:** Each report covers the last quarter of attribution data only.
-- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team members only. Access is restricted to that audience; no other roles or accounts may download or see the report, and users without the entitlement must not be able to retrieve it.
+- **BR-04 — Access:** The report is downloadable from K4A by Brightway Retail's finance team members only. Access is restricted to that audience; no other roles or accounts may download or see the report, and users without the entitlement must not be able to retrieve it. The reviewer confirmed that only the finance team can download the report (resolves DEC-006).
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
 - **BR-06 — Plan:** Brightway Retail is on the standard plan. Weekly PDF generation and storage is included at the standard plan tier; no upgrade or phased rollout is required to fit the five-week window (resolves DEC-002 / OQ-006).
 - **BR-07 — "Last quarter" definition:** "Last quarter" resolves to the most recent *completed* calendar quarter — a fixed set of three calendar months — **not** a rolling window that shifts each week. The window is the most recently completed calendar quarter as of the time the capability runs; it does not advance week-to-week within that quarter, only when a new calendar quarter completes (resolves DEC-003 / OQ-002).
@@ -260,24 +260,13 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Rewrote BR-07 so "last quarter" is the fixed most-recent-completed calendar quarter, not a rolling weekly-recalculated window.
-- Updated BR-08 note so the stored window reflects the fixed most-recent-completed calendar quarter rather than a per-weekly-run resolved window.
-- Updated the Information Requirements "last quarter window" bullet to the fixed most-recent-completed calendar quarter rather than recalculated each week.
-- Updated Section 6 deferred-decisions summary so "last quarter" is the fixed most-recent-completed calendar quarter, not recalculated every week.
+- Noted reviewer confirmation that access is restricted to the finance team only, resolving DEC-006, in BR-04.
 
 
 ---
 ## Open Questions & Decisions Register
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
-
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-006** | Access: The report is downloadable from K4A by Brightway Retail's finance team. Access is restricted to that audience; users without the entitlement must not be able to retrieve the report. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
@@ -286,6 +275,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-003**: Resolved — "last quarter" is the most recent completed calendar quarter, recalculated every week (rolls forward as quarters complete; not held fixed).
 - **DEC-004**: Assumed: Pre-generate on the weekly schedule and store the report for retrieval, so downloads are fast and each week's document is stable and reproducible.
 - **DEC-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
+- **DEC-006**: Confirmed DEC-006 — only Brightway Retail's finance team can download the report; access is restricted to that audience and unentitled users cannot retrieve it.
 
 ### Questions Resolved
 
