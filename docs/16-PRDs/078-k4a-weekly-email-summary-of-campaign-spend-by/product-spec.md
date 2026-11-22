@@ -303,7 +303,7 @@ The following are explicitly **NOT** included in Phase 1, to prevent scope creep
 | Self-service configuration (recipients, channel set, or schedule edited by the marketing team) | Future phase | Phase 1 is a fixed operational setup for Meridian Travel (BR-9). Would introduce a UI and role-based access-control surface not required now. |
 | Content beyond per-channel totals (period-over-period comparison, campaign counts, performance notes) | Future phase | Requester confirmed total spend per channel, one line per channel, is sufficient for Phase 1 (FR-014). |
 | Differentiated summaries by team or geography | Future phase | Phase 1 delivers one identical summary to the Meridian Travel marketing team list (BR-6); differentiation by team or geography is not needed in Phase 1. |
-| Additional advertisers beyond Meridian Travel | Future phase | This requirement is scoped to the single advertiser Meridian Travel on the standard plan. Generalizing to other advertisers is a later effort. |
+| Additional advertisers beyond Meridian Travel | Future phase | This requirement is scoped to the single advertiser Meridian Travel on the standard plan. The requester confirmed the email is built just for Meridian Travel for now, not as a reusable per-advertiser summary for other clients; generalizing to other advertisers is a later effort. |
 | Secure time-limited download link / attachment delivery of the summary | Out of scope | Phase 1 delivers in-email per-channel totals only; no file export is requested. |
 
 ---
@@ -351,7 +351,7 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Updated BR-9 to note the requester confirmed a fixed setup with no self-service UI is acceptable (resolves OQ-006).
+- Folded OQ-007 resolution into Section 6: confirmed single-advertiser (Meridian Travel only) scope, not a reusable per-advertiser product.
 
 
 ---
@@ -377,10 +377,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-003**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
 - **DEC-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-007**: Is this email specific to Meridian Travel only, or should it be built as a reusable per-advertiser weekly summary that other clients could use?
-
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
@@ -389,6 +385,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-004**: OQ-004 resolved — the email is strictly one spend line per channel with nothing else (no period-over-period change, campaign counts, or performance notes); this matches the position already stated in BR-3, FR-014, and the Section 6 out-of-scope table.
 - **OQ-005**: Resolved OQ-005 (and the duplicate DEC-005): when one or more channels have missing or delayed data at send time, the email sends on schedule with the available channels included and the missing/delayed channels flagged as incomplete, rather than holding until all channels report.
 - **OQ-006**: OQ-006 resolved — requester confirmed a fixed static setup with no self-service UI is acceptable for Phase 1; no config UI is needed and the 'no frontend change' assumption holds.
+- **OQ-007**: Resolved OQ-007 — the weekly summary email is built just for Meridian Travel for now, not as a reusable per-advertiser summary for other clients.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
