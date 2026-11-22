@@ -7,7 +7,7 @@ title: Product Specification
 
 ### Problem
 
-Brightway Retail's finance team currently has no self-serve way to obtain a formatted attribution report for their year-end close. They need a weekly attribution report, covering the last quarter (Q4), delivered as a downloadable PDF, and it must be available before their year-end close (approximately 5 weeks from the request date).
+Brightway Retail's finance team currently has no self-serve way to obtain a formatted attribution report for their year-end close. They need a weekly attribution report, covering the most recent completed quarter (recalculated every week so the window shifts with each weekly run, not fixed to a single calendar quarter), delivered as a downloadable PDF, and it must be available before their year-end close (approximately 5 weeks from the request date).
 
 ### Value
 
@@ -19,7 +19,7 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 
 - **BR-1 — Audience:** The report is produced for Brightway Retail, a standard-plan customer. The report is part of the standard plan: no gating, upgrade, or special entitlement is required, and a standard-plan account is entitled to it by default. Brightway can use it without any entitlement change.
 - **BR-2 — Cadence:** The report is generated on a permanently recurring weekly schedule (confirmed by the requester: weekly, every week, not just through year-end close). It is not a one-time year-end export, and the weekly cadence does not stop after year-end close — durable scheduling is in scope rather than a lighter-weight interim solution.
-- **BR-3 — Report period:** Each report covers the last quarter (Q4) only. The reporting window is a trailing-quarter window, not a configurable range in this phase.
+- **BR-3 — Report period:** Each report covers the most recent completed quarter only, recalculated on every weekly run so the window shifts to whichever quarter most recently closed as of that run (confirmed by the requester). The reporting window is a rolling trailing-quarter window, not a fixed calendar quarter and not a configurable range in this phase.
 - **BR-4 — Format:** The report is delivered as a downloadable PDF. The specific visual appearance and generation method are engineering decisions, deferred to downstream planning.
 - **BR-5 — Availability gate:** The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. [DECISION REQUIRED]
 - **BR-6 — Report content:** The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. [DECISION REQUIRED]
@@ -33,15 +33,18 @@ Brightway Retail's finance team currently has no self-serve way to obtain a form
 ```mermaid
 flowchart TD
     A["Weekly generation (system-triggered)"] --> B{"Is it the scheduled generation time?"}
-    B -->|"yes (weekly schedule)"| C["System assembles last-quarter (Q4) attribution data"]
+    B -->|"yes (weekly schedule)"| C["System resolves the most recent completed quarter and assembles its attribution data"]
     B -->|"no"| A
     C --> D{"Data assembly succeeded?"}
-    D -->|"no"| E["Record generation failure + raise operational alert"]
-    E --> F["No new report produced this cycle; prior report (if any) remains available"]
+    D -->|"no"| E["Record generation failure + retry once"]
+    E --> E2{"Retry succeeded?"}
+    E2 -->|"no"| E3["Raise operational alert + email finance owner"]
+    E2 -->|"yes"| G
+    E3 --> F["No new report produced this cycle; prior report (if any) remains available"]
     D -->|"yes"| G["System renders report as PDF"]
     G --> H{"PDF render succeeded?"}
     H -->|"no"| E
-    H -->|"yes"| I["Weekly report marked available for download"]
+    H -->|"yes"| I2["Weekly report marked available for download"]
 
     J["Finance user opens K4A console reports area"] --> K{"User's account entitled to the report?"}
     K -->|"no"| L["Download action unavailable / access denied"]
@@ -62,17 +65,19 @@ flowchart TD
 Given the weekly attribution report feature is enabled for an entitled account
 And the scheduled weekly generation time is reached
 When the generation cycle runs
-Then the system assembles an attribution report covering the last quarter (Q4) for that account
+Then the system assembles an attribution report covering the most recent completed quarter (recalculated for this run) for that account
 And the resulting report is rendered as a PDF
 And the report is marked available for download
 ```
 
-**FR-002 — Report period is the trailing quarter only**
+**FR-002 — Report period is the most recent completed quarter, recalculated weekly**
 ```gherkin
 Given a weekly report generation cycle runs
 When the system selects the data window for the report
-Then the report includes attribution data for the last quarter (Q4) only
-And data outside that trailing-quarter window is excluded from the report
+Then the system resolves the most recent completed quarter as of that run
+And the report includes attribution data for that most-recent-completed-quarter window only
+And the window is recalculated on each weekly run so it shifts as quarters close
+And data outside that window is excluded from the report
 ```
 
 **FR-003 — Generation failure is recorded and alerted, prior report preserved**
@@ -80,7 +85,8 @@ And data outside that trailing-quarter window is excluded from the report
 Given a weekly report generation cycle is running
 When data assembly or PDF rendering fails for that cycle
 Then the system records the failure as a named failure condition distinct from a successful run
-And an operational alert is raised for investigation
+And the system retries the generation once
+And if the retry also fails an operational alert is raised and the finance owner is emailed
 And no partial or corrupt report is marked available for that cycle
 And any previously generated report that was already available remains available for download
 ```
@@ -126,7 +132,7 @@ Given a finance user whose account is entitled to the weekly attribution report
 And a generated report is available for that account
 When the user selects Download PDF
 And the download request passes the server-side authorization check
-Then the system delivers the last-quarter (Q4) attribution report as a PDF file
+Then the system delivers the most-recent-completed-quarter attribution report as a PDF file
 ```
 
 **FR-009 — Server-side authorization enforced on download, independent of UI**
@@ -154,8 +160,8 @@ The system must track the following business information to support the Function
 
 - **Report generation record** — tracks each weekly generation cycle for an account: the account it belongs to, the trailing-quarter window covered, the cycle it corresponds to, and whether the cycle succeeded or failed. *System-derived.* Supports FR-001, FR-003, FR-004, FR-005, and distinguishes an available report from a failed cycle.
 - **Report availability state** — whether a generated report currently exists and is downloadable for an account, including which one is the latest available. *System-derived.* Supports FR-006, FR-007, FR-008, and the "prior report remains available" guarantee in FR-003.
-- **Generated PDF artifact** — the rendered last-quarter (Q4) attribution report delivered to the finance user. *System-derived* (built from attribution data). Supports FR-008.
-- **Attribution report content** — the underlying attribution metrics and data points that populate the report for the trailing-quarter window. *External/upstream* (sourced from the attribution data service, which backend owns this is unresolved per the Section 1 service-ownership note). Supports FR-001, FR-002. The exact metrics, data points, and grouping are unspecified (see BR-6, already flagged in Section 1).
+- **Generated PDF artifact** — the rendered most-recent-completed-quarter attribution report delivered to the finance user. *System-derived* (built from attribution data). Supports FR-008.
+- **Attribution report content** — the underlying attribution metrics and data points that populate the report for the most-recent-completed-quarter window (resolved and recalculated on each weekly run). *External/upstream* (sourced from the attribution data service, which backend owns this is unresolved per the Section 1 service-ownership note). Supports FR-001, FR-002. The exact metrics, data points, and grouping are unspecified (see BR-6, already flagged in Section 1).
 - **Account entitlement state** — whether a given account is entitled to the weekly attribution report feature. *System-derived / external* (from the authoritative entitlement source). Supports FR-006, FR-009. Standard-plan accounts are entitled to the report by default (see BR-1); entitlement is still re-derived and enforced server-side on every download request (NFR-004).
 - **Requesting user and account identity** — the user and account making a download request, used to authorize the request server-side on every call. *System-derived* (from the authenticated session). Supports FR-008, FR-009.
 - **Generation failure condition** — the named, distinct failure state for a cycle (e.g. data assembly failure vs. render failure), feeding the operational alert. *System-derived.* Supports FR-003, FR-010.
@@ -178,8 +184,8 @@ The system must track the following business information to support the Function
 
 ### Reliability & Risk Mitigation
 
-- **NFR-008 — Generation failure handling and fallback:** On a failed weekly cycle, the system records a named failure condition (distinguishing data-assembly failure, render failure, and dependency-unavailable), raises an operational alert, and preserves the prior available report (FR-003). Bounded retry with exponential backoff (3 attempts) applies to transient failures in calling the attribution data source; retries are never indefinite, and a 429/rate-limit response honors its Retry-After. Who is notified and accountable for investigating a failed weekly run — the finance team, an internal operations owner, or both — is not specified in the input. [DECISION REQUIRED]
-- **NFR-009 — Idempotent, non-overlapping scheduled generation:** Weekly generation is idempotent on the natural key of account + weekly cycle + trailing-quarter window: a retried or re-delivered run overwrites/retains the single report for that key and never produces a duplicate or double-counted result (FR-005). Concurrent re-runs of the same cycle are disabled at the scheduler level so an overlapping run cannot start (FR-004). The generation time of day is an engineering/operational default, chosen to complete before the finance team's typical workday.
+- **NFR-008 — Generation failure handling and fallback:** On a failed weekly cycle, the system records a named failure condition (distinguishing data-assembly failure, render failure, and dependency-unavailable), raises an operational alert, and preserves the prior available report (FR-003). When a weekly report generation fails, the system retries once; if that retry also fails, the system emails the finance owner. The finance owner is accountable for being notified of a failed weekly run. Bounded retry with exponential backoff still applies to transient failures in calling the attribution data source; retries are never indefinite, and a 429/rate-limit response honors its Retry-After.
+- **NFR-009 — Idempotent, non-overlapping scheduled generation:** Weekly generation is idempotent on the natural key of account + weekly cycle + most-recent-completed-quarter window: a retried or re-delivered run overwrites/retains the single report for that key and never produces a duplicate or double-counted result (FR-005). Concurrent re-runs of the same cycle are disabled at the scheduler level so an overlapping run cannot start (FR-004). The generation time of day is an engineering/operational default, chosen to complete before the finance team's typical workday.
 - **NFR-010 — Kill-switch:** Because this is HIGH-risk, multi-service work, the feature must be disableable via configuration without a code deploy, by an on-call engineer during an incident without separate approval. New requests reflect the disabled state within 5 minutes of the flip; generation cycles already in flight at the time of the flip complete under the prior behavior.
 
 ### Risk Mitigation (explicit, per Context Seed risks)
@@ -201,13 +207,13 @@ The system must track the following business information to support the Function
 
 ## 6. Out of Scope & Phasing
 
-The following are explicitly **NOT** included in Phase 1 (MVP). Phase 1 delivers a weekly-generated, last-quarter (Q4) attribution report downloadable as a PDF from the K4A console by entitled finance users, before Brightway Retail's year-end close.
+The following are explicitly **NOT** included in Phase 1 (MVP). Phase 1 delivers a weekly-generated most-recent-completed-quarter (recalculated weekly) attribution report downloadable as a PDF from the K4A console by entitled finance users, before Brightway Retail's year-end close.
 
 | Item | Status | Rationale |
 | --- | --- | --- |
 | Active delivery (email / in-app notification when a new report is ready) | Out of scope (future phase) | Delivery model unresolved (BR-7); MVP is on-demand download. Revisit if finance team confirms a delivery need. |
 | Benchmarking / comparison against other customers or industry standards | Out of scope (future phase) | Benchmarking requirement unresolved (BR-8); MVP covers Brightway Retail's own data only. |
-| User-configurable date ranges within the quarter | Out of scope (future phase) | MVP window is the trailing quarter (Q4) only (BR-3). |
+| User-configurable date ranges within the quarter | Out of scope (future phase) | MVP window is the most recent completed quarter, recalculated weekly, only (BR-3). |
 | Filtering, custom column selection, or report customization in the UI | Out of scope (future phase) | MVP UX is a single download action; controls scope creep against the deadline. |
 | On-demand regeneration for arbitrary date ranges | Out of scope (future phase) | MVP generation is the recurring weekly cycle only. |
 | Rollout to customers/plans beyond Brightway Retail | Out of scope (future phase) | MVP targets Brightway Retail specifically; broader entitlement rollout is a later decision. |
@@ -231,9 +237,21 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved BR-1: report is part of the standard plan, no gating or special entitlement needed.
-- Updated Account entitlement state info requirement: standard-plan accounts entitled by default, enforcement still applies.
-- Updated appendix cross-check note: report is not plan-gated, entitlements-api relevant only for enforcement.
+- Updated Problem statement to define the report window as the most recent completed quarter, recalculated weekly.
+- Rewrote BR-3 to specify the most-recent-completed-quarter, recalculated-weekly rolling window.
+- Updated the flow diagram node to reflect resolving the most recent completed quarter each run.
+- Updated FR-001 to cover the most recent completed quarter recalculated per run.
+- Rewrote FR-002 to resolve and recalculate the most recent completed quarter each weekly run.
+- Updated FR-008 delivery wording to the most-recent-completed-quarter report.
+- Updated Generated PDF artifact information requirement to the most-recent-completed-quarter window.
+- Updated Attribution report content to the recalculated most-recent-completed-quarter window.
+- Updated Section 6 phasing summary to the recalculated most-recent-completed-quarter window.
+- Updated Out-of-Scope rationale to reference the recalculated most-recent-completed-quarter window.
+- Updated NFR-009 idempotency key wording to the most-recent-completed-quarter window.
+- Resolved NFR-008 failure notification: retry once then email the finance owner, removing the [DECISION REQUIRED] tag.
+- Updated FR-003 to state retry-once-then-email-finance-owner failure handling.
+- Updated flow diagram failure branch to show retry-once then alert + email finance owner.
+- Renamed node I to I2 in flow diagram to avoid collision after adding retry branch.
 
 
 ---
@@ -253,21 +271,20 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-005** | Should the report show only Brightway Retail's own data, or does it need to compare against other customers or industry benchmarks? | Product owner | Scope the report to Brightway Retail's own data only, with no cross-customer or industry benchmarking in Phase 1. |
 | **DEC-006** | Does this report need to be delivered to the finance team automatically each week — for example by email or an in-app alert when a new one is ready — or is it enough for them to download it on demand from the console? | Product owner | On-demand download in the console only for Phase 1; add active delivery (email/in-app notification) in a later phase if the finance team confirms they need it. |
 | **DEC-007** | Are there any regulatory, audit, or contractual rules that dictate how long this finance report and its access records must be retained, or the format they must follow? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; no special format mandate assumed, confirm with Brightway Retail's finance/audit stakeholders before launch. |
-| **DEC-008** | When a weekly report fails to generate, who should be alerted and who is accountable for investigating it — the finance team, an internal operations owner, or both? | Product owner, with Engineering/Operations | Alert an internal operations/on-call owner for investigation; do not alert the finance team directly in Phase 1 unless they ask to be notified. |
 | **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-010** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-011** | Report content: The specific attribution metrics, data points, and grouping the finance team needs for year-end close are not specified in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-012** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-013** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
 - **DEC-001**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
+- **DEC-008**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: Does the finance team need the report actively delivered (email/notification when ready) or only on-demand download from the console? This decides whether the subscriptions/delivery workflow is in scope.
-- **OQ-004**: What exactly should 'last quarter' resolve to each week — a fixed Q4 window, or a rolling trailing-quarter that shifts with each weekly run?
-- **OQ-005**: If a weekly report generation fails, who should be notified and what's the fallback the finance team should see?
 - **OQ-006**: What specific attribution metrics/data points must the PDF contain and how should they be grouped for year-end close?
 - **OQ-007**: Beyond PDF download, does the finance team need any filtering, column customization, or ability to regenerate for a custom date range?
 - **OQ-008**: Does the report need to be Brightway-only, or include any benchmarking/comparison against other customers or industry standards?
@@ -276,6 +293,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved OQ-001 — the report is a permanently recurring weekly report (weekly, every week), not a cadence limited to year-end close, so durable scheduling is in scope.
 - **OQ-003**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
+- **OQ-004**: Resolved OQ-004: "last quarter" resolves to the most recent completed quarter, recalculated every week (a rolling trailing-quarter window, not a fixed Q4).
+- **OQ-005**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
 
 ---
 > **Classification:** Type A
