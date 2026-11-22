@@ -38,7 +38,7 @@ The report presents total attributed revenue and conversions by channel, laid ou
 
 ### Branding / compliance in the PDF
 
-Whether the PDF requires specific branding, disclaimers, or audit-oriented formatting for year-end close purposes is not yet specified. [DECISION REQUIRED]
+The PDF must display the Brightway logo (confirmed by finance). Whether the PDF requires any further branding, disclaimers, or audit-oriented formatting for year-end close purposes beyond the Brightway logo is not yet specified. [DECISION REQUIRED: DEC-004]
 
 ## KG cross-check note
 
@@ -99,6 +99,7 @@ Given a weekly attribution report has been generated
 When the report is made available to the finance team
 Then the report is produced as a single downloadable PDF file
 And the PDF content reflects the last-quarter attribution data for that generation cycle
+And the PDF displays the Brightway logo
 ```
 
 ### FR-004 — Idempotent generation per cycle
@@ -256,7 +257,7 @@ The system must track the following business information to support the Function
 | Historical access to prior weeks' PDFs | Confirmed with finance: they need the current week's report only, with no access to prior weeks' PDFs; multi-week retention/browsing is out of scope for Phase 1. | Future |
 | Automatic push/email delivery on a fixed day | Deadline-scoped MVP is on-demand download from K4A; a fixed-schedule push depends on the unresolved delivery-model decision. | Future |
 | Configurable/custom metrics, dimensions, and report layout | Phase 1 ships a fixed content set — total attributed revenue and conversions by channel as one simple table (see Section 1 Report contents); configurable/custom metrics, dimensions, and layout are deferred. | Future |
-| Custom branding, disclaimers, or audit formatting in the PDF | Unconfirmed for year-end close (see Section 1 Branding / compliance). | Future |
+| Custom branding, disclaimers, or audit formatting in the PDF beyond the Brightway logo | The Brightway logo is confirmed in scope for Phase 1 (see Section 1 Branding / compliance); any further disclaimers or audit formatting are unconfirmed for year-end close. | Future |
 | Non–standard-plan or multi-account rollout beyond Brightway Retail | Requirement is scoped to Brightway Retail on the standard plan. | Future |
 
 ---
@@ -286,11 +287,9 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved the quarter window definition to the most recent completed calendar quarter, recalculated weekly, and removed the [DECISION REQUIRED] tag.
-- Updated FR-002 note to state the resolved last-quarter definition instead of a pending decision.
-- Updated the Last-quarter window definition information item to reflect the resolved definition.
-- Added a risk-mitigation row recording resolution of the ambiguous last-quarter window.
-- Updated out-of-scope rationale for historical PDF access to reflect finance's confirmed decision (current week only, no history).
+- Recorded the confirmed Brightway logo requirement on the PDF and narrowed the remaining branding/compliance decision to DEC-004.
+- Added a Brightway-logo acceptance criterion to FR-003 (PDF output format).
+- Updated the out-of-scope branding row to carve the confirmed Brightway logo into Phase 1 while keeping further branding deferred.
 
 
 ---
