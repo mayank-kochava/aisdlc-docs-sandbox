@@ -48,7 +48,7 @@ An independent knowledge-graph lookup for this work item surfaced a meaningful d
 
 ## Scope reconciliation note
 
-Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Working assumption (DEC-005/OQ-002, pending finance confirmation): Phase 1 provides a download action in the K4A console UI; a report preview and a delivery-status indicator are treated as out of scope for Phase 1 unless finance asks for them.
+Intake recorded "UI/Frontend change needed: No", but an on-demand download initiated by the finance team from K4A inherently implies a user-facing download affordance in the K4A console. This spec treats a K4A download action as in-scope, since "finance team accesses the report on-demand from K4A" cannot be satisfied without it. Confirmed (resolves OQ-002): delivery is a user-facing download button in the K4A console — not email or API. Phase 1 therefore provides a download button in the K4A console UI (frontend-mos); a report preview and a delivery-status indicator are treated as out of scope for Phase 1 unless finance asks for them.
 
 ---
 
@@ -289,8 +289,7 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved DEC-005/OQ-002 with the stated working assumption and removed the [DECISION REQUIRED] tag in the Scope reconciliation note.
-- Resolved DEC-006 with the stated audit-retention working assumption (12 months min, extend to 24 months per Brightway Retail's cycle) and removed the [DECISION REQUIRED] tag in NFR-008.
+- Resolved OQ-002 in the Scope reconciliation note: confirmed a K4A console download button is the delivery mechanism.
 
 
 ---
@@ -315,13 +314,10 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **DEC-006**: Assumed: Retain audit records for 12 months minimum; extend to match Brightway Retail's own audit/close cycle (commonly 24 months for financial-close-relevant records) if their agreement requires it.
 - **DEC-007**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-
 ### Questions Resolved
 
 - **OQ-001**: Resolved OQ-001: the PDF is generated fresh on-demand when the finance user downloads it, not generated on a fixed weekly schedule or stored ahead of time.
+- **OQ-002**: Resolved OQ-002: delivery is a user-facing download button in the K4A console (not email/API).
 - **OQ-003**: Resolved DEC-003 / OQ-003 — the report presents total attributed revenue and conversions by channel as one simple table.
 - **OQ-004**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
 - **OQ-005**: Resolved OQ-005 — weeks with incomplete or still-processing attribution data are included in the report with a visible data-quality warning for each affected week (not excluded, not merely timestamped).
