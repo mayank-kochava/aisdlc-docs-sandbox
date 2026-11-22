@@ -23,12 +23,12 @@ Brightway Retail's finance team needs an attribution report covering the last qu
 - **BR-05 — Deadline:** The capability must be live and producing a downloadable report before Brightway Retail's year-end close (approximately five weeks from the request date).
 - **BR-06 — Plan:** Brightway Retail is on the standard plan. Whether weekly PDF generation and storage is included at the standard plan tier, or requires an upgrade / phased delivery, is unresolved. [DECISION REQUIRED]
 - **BR-07 — "Last quarter" definition:** "Last quarter" must resolve to a concrete window. Whether it is the most recent *completed* calendar quarter held fixed, or a window that rolls as new data completes, changes what the finance team sees each week. [DECISION REQUIRED]
-- **BR-08 — Generation model:** Each weekly report is **pre-generated every Monday on the schedule and stored for later retrieval** (not generated on-demand at click time), so that a download is fast and the "weekly" artifact is a stable, reproducible document.
+- **BR-08 — Generation model:** Each report is **generated fresh on demand when the finance user clicks download** (not pre-generated on a schedule and stored), covering the last-quarter window at the time of the request.
 - **BR-09 — Finance-grade correctness:** Because these figures feed a year-end close, the attribution numbers in the PDF must match the authoritative attribution data for the same window shown elsewhere in the product. Any discrepancy is treated as a defect.
 
 ### Report Contents
 
-The report contains **total attributed revenue and conversions by channel, presented as one simple table**. This is the resolved analytical content for the finance team's year-end close (resolves DEC-005). No additional attribution dimensions or summary sections are required for Phase 1. The PDF must display the Brightway logo (per finance's request); see FR-014.
+The report contains **total attributed revenue and conversions by channel, presented as one simple table**. This is the resolved analytical content for the finance team's year-end close (resolves DEC-005). The report is generated fresh on demand at download time rather than pre-generated and stored (resolves DEC-004). No additional attribution dimensions or summary sections are required for Phase 1. The PDF must display the Brightway logo (per finance's request); see FR-014.
 
 ### Knowledge-Graph Cross-Check Note
 
@@ -40,20 +40,15 @@ An independent cross-check of the codebase knowledge graph surfaced a broader se
 
 ```mermaid
 flowchart TD
-    A["Weekly generation (system-triggered)"] --> B{"Attribution data for last quarter available?"}
-    B -->|"no (data not ready)"| C["Skip/retry generation; raise operational alert; prior report remains the latest available"]
-    B -->|"yes"| D["Generate PDF for last-quarter window"]
-    D --> E["Store generated PDF as the week's report"]
-
     F["Finance user opens K4A report area"] --> G{"User entitled to this report?"}
     G -->|"no (not finance / no entitlement)"| H["Access denied; download affordance not available"]
-    G -->|"yes"| I["Show latest available weekly report"]
+    G -->|"yes"| I["Show report download affordance"]
     I --> J["User clicks Download"]
-    J --> K{"A stored report exists?"}
-    K -->|"no (none generated yet)"| L["Show empty-state message: no report available yet"]
-    K -->|"yes"| M["Deliver last-quarter attribution PDF to user"]
-    M --> N{"Download succeeds?"}
-    N -->|"no (delivery error)"| O["Show retry-able download error"]
+    J --> B{"Attribution data for last quarter available?"}
+    B -->|"no (data not ready)"| C["Show data-not-ready message; raise operational alert; no report produced"]
+    B -->|"yes"| D["Generate last-quarter attribution PDF on demand"]
+    D --> N{"Download succeeds?"}
+    N -->|"no (generation/delivery error)"| O["Show retry-able download error"]
     N -->|"yes"| P["User has the PDF for year-end close"]
 ```
 
@@ -61,15 +56,15 @@ flowchart TD
 
 ## 3. Functional Requirements (The Core)
 
-### Feature Area A — Weekly Report Generation
+### Feature Area A — On-Demand Report Generation
 
-#### FR-001 — Weekly scheduled generation
+#### FR-001 — On-demand generation at download
 ```gherkin
-Given the weekly report generation schedule is active
+Given an entitled finance user triggers a report download
   And attribution data for the last-quarter window is available
-When the scheduled weekly generation time is reached
+When the download request is received
 Then the system generates a PDF attribution report covering the last-quarter window
-  And the system stores that PDF as the latest available weekly report for the customer
+  And the system delivers that PDF to the requesting user
 ```
 
 #### FR-002 — Last-quarter data scope
@@ -80,47 +75,31 @@ Then the report includes only attribution data within the resolved "last quarter
   And data outside that window is excluded from the report
 ```
 
-#### FR-003 — Generation when underlying data is not yet ready
+#### FR-003 — Download when underlying data is not yet ready
 ```gherkin
-Given a scheduled weekly generation run begins
+Given an entitled finance user triggers a report download
   And the attribution data for the last-quarter window has not finished processing
 When the system attempts to generate the report
 Then the system does not produce a report from incomplete data
-  And the system raises an operational alert that the run could not complete
-  And the most recent previously generated report remains the latest available report
-```
-
-#### FR-004 — No overlapping or duplicate generation runs
-```gherkin
-Given a weekly generation run for a customer is already in progress
-When another generation run for the same customer and same weekly window is triggered
-Then the system does not start a second concurrent run
-  And the in-progress run is allowed to complete
-```
-
-#### FR-005 — Idempotent regeneration for the same window
-```gherkin
-Given a weekly report has already been generated and stored for a given weekly window
-When generation runs again for that same window
-Then the system overwrites the existing stored report for that window
-  And the system does not create a duplicate report entry for that window
+  And the system shows the user a message that the report is not available yet
+  And the system raises an operational alert that generation could not complete
 ```
 
 #### FR-014 — Brightway logo on the report PDF
 ```gherkin
-Given a weekly report PDF is generated
+Given a report PDF is generated
 When the system renders the PDF
 Then the Brightway logo is displayed on the report
   And the logo renders correctly in the stored and downloaded PDF
 ```
 *The source, exact placement, and sizing of the logo asset are an engineering/design detail; the business requirement is that the Brightway logo appears on the PDF.*
 
-#### FR-006 — Generation failure does not corrupt the latest available report
+#### FR-006 — Generation failure during download is recoverable
 ```gherkin
-Given a stored weekly report already exists as the latest available report
-When a subsequent generation run fails partway through
-Then the previously stored report remains intact and downloadable
-  And the failed run does not replace the latest available report with a partial file
+Given an entitled finance user triggers a report download
+When on-demand generation fails partway through
+Then the system does not present a partial file as a successful download
+  And the system shows the user a retry-able error
   And the failure raises an operational alert
 ```
 
@@ -131,24 +110,14 @@ Then the previously stored report remains intact and downloadable
 Given a user is authenticated in K4A
   And the user is entitled to the Brightway Retail attribution report
 When the user navigates to the report area
-Then the system shows the latest available weekly attribution report as downloadable
+Then the system shows the attribution report as downloadable
 ```
 
 #### FR-008 — Download the last-quarter attribution PDF
 ```gherkin
 Given an entitled finance user is viewing the report area in K4A
-  And a stored weekly report exists
 When the user triggers the download
-Then the system delivers the last-quarter attribution report as a PDF file
-```
-
-#### FR-009 — Empty state when no report has been generated yet
-```gherkin
-Given an entitled finance user is viewing the report area in K4A
-  And no weekly report has been generated and stored yet
-When the user views the report area
-Then the system shows an empty-state message indicating no report is available yet
-  And no download is offered
+Then the system generates and delivers the last-quarter attribution report as a PDF file
 ```
 
 #### FR-010 — Server-side access enforcement
@@ -287,10 +256,15 @@ Two knowledge-graph lookups were run; the services below combine both, flagged b
 
 _Applied reviewer's request._
 
-- Noted Brightway logo requirement in the Report Contents section with a pointer to FR-014.
-- Added FR-014 requiring the Brightway logo to appear on the generated report PDF.
-- Added the Brightway logo asset to the Information Requirements list.
-- Clarified the out-of-scope branding row so it excludes the Brightway logo (which is now in scope per FR-014).
+- Reversed BR-08 from pre-generated-and-stored to on-demand generation per the OQ-001/DEC-004 answer.
+- Noted that the report is generated on demand at download time, resolving DEC-004.
+- Rebuilt the user-flow diagram to generate the PDF on demand at download click instead of pre-generating and serving a stored artifact.
+- Reworked FR-001 from scheduled pre-generation to on-demand generation at download time.
+- Reframed FR-003 data-not-ready handling for the on-demand model (no stored prior report to fall back to).
+- Removed FR-004 (no-overlap) and FR-005 (idempotent regeneration) as obsolete under the on-demand model with no scheduled runs or stored artifacts.
+- Reframed FR-006 from protecting a stored latest report to handling on-demand generation failure during download.
+- Simplified FR-008 to on-demand generate-and-deliver and removed FR-009 empty-state (no stored-report concept under on-demand).
+- Updated FR-007 to show the report as downloadable rather than a "latest available weekly" stored artifact.
 
 
 ---
@@ -322,7 +296,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Questions Resolved
 
-- **OQ-001**: Resolved DEC-004/OQ-001 — the weekly PDF is pre-generated on a schedule every Monday and stored for download (not generated on-demand).
+- **OQ-001**: Resolved DEC-004/OQ-001 — the weekly PDF is generated fresh on demand when finance clicks download, not pre-generated on a schedule and stored.
 - **OQ-003**: Resolved OQ-003 — in-console download from K4A is sufficient; no email or notification delivery is needed.
 - **OQ-004**: Download access is restricted to Brightway Retail finance team members only; no other roles or accounts may see or download the report — resolves OQ-004 and settles DEC-001.
 - **OQ-005**: Resolved DEC-005 / OQ-005 — the PDF contains total attributed revenue and conversions by channel, presented as one simple table.
