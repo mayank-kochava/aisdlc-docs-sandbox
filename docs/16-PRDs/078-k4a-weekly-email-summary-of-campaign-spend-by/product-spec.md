@@ -17,13 +17,13 @@ Automating this into a weekly email summary removes the recurring manual pull an
 
 - **Delivery channel:** Email only. No on-screen K4A interface changes are required for this requirement.
 - **Content:** Total spend per channel, one line per channel. Nothing beyond per-channel totals is in scope for Phase 1.
-- **Cadence:** Once per week, aligned to the team's existing Monday process.
+- **Cadence:** Once per week, every Monday at 8:00 AM Eastern Time, aligned to the team's existing Monday process.
 - **Data population:** All campaigns for Meridian Travel (a single advertiser on the standard plan).
 
 ### Business Rules
 
 - **BR-1 — Weekly cadence.** The summary is generated and sent exactly once per calendar week.
-- **BR-2 — Monday alignment.** The send aligns to the team's existing manual-Monday process. The exact send time and timezone is a business decision. [DECISION REQUIRED]
+- **BR-2 — Monday alignment.** The send aligns to the team's existing manual-Monday process. The email is sent every Monday at 8:00 AM Eastern Time.
 - **BR-3 — Content is per-channel totals only.** Each email contains one line per channel showing that channel's total campaign spend for the reporting period. No period-over-period comparison, campaign counts, or performance notes are included in Phase 1.
 - **BR-4 — Advertiser scope.** The data covers all campaigns belonging to Meridian Travel only. No other advertiser's data appears in this email.
 - **BR-5 — Channel set.** The email lists every channel K4A tracks for Meridian Travel: email, paid search, paid social, and display.
@@ -250,7 +250,7 @@ The system must track the following business information to support the function
 - **Reporting period window** — the start/end boundary that defines which spend is counted. Derived from the reporting-period business rule (BR-7). Matters because it determines what "total spend" means for each run and is stated in the email (FR-007, FR-013).
 - **Channel-inclusion rule** — all channels K4A tracks for Meridian Travel (email, paid search, paid social, and display) are listed; no curated subset applies (BR-5). Matters because it governs which channels are listed (FR-008).
 - **Recipient list** — the addresses the summary is delivered to: the Meridian Travel marketing team list, `marketing-team@meridiantravel.example`, with all recipients receiving the same summary (BR-6). User/business-provided configuration for Meridian Travel. Matters because delivery must go to exactly these recipients and no one else (FR-015).
-- **Send schedule (time + timezone)** — when the weekly run fires. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
+- **Send schedule (time + timezone)** — when the weekly run fires: every Monday at 8:00 AM Eastern Time. User/business-defined configuration (BR-2). Matters because it drives FR-001 and aligns delivery to the team's Monday workflow.
 - **Feature-enabled state (kill-switch)** — whether the feature is active for Meridian Travel. System/operations-controlled configuration. Matters because it gates whether a run starts at all (FR-019, FR-020).
 - **Run record (per advertiser, per reporting week)** — tracks that a run for a given advertiser and reporting week has started/completed, and its outcome. System-derived. Matters because it enforces exactly-once sending, the overlap guard, and idempotency (FR-002, FR-003, FR-004).
 - **Partial-data / channel-availability status** — which channels reported complete data and which were missing or delayed at generation time. System-derived during retrieval. Matters because it drives the partial-data handling and the in-email flagging (FR-010).
@@ -351,9 +351,9 @@ The `[DECISION REQUIRED]` trade-offs in Sections 4–6 were already tagged and r
 
 _Applied reviewer's request._
 
-- Resolved BR-6 with the confirmed recipient (marketing-team@meridiantravel.example) and single-summary-for-all, removing the decision tag.
-- Updated Recipient list information requirement with the confirmed marketing-team address and single-summary scope.
-- Updated the differentiated-summaries out-of-scope row to reflect the resolved single-summary recipients decision.
+- Resolved BR-2 send time/timezone to every Monday at 8:00 AM Eastern Time and removed the decision tag.
+- Added the resolved Monday 8:00 AM Eastern send time to the Scope-at-a-glance cadence line.
+- Recorded the resolved Monday 8:00 AM Eastern send time in the Information Requirements send-schedule entry.
 
 
 ---
@@ -381,7 +381,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-003**: What time and timezone should the Monday email send, and is there a preferred delivery window to match their current workflow?
 - **OQ-004**: Should the email include anything beyond total spend per channel (e.g. period-over-period change, campaign count, performance notes), or strictly one spend line per channel?
 - **OQ-005**: When a channel's data is missing or delayed for a given week, should the email send on schedule with partial data, wait until all channels report, or send and flag the gap?
 - **OQ-006**: Does Meridian Travel need self-service control over channels/schedule/recipients, or is a fixed static setup acceptable? (This determines whether a config UI is needed, which conflicts with the current 'no frontend change' assumption.)
@@ -391,6 +390,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved OQ-001 (and the duplicate DEC-002): the email includes all channels K4A tracks for Meridian Travel — email, paid search, paid social, and display — not a curated subset.
 - **OQ-002**: Recipients resolved: the summary goes to the Meridian Travel marketing team list, marketing-team@meridiantravel.example, and all recipients receive the same summary with no differentiation by team or geography; this settles OQ-002 and the duplicate DEC-003.
+- **OQ-003**: OQ-003 resolved: the weekly summary email sends every Monday at 8:00 AM Eastern Time.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement and behavior are fully specified (weekly Monday email, total spend per channel, defined recipients and data scope), with the open questions being minor config details resolvable in design—this is clearly-specified multi-service backend integration work (reporting-api, reporting-dispatcher, k4a-mcp-server, sam-api), which is engineering-led design, not product discovery.
