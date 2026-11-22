@@ -396,4 +396,4 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 - **OQ-007**: Resolved OQ-007: spend numbers are raw totals only — no validation or anomaly/spend-spike flagging is performed.
 
 ---
-> **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is fully specified (Monday email, total spend per channel, one line each, matching the existing spreadsheet format, no UI) and the KG shows well-understood existing services (reporting-subscriptions-worker, reporting-api, cost-v2, accounts-api) that already do scheduled report emails and channel-level spend aggregation — this is engineering-led multi-service build, not product discovery; the "4 services" trigger reflects scope, not genuine ambiguity.
+> **Classification:** Type B (confirmed)
