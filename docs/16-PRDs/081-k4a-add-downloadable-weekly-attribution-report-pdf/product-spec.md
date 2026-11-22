@@ -30,7 +30,7 @@ The PDF is produced on a fixed weekly schedule — generated every Monday — an
 
 ### Quarter window definition
 
-"Last quarter only" is not yet pinned to a specific period definition — a rolling trailing window versus a calendar quarter versus a fiscal quarter produces materially different report contents for the finance team. [DECISION REQUIRED]
+"Last quarter only" means the most recent completed calendar quarter, recalculated every week so the window always reflects the latest completed quarter at generation time.
 
 ### Report contents
 
@@ -91,7 +91,7 @@ When the report content is assembled
 Then the report includes attribution data for the last quarter only
 And data outside the last-quarter window is excluded from the report
 ```
-> Note: the exact period definition for "last quarter" is pending a product decision (see Section 1, Quarter window definition). Until resolved, engineering should build against a configurable window so the definition can be set without re-architecture.
+> Note: "last quarter" is defined as the most recent completed calendar quarter, recalculated every week (see Section 1, Quarter window definition).
 
 ### FR-003 — PDF output format
 ```gherkin
@@ -182,7 +182,7 @@ I'll report the decisions I flagged in Section 1.
 The system must track the following business information to support the Functional Requirements. These are business concepts, not schema definitions — types and storage belong in eng-plan.
 
 - **Attribution report (generated artifact):** The weekly PDF itself, scoped to the last-quarter window. System-derived (produced by the generation cycle from attribution data). Matters to FR-001, FR-003, FR-008 — this is the deliverable the finance team downloads.
-- **Last-quarter window definition:** The period boundaries that scope the report content. Configuration-derived until a product decision pins it (see Section 1, Quarter window definition). Matters to FR-002 — determines exactly which data appears in each report.
+- **Last-quarter window definition:** The period boundaries that scope the report content — the most recent completed calendar quarter, recalculated every week (see Section 1, Quarter window definition). System-derived. Matters to FR-002 — determines exactly which data appears in each report.
 - **Generation cycle / cadence marker:** The weekly trigger and the identity of the week each generated report belongs to. System-derived. Matters to FR-001, FR-004, FR-005 — identifies the current report and provides the idempotency key for a given week and window.
 - **Report availability state:** Whether a current report exists, is pending generation, or last generation failed. System-derived. Matters to FR-008, FR-009 — drives whether a download is offered or an unavailable state is shown.
 - **Generation outcome / failure status:** The distinct, named result of each generation run (succeeded, data-source unavailable, etc.). System-derived. Matters to FR-007 — distinguishes failure conditions and preserves the prior successful report.
@@ -233,6 +233,7 @@ The system must track the following business information to support the Function
 | Hard 5-week deadline (year-end close) | Scope is held to the Phase-1 MVP in Section 6; open delivery-architecture and content decisions are flagged as `[DECISION REQUIRED]` with working defaults so engineering is never blocked waiting on them. |
 | Multi-service backend + frontend blast radius | Backward compatibility (NFR-010) protects existing consumers of the shared report services; kill-switch (NFR-009) and rollback plan bound production exposure. |
 | Unresolved delivery architecture (on-demand vs fixed weekly schedule) | The delivery-model decision is surfaced in Section 1 for a product call; FR-001–FR-003 are written to hold for either model, and the possibility of reusing an existing weekly-cadence scheduling mechanism (per KG cross-check) is routed to engineering design to avoid building new scheduling. |
+| Ambiguous "last quarter" window | Resolved: the report covers the most recent completed calendar quarter, recalculated every week (see Section 1 Quarter window definition). |
 | Data freshness / completeness uncertainty | FR-006 mandates explicit incomplete-data handling with a default (freshness timestamp + visible warning) until the content decision lands. |
 
 ---
@@ -252,7 +253,7 @@ The system must track the following business information to support the Function
 |---|---|---|
 | Report preview within K4A (beyond a download action) | Not critical-path to "download the PDF on-demand"; UI surface beyond a download action is unconfirmed (see Section 1 Scope reconciliation note). | Future |
 | Delivery-status indicator in K4A | Same as above — not required to satisfy on-demand download. | Future |
-| Historical access to prior weeks' PDFs | Success criteria require only the current week's last-quarter report; multi-week retention/browsing is unconfirmed. | Future |
+| Historical access to prior weeks' PDFs | Confirmed with finance: they need the current week's report only, with no access to prior weeks' PDFs; multi-week retention/browsing is out of scope for Phase 1. | Future |
 | Automatic push/email delivery on a fixed day | Deadline-scoped MVP is on-demand download from K4A; a fixed-schedule push depends on the unresolved delivery-model decision. | Future |
 | Configurable/custom metrics, dimensions, and report layout | Phase 1 ships a fixed content set — total attributed revenue and conversions by channel as one simple table (see Section 1 Report contents); configurable/custom metrics, dimensions, and layout are deferred. | Future |
 | Custom branding, disclaimers, or audit formatting in the PDF | Unconfirmed for year-end close (see Section 1 Branding / compliance). | Future |
@@ -285,10 +286,11 @@ Note: the cross-check did not re-confirm **pubsuite-attribution** as a data sour
 
 _Applied reviewer's request._
 
-- Resolved DEC-003/OQ-003: report contents are total attributed revenue and conversions by channel as one simple table.
-- Updated FR-006 note to point to the freshness open question rather than the now-resolved Report contents section.
-- Updated Section 4 attribution-data bullet to reflect the resolved report contents instead of a pending decision.
-- Updated Section 6 out-of-scope row to reflect the fixed Phase-1 content set now that report contents are settled.
+- Resolved the quarter window definition to the most recent completed calendar quarter, recalculated weekly, and removed the [DECISION REQUIRED] tag.
+- Updated FR-002 note to state the resolved last-quarter definition instead of a pending decision.
+- Updated the Last-quarter window definition information item to reflect the resolved definition.
+- Added a risk-mitigation row recording resolution of the ambiguous last-quarter window.
+- Updated out-of-scope rationale for historical PDF access to reflect finance's confirmed decision (current week only, no history).
 
 
 ---
@@ -302,7 +304,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | When the report says it covers the last quarter, does that mean a rolling trailing window, the most recent completed calendar quarter, or the customer's fiscal quarter? | Product owner (with Brightway Retail finance, since it drives year-end close numbers) | Most recent completed calendar quarter, built against a configurable window so the definition can change without re-architecture. |
 | **DEC-003** | What attribution metrics and dimensions does the finance team need in the report, in what order, and do they need row-level detail or summaries for year-end close? | Product owner (with Brightway Retail finance) | Revenue by channel, conversions by campaign, and ROI by touchpoint, shown as summary tables with the option of row-level detail, ordered revenue-first. |
 | **DEC-004** | Does the PDF need any specific branding, disclaimers, or audit-oriented formatting to be acceptable for the finance team's year-end close? | Product owner (with Compliance and Brightway Retail finance) | Include the Kochava/K4A logo, the account name, a generation timestamp, and the covered-period range, with no additional legal disclaimers until finance specifies otherwise. |
 | **DEC-005** | Does the finance team need a user-facing download affordance inside the K4A console, or should the report reach them through a non-console path such as a link or email? | Product owner (with requester Mayank Ukey) | Provide a download action in the K4A console UI; treat report preview and a delivery-status indicator as out of scope for Phase 1 unless finance asks for them. |
@@ -311,14 +312,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 ### Decisions Resolved
 
 - **DEC-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
+- **DEC-002**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
 - **DEC-007**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-002**: The intake classifies this as no frontend change, but the delivery is described as an on-demand download 'from K4A' — can you confirm whether there IS a user-facing download link/preview in the K4A console, or is delivery meant to happen some other way (e.g. email, API)?
-- **OQ-004**: Should the report always cover a rolling 13-week window, or snap to calendar/fiscal quarter boundaries? 'Last quarter' is ambiguous.
 - **OQ-005**: How should weeks with incomplete or still-processing attribution data be handled — include with a freshness timestamp, exclude, or show a data-quality warning?
-- **OQ-006**: Does finance need access to previous weeks' PDF reports (history), or only the current week's report?
 - **OQ-007**: Are there branding, compliance, or audit requirements for the PDF (logos, disclaimers, row-level detail vs. summary) needed for year-end close?
 - **OQ-008**: If generated on-demand, what's the acceptable latency between data collection and the PDF being downloadable, and how should users know fresh data is available?
 
@@ -326,6 +326,8 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: Resolved OQ-001/DEC-001/DEC-007: the PDF is generated on a fixed weekly schedule every Monday and stored for on-demand download from K4A.
 - **OQ-003**: Resolved DEC-003 / OQ-003 — the report presents total attributed revenue and conversions by channel as one simple table.
+- **OQ-004**: Resolved OQ-004/DEC-002: "last quarter" is the most recent completed calendar quarter, recalculated every week.
+- **OQ-006**: OQ-006 resolved: finance needs only the current week's report, no access to previous weeks' PDF history.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. Requirement clarity is "clear" and UX need is "none" — the desired behavior (weekly attribution PDF, last-quarter data, on-demand download from K4A) is confirmed; the open questions are routine engineering/design decisions (schedule vs. on-demand, metrics layout, data freshness) rather than genuine product ambiguity, so the multi-service (4-6 services, backend+frontend) build is engineering-led design, not discovery.
