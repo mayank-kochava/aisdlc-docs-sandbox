@@ -1,4 +1,4 @@
-# Spec Critique
+# Spec Critique: Brightway Retail Weekly Attribution Report (PDF)
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 2
+- **Critical Issues:** 0
 - **High Issues:** 5
-- **Medium Issues:** 6
-- **Blocking:** Yes
+- **Medium Issues:** 7
+- **Blocking:** No
 
 ---
 
@@ -17,8 +17,9 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | **Entitlement for the sole target customer is unresolved (BR-1).** Brightway is a standard-plan customer, and whether the feature is plan-gated is flagged [DECISION REQUIRED]. If gated-by-default, the entire deliverable is unusable by the one customer it is being built for — the happy path in FR-006/FR-008 (entitled user downloads) may never trigger for the actual target. This is not a mere ambiguity; it can nullify the MVP against a hard 5-week deadline. | Critical | 1 (BR-1), 3 (FR-006/009) | Resolve entitlement before build starts. If gated, add an explicit requirement for the entitlement grant/change as an in-scope prerequisite, not a "later decision" (which contradicts Out-of-Scope row 6). | 
-| CG-002 | **Availability gate (BR-5) has no known deadline, yet it is the core success criterion.** The entire Value proposition is "available before year-end close," but the close date is not supplied [DECISION REQUIRED]. There is no FR or NFR that asserts/verifies the report is ready before that date. The success condition is literally untestable until this input exists, and the 5-week risk cannot be managed against an unknown target. | Critical | 1 (BR-5), 5 (Risk table) | Obtain the exact year-end close date and add a dated acceptance criterion: "Given the close date D, the first valid weekly report must be available no later than D minus [buffer]." |
+| CG-001 | **No defined "no data for the quarter" path.** FR-002 excludes data outside the window, but nothing defines behavior when the most-recent-completed-quarter has *zero* attribution rows (new account, data gap, upstream lag). Does generation succeed with an empty table, mark a failure, or produce a misleading zero report? Finance reconciliation with a silently-empty table is a correctness risk. | High | §3 FR-002 / §5 NFR-008 | Add an FR: Given the resolved window has no attribution data, Then the system produces a report that explicitly indicates "no data for period" OR raises a distinct named condition — not a blank table that reads as $0 attributed. |
+| CG-002 | **Stale-report ambiguity against the availability gate.** FR-003 preserves the "prior report" on failure, but BR-5/NFR-003 require a *fresh* report before year-end close. If every cycle fails for weeks, the console shows a stale prior report with no visible staleness indicator to the finance user. They may reconcile against an out-of-date quarter unknowingly. | High | §3 FR-003 / §2 flow / BR-5 | Add requirement: the download/empty-state UI must surface the generation date/period of the available report and flag when the latest cycle failed so a stale artifact is never mistaken for current. |
+| CG-003 | **Quarter-boundary race is undefined.** FR-002 resolves "most recent completed quarter as of that run." A weekly run executing within hours of a quarter close (or during late-arriving attribution data) may resolve a window whose data is still settling upstream, producing numbers that change on the next run. No rule governs attribution-data settlement lag vs. window selection. | High | §3 FR-002 | Define a settlement/lookback rule: Given a quarter closed < N days before the run, Then selection either waits for upstream finalization or marks the report provisional. |
 
 ---
 
@@ -26,15 +27,15 @@
 
 ### Vague Requirements Found
 
-The FRs themselves are in solid Gherkin. The vagueness lives mostly in NFRs and in Gherkin steps that assert undefined concepts.
-
-| FR/NFR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
+| FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| NFR-002 | "operate under an explicit rate cap... The specific cap is an engineering default to be set during planning." | No numeric cap = not testable. "explicit rate cap" with an unset value cannot be asserted. | Given the weekly generation job queries the attribution source, When it issues read requests, Then the request rate must not exceed [N] req/s, And requests beyond [N] are queued or throttled, not dropped. (N must be set.) |
-| NFR-009 | "generation time of day is an engineering/operational default, chosen to complete before the finance team's typical workday." | "typical workday" is unmeasurable; no timezone, no completion deadline. | Given a weekly cycle, When generation runs, Then the available report must exist by [HH:MM TZ], And a cycle not complete by [HH:MM TZ] raises an alert. |
-| NFR-001 | "measured under expected concurrent finance-user load" | "expected...load" is undefined — p95 ≤ 5s is meaningless without a concurrency figure. | Given [C] concurrent download requests for an available report, When authorized, Then p95 latency ≤ 5s. (C must be set.) |
-| NFR-005 | "link validity window is an engineering default to be set during planning." | No validity window value = cannot test link expiry. | Given a delivered secure link, When [T] minutes have elapsed, Then the link returns an access-denied/expired response. (T must be set.) |
-| FR-010 | "the report content is unavailable or the retrieval fails" | Two distinct failure modes collapsed; "unavailable" overlaps with FR-007 empty state. Ambiguous which state to assert. | Split: one scenario for content-exists-but-retrieval-fails, one for content-purged/unavailable, each with its own named error state. |
+| NFR-002 | "operate under an explicit rate cap… The specific cap is an engineering default to be set during planning." | No numeric threshold = untestable acceptance criterion. "Explicit cap" with no value cannot be verified. | Given the weekly generation job reads the attribution source, When it issues queries, Then the request rate stays ≤ [X] req/s and existing-traffic p95 latency does not increase by > [Y]%. (Fill X/Y before test design.) |
+| NFR-001 | "p95 ≤ 5s for serving an already-generated report" under "expected concurrent finance-user load" | p95 target is measurable, but "expected concurrent load" is undefined — the test harness has no concurrency number to reproduce. | Given [N] concurrent entitled finance users requesting download, When the report is already generated, Then p95 response ≤ 5s. (Define N.) |
+| NFR-009 | "chosen to complete before the finance team's typical workday" | "typical workday" is not a testable clock time or timezone. | Given the weekly cycle runs, Then an available report exists by [HH:MM] [TZ] on the scheduled day. |
+| NFR-005 | "time-limited secure link… validity window is an engineering default" | No validity duration = cannot test link expiry. | Given a download link is issued, When [T] minutes elapse, Then the link returns access-denied. (Define T.) |
+| BR-5 | "target the first successful weekly report… no later than 4 weeks from kickoff" (working assumption, close date unconfirmed) | Acceptance depends on an unconfirmed calendar date; cannot sign off completion against an unknown deadline. | Blocker-adjacent: confirm the actual close date, then: Given kickoff date D, Then first successful report available ≤ D+4 weeks AND ≤ (close date − 1 week). |
+
+Note: All ten FR-001–FR-010 are correctly in Gherkin — no prose-FR violations found. The vagueness above is concentrated in the NFRs, which are not required to be Gherkin but still need measurable thresholds.
 
 ---
 
@@ -42,30 +43,30 @@ The FRs themselves are in solid Gherkin. The vagueness lives mostly in NFRs and 
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Hard external deadline (5 weeks) | Partial | **FAIL** | Mitigation leans on resolving BR-5 (close date) and BR-6 "early" — but both remain [DECISION REQUIRED] in the spec itself. A mitigation that depends on an unresolved input is not yet a mitigation. No dated acceptance criterion exists. |
-| Multi-service blast radius (5+ services) | Yes | PASS | NFR-004, NFR-010, NFR-008, NFR-009 concretely contain cross-service failure. Strong. |
-| Unconfirmed UX scope | Yes | PASS | MVP UX bounded to FR-006–010; customization explicitly out of scope (Section 6). |
-| Unclear recurring vs. one-time | Yes | PASS | Resolved to weekly (BR-2); no one-time path built. |
-| Legacy/shared attribution data source dependency | Yes | PASS | NFR-002 rate cap + NFR-008 bounded retry/backoff + Retry-After honoring. Adequate (pending numeric cap, see Testability). |
-| Service-ownership ambiguity for report-content data | Flagged, not resolved | **FAIL** (as a mitigation) | Section 1 and the Appendix correctly refuse to pick a side, which is honest — but no FR/NFR makes the report robust to the ambiguity (e.g. an interface-contract requirement independent of which backend wins). Add a requirement that report content is consumed via a defined contract regardless of owning service. |
-| Audit/regulatory retention mandate (NFR-007) | No | **FAIL** | 12-month minimum is asserted but the actual regulatory obligation is [DECISION REQUIRED]. If a longer finance/audit mandate applies, 12 months is non-compliant. No mitigation beyond flagging. |
+| Hard external deadline (5 wks / year-end close) | Partial — scope held to MVP, kill-switch, buffer | PARTIAL | Mitigation hinges on BR-5's **unconfirmed** close date. A risk mitigated by an assumption is not fully mitigated. Confirm the date to close this. |
+| Multi-service blast radius (5+ services) | Yes — NFR-004/008/009/010 | PASS | Server-side enforcement, bounded retries, idempotency, kill-switch are concrete and testable. |
+| Unconfirmed UX scope | Yes — resolved, Out of Scope list | PASS | Clearly resolved and fenced in Section 6. |
+| Recurring vs. one-time ambiguity | Yes — BR-2 | PASS | Resolved as time-bounded weekly through close. |
+| Service-ownership ambiguity (report-content data owner) | Flagged, not resolved | PARTIAL (acceptable) | Correctly deferred to planning and not silently decided — appropriate for a spec, but it remains an open dependency that gates FR-001/FR-002 data sourcing. |
+| Legacy/shared attribution source degradation | Yes — NFR-002 rate cap + NFR-008 backoff/Retry-After | PASS (once NFR-002 cap is numeric) | Mechanism present; only the threshold value is missing (see Testability). |
+| Entitlement source unreachable | Yes — NFR-004 "fail closed" | PASS | Good: fail-closed explicitly stated. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Q4 boundary / which year's Q4:** BR-3 says "last quarter (Q4) only," but "last quarter" and "Q4" are not the same thing — trailing-quarter rolls forward each week, yet Q4 is fixed. Across the year-end boundary, does a weekly run in January 2027 still report Q4 2026, or roll to Q1? FR-002 conflates "last quarter" and "Q4." Undefined and likely to produce wrong data at the exact moment (year-end close) the report matters most.
-2. **No data for the quarter:** FR-001/FR-002 assume attribution data exists. What is produced if the Q4 window has zero attribution rows — an empty-but-valid PDF, or a generation failure? Undefined.
-3. **Partial data at generation time:** If the attribution source returns a success but with incomplete/late-arriving data, the report renders successfully but is wrong. No freshness/completeness check requirement.
-4. **Stale "prior report remains available" (FR-003):** When every cycle fails for weeks, the user keeps downloading an increasingly stale report with no indication of staleness. No requirement to surface the report's as-of/generated-at date or a staleness warning.
-5. **Concurrent kill-switch flip vs. in-flight download:** NFR-010 covers in-flight *generation*, but not an in-flight *download* whose secure link was issued just before the flip. Does the link still resolve? Undefined.
-6. **Secure link after rollback (NFR-005 + NFR-011):** Rollback does not withdraw already-produced reports, but does a previously issued, still-valid time-limited link to a report with *incorrect content* remain downloadable? Potential delivery of known-bad data.
-7. **Entitlement revoked between generation and download:** User was entitled at generation, loses entitlement, then downloads. FR-009 re-checks server-side (good), but the audit/empty-state transition for a mid-cycle revocation isn't specified.
-8. **Timezone of "weekly" and "Q4":** No timezone is defined for the weekly cadence or the quarter boundary. Finance close is date-sensitive; an off-by-one-day due to TZ could miss the close.
-9. **Download of a cycle that was superseded mid-download:** A new weekly report becomes available while the user is mid-download of the prior one. Which artifact is served; is the link to "latest" or to a specific cycle? FR-006 says "the available report" (singular) but FR-003 implies multiple can exist.
-10. **Audit-write failure during kill-switch incident:** NFR-007 raises an alert on audit-write failure, but during an incident the feature may be disabled — does a disabled feature still attempt/alert on audit writes? Interaction unspecified.
-11. **reporting-dispatcher vs. reporting-subscriptions-worker ownership of cadence:** The spec itself admits these two overlap on who owns the weekly cadence. If both fire, FR-004's "no overlapping generation" guard must span *two* services, not just one scheduler. NFR-009 says "disabled at the scheduler level" (singular) — insufficient if two schedulers exist.
-12. **PDF size / timeout on large quarter:** NFR-001 bounds serving an already-generated report but not generation duration for a large Q4 dataset; no upper bound or timeout defined for the async job itself.
+1. **Empty-quarter data:** No defined behavior when the window has zero attribution rows (see CG-001).
+2. **Stale-but-available report:** Repeated generation failures leave a stale prior report with no staleness signal (see CG-002).
+3. **Partial-channel data:** FR-006 reports "by channel," but behavior when some channels are missing/late upstream is undefined — the table may under-report revenue without flagging it. Finance totals could be wrong.
+4. **Concurrent download during an in-flight regeneration swap:** FR-005 retains a single report per cycle; nothing defines what a user downloading at the exact moment the new PDF replaces the old one receives (old, new, or a torn read / 404).
+5. **Link expiry mid-download:** NFR-005 time-limited link — behavior if the validity window expires during an in-progress large download is unspecified.
+6. **Timezone of "quarter" and "weekly run":** No timezone is pinned for quarter boundaries or the weekly schedule. Brightway's fiscal/calendar quarter vs. system UTC could misalign the window for a finance (year-end-close) use case.
+7. **Audit-write failure path:** NFR-007 says audit failure raises an alert and must not block the operation — but does the download still succeed if its audit entry failed? For a "sensitive finance export" with a 2-year audit mandate, a successful download with no audit record may be non-compliant. Behavior should be explicitly chosen.
+8. **Logo asset unavailable:** FR-008a mandates the Brightway logo on the PDF (confirmed requirement). No path defines whether generation fails, retries, or proceeds without the logo if the brand asset is missing/corrupt.
+9. **Kill-switch flipped mid-cycle vs. download:** NFR-010 handles in-flight generation, but says nothing about a download request for an already-available report after the feature is disabled — is the existing report still downloadable or access-denied?
+10. **Entitlement revoked between generation and download:** A report generated while entitled, then account entitlement removed — NFR-004 fail-closed implies denial on download, but this interaction with an already-generated artifact isn't stated explicitly.
+11. **Retry-once vs. NFR-008 backoff interaction:** FR-003 says "retries the generation once"; NFR-008 also describes "bounded retry with exponential backoff" for transient attribution-source calls. The relationship between the single cycle-level retry and the sub-call-level backoff retries is ambiguous and could be read as conflicting retry policies.
+12. **Weekly cycle after year-end close / cadence stop:** BR-2 bounds the cadence to year-end close, but no requirement defines *how* the schedule stops (manual disable, configured end date) or what the console shows once the cadence ends.
 
 ---
 
@@ -73,26 +74,22 @@ The FRs themselves are in solid Gherkin. The vagueness lives mostly in NFRs and 
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-010 are all well-formed Gherkin. |
-| Document contains only Sections 0–6 | **FAIL** | The document ends with an **"## Appendix: Engineering Reference"** containing an *Affected Services* list and a multi-paragraph narrative *"Cross-check discrepancy (for planning)"* analysis with its own findings. This is a stray multi-paragraph KG cross-check appendix beyond Sections 0–6 — not a sanctioned trailing Revision Summary, not a one-line `> **Label:**` metadata blockquote. It is exactly the kind of extra narrative appendix that must be flagged. Move the affected-services grounding into planning collateral or fold the ownership ambiguity (already present) into Section 1; remove the appendix from the spec. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is entirely bullet items; each tags *System-derived/External* in prose and defers field names/types. No attribute tables present. |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-010 (incl. FR-008a) are all in valid Gherkin blocks; no prose FRs. |
+| Document contains only Sections 0–6 | FAIL | An `## Appendix: Engineering Reference` (with "Affected Services" + a multi-paragraph "Cross-check discrepancy" narrative) sits between Section 6 and the Revision Summary. This is NOT a sanctioned trailer: it is a multi-paragraph narrative analysis appendix with its own findings/recommendations prose — exactly the "stray KG cross-check appendix" the base rule is written to catch. The trailing `## Revision Summary` itself is EXPECTED and is NOT flagged. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a bullet list of business concepts; no attribute tables or field types. (Note: Section 5's risk-mitigation and Section 6 tables are permitted in those sections.) |
 
----
-
-## KG Cross-Check (grounding vs. spec claims)
-
-- The spec's handling of the service-ownership discrepancy is **accurate and honest**: it refuses to pick between pubsuite-attribution, summary-report-cloud, and koch-query-api, matching the independent lookup's low/medium confidence spread. No contradiction to flag here.
-- **Discrepancy worth noting:** The independent cross-check surfaced **entitlements-api** (gates access to the report feature) and did **not** re-find pubsuite-attribution. The spec's Appendix lists pubsuite-attribution in the *primary* list and relegates entitlements-api to a low-confidence footnote — yet BR-1/NFR-004 make entitlement enforcement central (CG-001). The spec under-weights entitlements-api relative to how load-bearing entitlement is to this feature's viability. Recommend elevating entitlements-api from footnote to a named dependency for planning. (Grounding note only — this does not change the Format verdict above.)
+**Detail on the FAIL:** The `## Appendix: Engineering Reference` block is a full multi-paragraph narrative section (service list + a prose "Cross-check discrepancy (for planning)" subsection with its own reasoning and recommendations), not a short one-line `> **Label:** ...` metadata blockquote and not the Revision Summary. It must be removed or relocated out of the spec body to comply with the Sections 0–6 constraint. The service-ownership ambiguity is already appropriately captured in Section 1's service-ownership note and Section 4, so the appendix is redundant as well as out-of-structure.
 
 ---
 
 ## 6. Recommendations
 
-1. **Resolve CG-001 (entitlement) and CG-002 (year-end close date) before any engineering starts.** Both are Critical and either can nullify the MVP. Add a dated availability acceptance criterion once the close date is known.
-2. **Remove the Engineering Reference Appendix** (Section 5 format FAIL) — fold its one genuinely spec-relevant point (service-ownership ambiguity, already in Section 1) in and move the rest to planning collateral.
-3. **Fix the "last quarter" vs. "Q4" conflation** (Edge Case #1) in BR-3 and FR-002 — define exactly which quarter is reported across the year-end boundary and the controlling timezone. This is the highest-value data-correctness fix given the close-date context.
-4. **Set the deferred numeric NFR values** (NFR-001 concurrency, NFR-002 rate cap, NFR-005 link TTL, NFR-009 completion time) so they become testable.
-5. **Reconcile dual schedulers** (reporting-dispatcher vs. reporting-subscriptions-worker) — FR-004/NFR-009 must guarantee non-overlap across both services, not one scheduler.
-6. **Add staleness surfacing** (Edge Cases #4) and define empty/partial-data generation behavior (#2, #3).
-7. **Confirm the audit retention mandate** (NFR-007 [DECISION REQUIRED]) to avoid building a non-compliant 12-month floor.
-8. **Specify secure-link behavior across kill-switch/rollback** (Edge Cases #5, #6) to prevent serving known-bad content post-rollback.
+1. **Remove/relocate the `## Appendix: Engineering Reference` section** (Format FAIL) — its content is already covered by the Section 1 service-ownership note; keep the document to Sections 0–6 plus the sanctioned Revision Summary.
+2. **Confirm the actual year-end-close date** and convert BR-5 from a working assumption to a committed, testable deadline — this unblocks the deadline-risk mitigation and the first-report acceptance criterion.
+3. **Add an empty/partial-data FR** (CG-001, edge cases 1 & 3): define behavior for zero-row and missing-channel quarters so finance never reconciles against a silently-empty or under-reported table.
+4. **Add a staleness-visibility requirement** (CG-002): surface the available report's generation date/period and flag when the latest cycle failed, so a stale prior report is never mistaken for current.
+5. **Define quarter-boundary / attribution-settlement rules and pin a timezone** (CG-003, edge cases 6): govern window selection relative to upstream data finalization.
+6. **Backfill numeric thresholds** for NFR-001 (concurrency N), NFR-002 (rate cap), NFR-005 (link TTL), and NFR-009 (concrete completion clock/TZ) so each becomes testable.
+7. **Resolve the audit-vs-download and entitlement-revocation interactions** (edge cases 7, 10): explicitly state whether a download proceeds when its audit write fails, given the 2-year compliance mandate.
+8. **Clarify the retry model** (edge case 11): reconcile FR-003's "retry once" with NFR-008's "exponential backoff" so engineers implement one coherent policy.
+9. **Specify logo-asset-unavailable and kill-switch-vs-existing-download behaviors** (edge cases 8, 9) and how the weekly cadence terminates at year-end close (edge case 12).

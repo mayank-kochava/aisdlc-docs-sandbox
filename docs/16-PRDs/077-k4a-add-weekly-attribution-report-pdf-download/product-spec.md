@@ -289,4 +289,4 @@ _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIR
 - **OQ-008**: Resolved OQ-008 and DEC-005 (same question): the report covers Brightway Retail's own data only — no benchmarking or comparison against other customers/industry standards.
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
