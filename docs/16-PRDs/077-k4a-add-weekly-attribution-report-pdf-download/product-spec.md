@@ -187,7 +187,7 @@ The system must track the following business information to support the Function
 - **NFR-004 — Server-side access enforcement:** Entitlement to the report must be enforced server-side on every download request and re-derived from the authoritative entitlement source on each request — never cached client-side, never trusted from a client-supplied claim, and never relying on UI-hiding alone. An ineligible account calling the download path directly must be rejected (typically 403). Fail closed if the entitlement source is unreachable. (Implements the gate behind FR-009.)
 - **NFR-005 — Secure, time-limited delivery:** The attribution report is a sensitive finance export and must be delivered via a time-limited secure link rather than a permanently public URL or raw attachment. The link validity window is an engineering default to be set during planning.
 - **NFR-006 — No sensitive data in logs:** The system must never log raw report content, user-identifying data, credentials, or tokens. Download and generation logs record identifiers and outcome/status only.
-- **NFR-007 — Audit trail for report access and generation:** Record an append-only, immutable audit entry for each report generation outcome and each download request, capturing actor identity (user ID + account ID), resource identity (report type + ID + period), action, timestamp, and outcome/status. Audit writes are asynchronous and must never block the primary operation, but an audit-write failure must raise an immediate operational alert rather than fail silently. Minimum retention is 12 months; a longer retention tied to Brightway Retail's finance/audit or regulatory obligations may be required. Whether a regulatory/audit retention or format mandate applies to this report is not specified in the input. [DECISION REQUIRED]
+- **NFR-007 — Audit trail for report access and generation:** Record an append-only, immutable audit entry for each report generation outcome and each download request, capturing actor identity (user ID + account ID), resource identity (report type + ID + period), action, timestamp, and outcome/status. Audit writes are asynchronous and must never block the primary operation, but an audit-write failure must raise an immediate operational alert rather than fail silently. Both the report and its access (audit) records must be retained for two years (confirmed by the reviewer). No specific format mandate applies to this report.
 
 ### Reliability & Risk Mitigation
 
@@ -244,7 +244,7 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Resolved BR-6: report content is total attributed revenue and conversions by channel in one simple table.
+- Resolved NFR-007 retention: report and access records retained for two years, no format mandate, removing the [DECISION REQUIRED] tag.
 
 
 ---
@@ -262,7 +262,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-004** | Does the finance team need to be actively notified (for example by email or an in-app alert) when each week's report is ready, or is on-demand download from the console enough? | Product owner | Ship on-demand download in the console for Phase 1 with no active delivery/notification, and revisit email delivery as a fast-follow if finance asks for it. |
 | **DEC-005** | Should the report show only Brightway Retail's own data, or does it need to compare against other customers or industry benchmarks? | Product owner | Scope the report to Brightway Retail's own data only, with no cross-customer or industry benchmarking in Phase 1. |
 | **DEC-006** | Does this report need to be delivered to the finance team automatically each week — for example by email or an in-app alert when a new one is ready — or is it enough for them to download it on demand from the console? | Product owner | On-demand download in the console only for Phase 1; add active delivery (email/in-app notification) in a later phase if the finance team confirms they need it. |
-| **DEC-007** | Are there any regulatory, audit, or contractual rules that dictate how long this finance report and its access records must be retained, or the format they must follow? | Compliance/Security, with Product owner | Retain audit records for 12 months minimum; no special format mandate assumed, confirm with Brightway Retail's finance/audit stakeholders before launch. |
 | **DEC-009** | Audience: The report is produced for Brightway Retail, a standard-plan customer. Whether this report is a standard-plan entitlement or a gated/premium feature that a standard-plan customer cannot access by default is unresolved and materially affects whether Brightway can use it without an entitlement change. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-010** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-012** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
@@ -270,11 +269,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | **DEC-014** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-016** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 | **DEC-018** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
+| **DEC-019** | Availability gate: The report must be generated and available for download before Brightway Retail's year-end close date. The exact year-end close date is not supplied in the input. | _(not yet assigned)_ | _(not yet specified)_ |
 
 ### Decisions Resolved
 
 - **DEC-001**: Report is part of the standard plan — no gating or special entitlement needed; this also resolves the duplicate question DEC-001.
 - **DEC-003**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
+- **DEC-007**: Resolved DEC-007: the finance report and its access records must be retained for two years; no specific format mandate applies.
 - **DEC-008**: On a failed weekly report generation, retry once, then email the finance owner (who is both notified and the fallback the finance team sees); this same answer resolves DEC-008 on who is alerted/accountable.
 - **DEC-011**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
 - **DEC-015**: Report content resolved: total attributed revenue and conversions by channel, presented as one simple table.
