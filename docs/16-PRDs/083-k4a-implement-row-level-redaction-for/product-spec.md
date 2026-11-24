@@ -320,28 +320,24 @@ Phase 1 implementation of the redaction *mechanism* can proceed in parallel with
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
+### Decisions Resolved
 
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
+- **DEC-001**: Engineering decides: Redact a row when the requesting account is not the advertiser that owns the row, and additionally when a per-row sensitivity/eligibility flag marks it restricted; one consistent rule for all customers until role-specific rules are defined.
+- **DEC-002**: Engineering decides: Show the row labeled as "redacted" with a short explanation of why, so the customer knows data exists but is restricted rather than silently missing.
+- **DEC-003**: Engineering decides: No self-service access request in Phase 1; redacted rows stay redacted and any access change happens through the existing manual support/escalation channel, with an in-product request flow deferred to a later phase.
+- **DEC-004**: Engineering decides: Retain audit records for a minimum of 12 months; extend to match any governing third-party data-sharing agreement's required period if one applies.
+- **DEC-005**: Engineering decides: Eligibility is the determinant of visibility: A row is shown only when the requester is eligible to see it per the eligibility rules. The specific eligibility criteria that make a row redactable (e.g. user permissions, advertiser status, data freshness, campaign state) are not yet defined and must be established before implementation.
 
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | Which conditions should make an individual eventGrainEligibility row redacted for a customer — for example the customer's permissions, the advertiser's status, how fresh the data is, or the campaign's state? | Product owner (Mayank Ukey) with Compliance | Redact a row when the requesting account is not the advertiser that owns the row, and additionally when a per-row sensitivity/eligibility flag marks it restricted; one consistent rule for all customers until role-specific rules are defined. |
-| **DEC-002** | When a row is redacted, what should the customer see — the row removed entirely, a placeholder in its place, or the row clearly labeled as redacted with a short explanation? | Product owner with Design | Show the row labeled as "redacted" with a short explanation of why, so the customer knows data exists but is restricted rather than silently missing. |
-| **DEC-003** | Should a customer be able to request access to a row that was redacted from them, and if so what approval or escalation steps should that request go through? | Product owner with Compliance | No self-service access request in Phase 1; redacted rows stay redacted and any access change happens through the existing manual support/escalation channel, with an in-product request flow deferred to a later phase. |
-| **DEC-004** | If this Amazon Ads data is covered by a data-sharing agreement with its own compliance cycle, how long do we need to keep the redaction audit records? | Compliance/Security, with Product owner | Retain audit records for a minimum of 12 months; extend to match any governing third-party data-sharing agreement's required period if one applies. |
-| **DEC-005** | Eligibility is the determinant of visibility: A row is shown only when the requester is eligible to see it per the eligibility rules. The specific eligibility criteria that make a row redactable (e.g. user permissions, advertiser status, data freshness, campaign state) are not yet defined and must be established before implementation. | _(not yet assigned)_ | _(not yet specified)_ |
+### Questions Resolved
 
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-001**: What specific signal should drive redaction (user permissions, advertiser status, data freshness, campaign state, or a dedicated eligibility flag)? This determines whether a new field has to be defined/ingested upstream.
-- **OQ-002**: How should redacted rows appear to customers — omitted entirely, shown with placeholder text, or shown labeled as 'redacted' with an explanation? This is the main driver of whether there's real frontend work.
-- **OQ-003**: Is one redaction rule applied uniformly, or do rules differ by user role / advertiser type? (This affects whether per-account/per-app scoping is needed on the read paths.)
-- **OQ-004**: Does redaction need to be enforced on every consumer surface — both analytics queries and customer-facing reports and any downstream dashboards — or only the K4A UI path?
-- **OQ-005**: Should customers be able to request access to redacted rows, and if so, what approval/escalation workflow is expected?
-- **OQ-006**: Do redaction decisions need to be real-time, or can eligibility be computed periodically / cached? (Affects whether masking is on the hot read path vs. precomputed.)
-- **OQ-007**: Is the intended mechanism masking at the data layer, or server-enforced filtering per account/app? The codebase hints at both and they imply very different designs — which does the product expect?
-- **OQ-008**: Can someone confirm what a customer currently sees when accessing eventGrainEligibility in K4A? This is still marked Unknown and blocks scoping the redaction delta.
+- **OQ-001**: Engineering decides: What specific signal should drive redaction (user permissions, advertiser status, data freshness, campaign state, or a dedicated eligibility flag)? This determines whether a new field has to be defined/ingested upstream.
+- **OQ-002**: Engineering decides: How should redacted rows appear to customers — omitted entirely, shown with placeholder text, or shown labeled as 'redacted' with an explanation? This is the main driver of whether there's real frontend work.
+- **OQ-003**: Engineering decides: Is one redaction rule applied uniformly, or do rules differ by user role / advertiser type? (This affects whether per-account/per-app scoping is needed on the read paths.)
+- **OQ-004**: Engineering decides: Does redaction need to be enforced on every consumer surface — both analytics queries and customer-facing reports and any downstream dashboards — or only the K4A UI path?
+- **OQ-005**: Engineering decides: Should customers be able to request access to redacted rows, and if so, what approval/escalation workflow is expected?
+- **OQ-006**: Engineering decides: Do redaction decisions need to be real-time, or can eligibility be computed periodically / cached? (Affects whether masking is on the hot read path vs. precomputed.)
+- **OQ-007**: Engineering decides: Is the intended mechanism masking at the data layer, or server-enforced filtering per account/app? The codebase hints at both and they imply very different designs — which does the product expect?
+- **OQ-008**: Engineering decides: Can someone confirm what a customer currently sees when accessing eventGrainEligibility in K4A? This is still marked Unknown and blocks scoping the redaction delta.
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
