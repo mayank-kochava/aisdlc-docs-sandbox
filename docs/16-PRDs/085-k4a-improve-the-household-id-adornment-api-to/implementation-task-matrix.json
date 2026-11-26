@@ -1,0 +1,703 @@
+{
+  "matrix_id": "wi_0dbb892fb474bfe2caaa-r1",
+  "prd": {
+    "id": "wi_0dbb892fb474bfe2caaa",
+    "folder": "085-k4a-improve-the-household-id-adornment-api-to",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "B",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-26T11:46:24.749043Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Add NoResultReason enum and KeyedHousehold.reason (tag 4); regenerate Go and Python stubs",
+      "title_clean": "Add NoResultReason enum and KeyedHousehold.reason (tag 4); regenerate Go and Python stubs",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T001 — Add NoResultReason enum and KeyedHousehold.reason (tag 4); regenerate Go and Python stubs",
+        "anchors": [],
+        "pattern": "KeyedHousehold at household_service.proto:30-36 (tag 4 is free)"
+      },
+      "repo": "Kochava/household-id-adornment-proto",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "household_service.proto",
+          "go/householdservice/household_service.pb.go",
+          "go/householdservice/household_service_grpc.pb.go",
+          "python/householdservice/household_service_pb2.py",
+          "python/householdservice/household_service_pb2.pyi",
+          "python/householdservice/household_service_pb2_grpc.py"
+        ],
+        "test": [
+          "go/householdservice/household_service_reason_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none",
+        "produces": "proto: enum NoResultReason { NO_RESULT_REASON_UNSPECIFIED = 0; NO_RESULT_REASON_NO_MATCH_FOUND = 1; NO_RESULT_REASON_INVALID_INPUT_FORMAT = 2; NO_RESULT_REASON_LOOKUP_DEPENDENCY_UNAVAILABLE = 3; } and field `NoResultReason reason = 4;` on KeyedHousehold. Go (package householdservice, module github.com/Kochava/household-id-adornment-proto/go): type NoResultReason, NoResultReason_NO_RESULT_REASON_NO_MATCH_FOUND (etc.), (*KeyedHousehold).GetReason()"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: backend stack go",
+        "confidence": 0.7,
+        "evidence": [
+          {
+            "source": "stack-hint",
+            "ref": "stack=go"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-010",
+        "NFR-007"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "a39d20c29bfd2ec170e6003e5e78586e77f02b23",
+        "resolved": [
+          "household_service.proto",
+          "go/householdservice/household_service.pb.go",
+          "go/householdservice/household_service_grpc.pb.go",
+          "python/householdservice/household_service_pb2.py",
+          "python/householdservice/household_service_pb2.pyi",
+          "python/householdservice/household_service_pb2_grpc.py"
+        ],
+        "missing": [
+          "go/householdservice/household_service_reason_test.go",
+          "go/householdservice/household_service_reason_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "python/householdservice/__init__.py"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T002",
+      "title": "Mirror the reason enum and field in the api repo's in-tree proto and regenerate its Go stubs",
+      "title_clean": "Mirror the reason enum and field in the api repo's in-tree proto and regenerate its Go stubs",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T002 — Mirror the reason enum and field in the api repo's in-tree proto and regenerate its Go stubs",
+        "anchors": [],
+        "pattern": "pkg/householdservice/household_service.proto:30-36"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "pkg/householdservice/household_service.proto",
+          "pkg/householdservice/household_service.pb.go",
+          "pkg/householdservice/household_service_grpc.pb.go"
+        ],
+        "test": [
+          "internal/householdserver/household_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "enum NoResultReason and KeyedHousehold.reason = 4 as defined in T001 (same tags and names)",
+        "produces": "Go in github.com/Kochava/household-id-adornment-api/pkg/householdservice: type NoResultReason, constants NoResultReason_NO_RESULT_REASON_UNSPECIFIED / _NO_MATCH_FOUND / _INVALID_INPUT_FORMAT / _LOOKUP_DEPENDENCY_UNAVAILABLE, (*KeyedHousehold).GetReason()"
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-010",
+        "NFR-007"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "pkg/householdservice/household_service.proto",
+          "pkg/householdservice/household_service.pb.go",
+          "pkg/householdservice/household_service_grpc.pb.go",
+          "internal/householdserver/household_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T003",
+      "title": "Bounded retry helper for Dragonfly Get and SMisMember calls",
+      "title_clean": "Bounded retry helper for Dragonfly Get and SMisMember calls",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Bounded retry helper for Dragonfly Get and SMisMember calls",
+        "anchors": [],
+        "pattern": "Single-shot calls at internal/householdserver/household.go:37 and :67"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [
+          "internal/householdserver/retry.go"
+        ],
+        "modify": [],
+        "test": [
+          "internal/householdserver/retry_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "none (redis.Nil from github.com/redis/go-redis/v9)",
+        "produces": "package householdserver: `func retry[T any](ctx context.Context, attempts int, base time.Duration, fn func(context.Context) (T, error)) (T, error)`; redis.Nil is returned immediately without retry; other errors retried up to `attempts` total tries with backoff base*2^n; honors ctx cancel; returns the last error wrapped. Constants `defaultRetryAttempts = 3`, `defaultRetryBase`."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [
+        "FR-009",
+        "NFR-002"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [],
+        "missing": [
+          "internal/householdserver/retry.go",
+          "internal/householdserver/retry_test.go",
+          "internal/householdserver/retry_test.go"
+        ],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "internal/householdserver/key.go",
+          "internal/householdserver/household.go"
+        ],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T004",
+      "title": "Return distinct reason on GetHousehold and GetHouseholdFromIP empty results (no match, dependency unavailable, invalid input)",
+      "title_clean": "Return distinct reason on GetHousehold and GetHouseholdFromIP empty results (no match, dependency unavailable, invalid…",
+      "summary": "",
+      "flags": [
+        {
+          "level": "yellow",
+          "text": "Already on main — will verify and extend"
+        }
+      ],
+      "description": "Verify and extend the existing implementation, then fill any gaps. Original task: ",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T004 — Return distinct reason on GetHousehold and GetHouseholdFromIP empty results (no match, dependency unavailable, invalid input)",
+        "anchors": [],
+        "pattern": "Existing branches at internal/householdserver/household.go:37-44 (redis.Nil vs err) and :57-74; hash-before-log at :35 and :62"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/householdserver/household.go"
+        ],
+        "test": [
+          "internal/householdserver/household_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "householdservice.NoResultReason constants and KeyedHousehold.Reason from T002; retry[T], defaultRetryAttempts, defaultRetryBase from T003",
+        "produces": "package householdserver: `func emptyResult(di *householdservice.DeviceId, ip *householdservice.IP, r householdservice.NoResultReason) *householdservice.KeyedHousehold` (Household nil, Reason set, echoes the request identifier only via the existing DeviceId/Ip field); `func validDeviceID(di *householdservice.DeviceId) bool`. GetHousehold and GetHouseholdFromIP return (non-nil KeyedHousehold with Reason, nil error) on every empty outcome."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T002",
+        "T003"
+      ],
+      "inferred_depends_on": [],
+      "wave": 2,
+      "requirements": [
+        "PRD-085-k4a-improve-the-household-id-adornment-api-to",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-010",
+        "FR-009",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "NFR-004",
+        "NFR-005"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "S",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "verify",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "internal/householdserver/household.go",
+          "internal/householdserver/household_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "internal/householdserver/key.go"
+        ],
+        "status": "exists",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T005",
+      "title": "Carry per-item reasons through the GetHouseholds batch loop",
+      "title_clean": "Carry per-item reasons through the GetHouseholds batch loop",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T005 — Carry per-item reasons through the GetHouseholds batch loop",
+        "anchors": [],
+        "pattern": "Batch loop at internal/householdserver/household.go:84-116"
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [
+          "internal/householdserver/household.go"
+        ],
+        "test": [
+          "internal/householdserver/household_test.go"
+        ]
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "GetHousehold/GetHouseholdFromIP returning KeyedHousehold with Reason (T004)",
+        "produces": "GetHouseholds appends every KeyedHousehold (hits and reason-only entries); a batch with only misses returns a non-nil response with one reason entry per input."
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 3,
+      "requirements": [
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-010"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "1342aff9270fd2ad718e71ecb5038ab1c6cee216",
+        "resolved": [
+          "internal/householdserver/household.go",
+          "internal/householdserver/household_test.go"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "internal/householdserver/key.go"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "T006",
+      "title": "Bump household-id api image tag in qa then prod",
+      "title_clean": "Bump household-id api image tag in qa then prod",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T006 — Bump household-id api image tag in qa then prod",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/ko-k8s-apps",
+      "stack": "yaml-tf",
+      "domain_manifest": "infra",
+      "governance": "infra",
+      "files": {
+        "create": [],
+        "modify": [
+          "adornment/household-id/api/qa/api.yaml",
+          "adornment/household-id/api/prod/api.yaml"
+        ],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "infra (SRE, manual): infra repo, SRE is manual",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "rule repo_in=['Kochava/ko-k8s-apps', 'Kochava/ko-k8s-ops', 'Kochava/ko-infrastructure']"
+          }
+        ],
+        "assignee": null,
+        "lane": "infra"
+      },
+      "allocation": "manual",
+      "depends_on": [
+        "T005"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [
+        "FR-010",
+        "NFR-009"
+      ],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "e4104ee339163f82a715bfeb3918e43a5aa81d0c",
+        "resolved": [
+          "adornment/household-id/api/qa/api.yaml",
+          "adornment/household-id/api/prod/api.yaml"
+        ],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [
+          "adornment/household-id/api/qa/api_hpa.yaml",
+          "adornment/household-id/api/qa/istio-sidecar.yaml",
+          "adornment/household-id/api/qa/kustomization.yaml",
+          "adornment/household-id/api/qa/service.yaml",
+          "adornment/household-id/api/prod/api_hpa.yaml"
+        ],
+        "status": "partial",
+        "notes": []
+      },
+      "test_cmd": "kustomize build {dirs} && yamllint {files}"
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/household-id-adornment-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/household-id-adornment-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/household-id-adornment-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T005"
+      ],
+      "inferred_depends_on": [],
+      "wave": 4,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    },
+    {
+      "id": "TG2",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/household-id-adornment-proto with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG2",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/household-id-adornment-proto",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/household-id-adornment-proto before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T001"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T001",
+      "T003"
+    ],
+    [
+      "T002",
+      "TG2"
+    ],
+    [
+      "T004"
+    ],
+    [
+      "T005"
+    ],
+    [
+      "T006",
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 15,
+    "covered": 15,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [],
+  "decisions": "",
+  "warnings": [
+    "T001: task too large (7 files (max 5)); consider splitting"
+  ],
+  "removed": []
+}
