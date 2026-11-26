@@ -1,0 +1,49 @@
+// K4A — Enhanced Error Reporting for Household ID Adornment Lookups
+// Contract excerpt for household-id-adornment-proto.
+//
+// This is the ADDITIVE change to the existing proto3 contract. The service
+// block and existing message tags are UNCHANGED (no RPC-surface change,
+// investigation-verified proto CA-1). Only a new enum + new fields are added.
+//
+// Generated from: product-spec.md FR-002..FR-005, FR-007; eng-research.md.
+// Released as a `feat:` semantic-release minor bump (v1.0.3 -> v1.1.0).
+//
+// REGEN HAZARD (Linux): the Makefile Python codegen step uses BSD `sed -i ''`
+// (Makefile:49) which fails on Linux; use `sed -i` (no empty-string arg).
+
+syntax = "proto3";
+
+package householdservice;
+
+// NEW: the repo's first enum (NumEnums 0 -> 1). Proto3 requires a zero-value
+// default; NO_RESULT_REASON_UNSPECIFIED doubles as the backward-compat signal
+// so happy-path / legacy responses carry the unset reason (BR-5 / FR-010).
+enum NoResultReason {
+  NO_RESULT_REASON_UNSPECIFIED = 0; // default / not an empty result
+  NO_MATCH_FOUND = 1;               // valid input, dependency up, no record (FR-002)
+  LOOKUP_DEPENDENCY_UNAVAILABLE = 2; // dependency down after bounded retry; transient (FR-004)
+  INVALID_INPUT_FORMAT = 3;         // input malformed / fails validation (FR-003)
+}
+
+// Existing message, shown for context. Fields 1-3 UNCHANGED.
+// NEW: field 4 carries the distinct reason on an empty result. Tag 4 is the
+// confirmed free slot (investigation proto CA-2). Old clients ignore it,
+// satisfying FR-010 / NFR-007 at the decode level. Reason is category-only and
+// MUST NOT echo customer-identifying query values (FR-007 / NFR-004).
+message KeyedHousehold {
+  Household household = 1; // The household (empty on no-result)
+  DeviceId device_id = 2;  // The device id
+  IP ip = 3;               // The ip address
+  NoResultReason reason = 4; // NEW: distinct named reason when result is empty
+}
+
+// Existing envelope, shown for context. Field 1 UNCHANGED.
+// CONDITIONAL NEW: field 2 carries a request-wide reason for a failure that
+// applies to the whole batch (e.g. dependency unavailable). Tag 2 confirmed
+// free (investigation proto CA-3). Include ONLY if the batch-granularity
+// decision requires an envelope-level reason; per-item reasons otherwise ride
+// on each KeyedHousehold.reason above.
+message GetHouseholdsResponse {
+  repeated KeyedHousehold keyed_households = 1; // The keyed households
+  NoResultReason reason = 2; // CONDITIONAL NEW: request-wide batch reason
+}
