@@ -6,10 +6,10 @@
 
 ## Summary
 
-- **Critical Issues:** 0
-- **High Issues:** 5
-- **Medium Issues:** 6
-- **Blocking:** No
+- **Critical Issues:** 2
+- **High Issues:** 6
+- **Medium Issues:** 5
+- **Blocking:** Yes
 
 ---
 
@@ -17,11 +17,8 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-003 (invalid input) and FR-002/FR-004 ordering: the flowchart checks "input well-formed" BEFORE "dependency available", but no FR covers the case where input is malformed AND the dependency is simultaneously down. The precedence rule exists only in the Mermaid diagram, not in any testable requirement — an ambiguity about which reason wins when multiple causes co-occur. | High | 2, 3 | Add an FR making cause precedence explicit: invalid-input is evaluated and reported first, dependency-unavailable second, no-match last. FR-005 says "exactly one" reason but never states which one wins on overlap. |
-| CG-002 | FR-004 covers dependency "unavailable or fails to respond within bounded retry," but no requirement defines behavior for a PARTIAL/degraded dependency response (e.g. dependency returns HTTP 200 with a malformed or empty body). This falls between "available" and "unavailable" and hits no defined branch. | High | 3 | Add an FR classifying a successful-status-but-unparseable dependency response — treat it as dependency-unavailable (transient) rather than silently as no-match. |
-| CG-003 | No FR defines behavior when input-format validation itself cannot run or the request is structurally un-parseable at the transport layer (e.g. missing required field entirely, not merely malformed value). FR-003 assumes the request reaches format validation. | Medium | 3 | Clarify that a structurally un-parseable / missing-field request maps to the invalid-input-format reason, or define a separate rejection behavior. |
-
-No issue rises to **Critical** (implementation-blocking / data-loss / security). The privacy and access-control requirements (FR-007, FR-008, NFR-004–006) are present and testable, which removes the usual security-blocker candidates.
+| CG-001 | **Ordering collision is undefined.** The flow (Section 2) implies strict precedence: input-format → dependency availability → match. But FR-002 through FR-005 do not define behavior when two conditions are simultaneously true (e.g. malformed input AND the dependency is down, or an input that passes surface validation but is semantically unresolvable). FR-005 mandates "exactly one" reason yet never states the resolution rule the API uses to pick which one. Implementers will each choose differently. | Critical | §2, FR-002–FR-005 | Add an explicit precedence requirement: "Given multiple empty-result conditions apply simultaneously, Then the API returns the reason according to the fixed precedence: invalid input format > lookup dependency unavailable > no match found." Ground this in the Mermaid ordering so flow and FRs agree. |
+| CG-002 | **"Dependency unavailable" vs. "slow-but-eventually-empty" is a dead end.** FR-009 bounds retries, but there is no defined behavior for the case where the dependency *responds successfully after retry* with a genuine no-match, versus partial/degraded responses. FR-004 fires only when attempts are "exhausted," but a dependency that returns a 200 with a malformed/empty payload (not a timeout, not a clean no-match) has no defined reason classification and would silently fall through to "no match found" — misleading the agent into telling the customer no record exists when the truth is a data-integrity failure. | Critical | FR-004, FR-009 | Add an FR for degraded/ambiguous dependency responses (malformed payload, partial response, unexpected status): classify as "lookup dependency unavailable" (transient), never as "no match found." |
 
 ---
 
@@ -31,12 +28,10 @@ No issue rises to **Critical** (implementation-blocking / data-loss / security).
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| FR-006 | "the reason explains the cause ... in terms the agent can act on" / "enables the agent to determine an appropriate next step" | Not objectively measurable — "actionable" and "can act on" have no pass/fail criterion. An automated test cannot assert "actionability." | Given a no-results response with reason R, When R is inspected, Then R maps to exactly one entry in a defined, versioned reason→agent-action catalog, And every supported reason code has a non-empty catalog entry. (Requires defining that catalog — currently undefined.) |
-| NFR-001 | "must not measurably degrade successful-lookup latency ... remains within its current p95 ... baseline p95 target is not supplied" | Untestable: no numeric baseline exists, so "within current p95" cannot be verified. Flagged [DECISION REQUIRED] but still unmeasurable as written. | Given 10k representative concurrent happy-path lookups, When measured, Then success-path p95 ≤ [BASELINE_MS] (baseline must be supplied before this is a test). |
-| NFR-003 | "error rate exceeds 1% for 5 minutes, sustained" | Mostly measurable, but "error rate" is undefined — numerator/denominator unspecified (dependency errors ÷ total lookups? ÷ dependency calls?). Risk of ambiguous alerting. | Define error-rate = (dependency calls returning error or timeout) ÷ (total dependency calls) over a rolling 5-min window; alert when > 1%. |
-| FR-009 | "exponential backoff (default: up to 3 attempts)" | "default" implies configurability but no FR defines the configurable bounds or min/max backoff interval — partially testable. | Specify initial backoff, multiplier, and max cap (e.g. 100ms base, ×2, cap 2s, max 3 attempts) so the retry envelope is deterministically testable. |
-
-All ten FRs are written in Gherkin — no prose-FR violations. The issues above are vagueness within otherwise-conformant Gherkin, not format failures.
+| FR-006 | "the reason explains the cause ... in terms the agent can act on ... enables the agent to determine an appropriate next step" | "Actionable" and "can act on" are subjective and untestable. No automated test can assert "actionability." | `Given an empty-result response with a diagnostic reason, When the response is validated, Then the reason field equals one of the approved enumerated reason codes AND carries a non-empty human-readable message AND the (reason code → message) mapping matches the approved content table defined by the content-decision owner.` (Requires the content table to exist — see RM audit.) |
+| NFR-001 | "must not measurably degrade successful-lookup latency ... remains within its current p95 ... baseline p95 target is not supplied" | Untestable: the baseline p95 is admitted missing and marked `[DECISION REQUIRED]`. "Measurably degrade" has no threshold. | `Given representative concurrent load at the documented baseline, When the happy path (FR-001) is exercised, Then p95 latency does not exceed <BASELINE_P95_MS> by more than <N>%.` Blocked until baseline is supplied. |
+| FR-003 | "whose input is malformed or fails input-format validation" | "Malformed" / "fails input-format validation" is undefined. The actual validation rules (length, charset, allowed formats) are never specified, so the trigger for FR-003 is untestable. | Define the validation ruleset, then: `Given an input violating rule <X> of the documented input-format spec, When the API validates it, Then it returns empty-result with reason "invalid input format".` |
+| FR-004 | "the lookup dependency is unavailable or fails to respond within its bounded retry attempts" | "Unavailable" conflates timeout, connection refused, 5xx, and rate-limit. Each needs a distinct testable trigger. | Split into discrete Given clauses per failure mode (timeout / 5xx / connection error / rate-limit-exhausted) each asserting the same reason. |
 
 ---
 
@@ -44,28 +39,28 @@ All ten FRs are written in Gherkin — no prose-FR violations. The issues above 
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Response shape designed before agent needs known (NFR-008) | Yes — deferred to named-owner decisions; behavioral contract in interim | PASS | Correctly gated, not just listed. |
-| Proto/contract change ripples to unknown consumers (NFR-009) | Partial — mitigation is "enumerate all consumers before rollout" | **FAIL** | Mitigation is a process promise with no owner, no deadline, and no FR. NFR-007 enforces additive-only shape, but nothing verifies the enumeration actually happened. This is the spec's own highest-rated risk and its mitigation is unenforceable. |
-| Collapsing distinct failure causes (NFR-010) | Yes — FR-005 | PASS | Directly backed by a testable FR. |
-| Privacy leakage via diagnostic detail (NFR-011) | Yes — FR-007, FR-008, NFR-004/005 + release gate | PASS | Well covered. |
-| Undefined front-end involvement (NFR-012) | Yes — out-of-scope for Phase 1, gated on decision | PASS | Cleanly scoped out. |
-| No added latency on success path (NFR-001) | Partial — target stated but no baseline | **FAIL** | Risk acknowledged, mitigation not verifiable (no baseline number). Flagged [DECISION REQUIRED] but ships without an acceptance threshold. |
+| NFR-008 — Response shape designed before agent needs known | Deferred to a `[DECISION REQUIRED]` with no named owner | **FAIL** | Mitigation is conditional on decisions that have *no assigned human owner and no due date*. "Mitigated when … have named human owners" — but no owner is named anywhere. The mitigation is a promissory note, not a requirement. |
+| NFR-009 — Proto change ripples to unknown consumers | Partial — states "mitigated when complete consumer set enumerated" but no FR enumerates them | **FAIL** | The consumer list is explicitly *not enumerated* ("not enumerated in available evidence"). FR-010/NFR-007 assert additive-compatibility but no requirement forces the enumeration-and-verification step before rollout. This is a Critical-adjacent gap for a contract change. |
+| NFR-010 — Collapsing distinct causes | Yes — FR-005 directly enforces | **PASS** | Well-handled and testable. |
+| NFR-011 — Privacy leakage via diagnostic detail | Yes — FR-007, FR-008, NFR-004, NFR-005, release gate | **PASS** | Strong. Release-gate privacy review is a concrete mitigation. |
+| NFR-012 — Undefined front-end involvement | Yes — scoped out of Phase 1 pending decision | **PASS** | Deferral is explicit and gated. Acceptable. |
+| BR-4 Privacy boundary marked `[DECISION REQUIRED]` | Enforced by FRs but still flagged undecided | **FAIL** | A privacy boundary that is both enforced by FR-007/008 *and* marked `[DECISION REQUIRED]` is contradictory — either the boundary is settled (drop the flag) or it is open (then FR-007/008 are built on sand). Resolve the contradiction. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Multiple co-occurring causes:** Malformed input while dependency is down — which reason is returned? Precedence lives only in the flowchart (CG-001).
-2. **Dependency returns 200 with empty/garbage body:** Classified as no-match or dependency-unavailable? Undefined (CG-002).
-3. **Structurally un-parseable request / missing required field:** Not covered by FR-003's "malformed value" framing (CG-003).
-4. **Rate-limit with no Retry-After header:** FR-009 says "honor the Retry-After indication" but doesn't define fallback when a 429 arrives WITHOUT a Retry-After value.
-5. **Retry budget exhausted mid-backoff vs. a hard failure:** No requirement distinguishes "all 3 attempts failed fast" from "3 attempts timed out slowly" for NFR-002's bounded-wait guarantee — the worst-case total wait time is unstated.
-6. **Concurrent/duplicate lookups for the same household:** No idempotency or de-dup consideration; irrelevant if stateless, but unconfirmed.
-7. **Partial match / ambiguous multiple matches:** FR-001 assumes a single matching record. Behavior for >1 match or a low-confidence match is undefined (though matching logic is out of scope, the RESPONSE shape for it is not).
-8. **Masking failure in FR-008:** What happens if the masking/hashing step itself fails — does the system fail-closed (drop the log) or fail-open (risk raw PII)? Privacy-critical gap with no stated default.
-9. **Backward-compat negative test:** FR-010 asserts existing callers "continue to function unchanged" but no FR specifies the regression test against a real legacy consumer — and the consumer list is admittedly un-enumerated (NFR-009).
-10. **Reason-code localization/versioning:** If reasons are structured codes (NFR-007), no requirement covers how a new reason code is introduced without breaking consumers that switch on a closed enum.
-11. **Telemetry sink unavailable:** If the diagnostic telemetry write (FR-008) fails, does the lookup response still return? No requirement decouples the user-facing response from the operational logging path.
+1. **Simultaneous condition precedence:** No rule when input-invalid + dependency-down + no-match all apply (see CG-001).
+2. **Degraded dependency 200 with garbage payload:** Not classified; risks false "no match found" (see CG-002).
+3. **Concurrent / duplicate lookups:** No statement on idempotency or whether repeated identical lookups during a dependency outage each consume full retry budgets (retry-storm amplification against an already-failing dependency).
+4. **Retry-After larger than caller timeout:** FR-009 honors `Retry-After`, but if the indicated wait exceeds the overall request budget, behavior is undefined — does the API wait, or immediately return "dependency unavailable"? Unspecified.
+5. **Partial match / ambiguous multi-match:** The flow treats match as binary (yes/no). What if the lookup returns *multiple* candidate households? Neither "no match" nor "match" cleanly applies; no reason exists for ambiguity.
+6. **Empty vs. null vs. whitespace input:** FR-003 covers "malformed," but a truly empty/absent input parameter may short-circuit before validation. Is an empty query "invalid input format" or a different error? Undefined.
+7. **Reason-set versioning:** If the reason taxonomy later expands (explicitly anticipated in §6), existing consumers may receive a reason code they don't recognize. No requirement defines forward-compatible handling of unknown reason codes by consumers.
+8. **Telemetry write failure:** FR-008 governs *what* is logged, but not what happens if the privacy-safe telemetry write itself fails — does the lookup response still succeed? (It should; confirm the telemetry path is non-blocking.)
+9. **Masking collision / reversibility:** NFR-005 requires "masked" identifiers for troubleshooting. No requirement forbids a masking scheme that is reversible or that allows correlation back to a customer across log entries — a weak mask defeats the privacy intent.
+10. **Access-control on the new fields specifically:** NFR-006 preserves existing gating, but doesn't state whether the *new diagnostic fields* could leak information to a caller authorized for the lookup but not for diagnostic detail (e.g. tiered agent roles). Diagnostic detail may warrant its own gate.
+11. **Rate-limit on the enhanced path itself:** No requirement caps how often a caller can trigger diagnostic generation; a hostile caller could probe the "invalid input format" path to fingerprint validation rules.
 
 ---
 
@@ -73,19 +68,26 @@ All ten FRs are written in Gherkin — no prose-FR violations. The issues above 
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-010 all use Given/When/Then. |
-| Document contains only Sections 0–6 | **FAIL** | Document ends with an **"Appendix: Engineering Reference"** containing an "Affected Services" narrative beyond Sections 0–6. This is NOT a sanctioned Revision Summary nor a one-line `> **Label:**` metadata trailer — it is a multi-paragraph narrative appendix with its own per-service findings, exactly the kind of stray content the format rule is meant to catch. Flag and remove (or relocate the KG grounding into Section 1). |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is entirely bullet-list items with prose descriptions; no attribute tables or type declarations. (Note: each bullet carries a "Source:" label in prose, which is acceptable as bullet content, not a type table.) |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-010 are all in valid Gherkin. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains an **`## Appendix: Engineering Reference`** section between Section 6 and the Revision Summary. This is a multi-section narrative appendix ("Affected Services" with prose role/kind/confidence descriptions) — exactly the kind of extra content the Sections 0–6 rule exists to catch. It is NOT a sanctioned trailing Revision Summary nor a one-line `> **Label:**` metadata blockquote, so the exceptions do not apply. The trailing `## Revision Summary` section itself is EXPECTED and is **not** flagged. Recommend moving the Engineering Reference content into eng-plan, or demoting it so Sections 0–6 + Revision Summary are the only top-level structure. |
+| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a pure bullet list; each item carries a Source/Matters narrative but no attribute tables or type declarations. Compliant. |
+
+---
+
+## KG Cross-Check Findings (grounding reconciliation — not document content)
+
+- The spec's own "KG Cross-Check Note" (§1) and Appendix claim three affected services: `household-id-adornment-api` (high), `household-id-adornment-proto` (contract), and `frontend-mos` (low confidence). The independent cross-check re-found **only** `household-id-adornment-api` (high) and `household-id-adornment-proto` (medium). **`frontend-mos` was NOT re-found by the independent lookup.** This is consistent with the spec's own characterization of `frontend-mos` as low-confidence and out of scope for Phase 1, so it is not a contradiction — but it *strengthens* the case to keep front-end work out of scope and confirms the consumption-surface decision (§1 `[DECISION REQUIRED]`) remains genuinely unresolved. No spec claim about data flow, joins, config, or existing endpoints contradicts the KG evidence.
 
 ---
 
 ## 6. Recommendations
 
-1. **Remove or relocate the "Appendix: Engineering Reference."** It violates the Sections 0–6 constraint (Format Compliance FAIL). The grounded affected-service context belongs inside Section 1's KG Cross-Check Note or an eng-plan artifact, not as a trailing appendix on the spec.
-2. **Add a cause-precedence FR (CG-001)** so the "exactly one reason" rule in FR-005 is deterministic when invalid-input, dependency-down, and no-match overlap. Precedence must not live only in the Mermaid diagram.
-3. **Make NFR-009's consumer-enumeration mitigation enforceable** — assign a named owner and a pre-rollout gate; it is the spec's highest-rated risk with the weakest mitigation. (Note: the independent KG cross-check re-found only `household-id-adornment-api` (high) and `household-id-adornment-proto` (medium) and did NOT re-find `frontend-mos`; this corroborates keeping front-end out of Phase 1 and reinforces that the proto consumer list is genuinely unverified.)
-4. **Supply the NFR-001 baseline p95 number** or explicitly convert it to a decision with an owner and a deadline — otherwise the success-path latency guard is untestable at release.
-5. **Define behavior for degraded/partial dependency responses (CG-002)** and rate-limit-without-Retry-After (edge case 4).
-6. **Specify the privacy fail-mode (edge case 8)** — masking failure must fail-closed by default; this is privacy-critical and currently silent.
-7. **Decouple telemetry-write failure from the user response (edge case 11)** so a logging-sink outage never blocks a lookup response.
-8. **Tighten FR-006 actionability into a testable reason→action catalog** so QA can assert it.
+1. **Resolve CG-001 (precedence rule).** Add an explicit, testable precedence ordering for simultaneous empty-result conditions; align the Mermaid flow and FR-002–FR-005 to it. **Blocking.**
+2. **Resolve CG-002 (degraded dependency response).** Add an FR classifying malformed/partial/degraded dependency responses as transient "lookup dependency unavailable," never "no match found." **Blocking.**
+3. **Fix Format Compliance FAIL:** remove or relocate the `## Appendix: Engineering Reference` so the document is Sections 0–6 + Revision Summary only.
+4. **Assign named human owners and due dates** to every `[DECISION REQUIRED]` (content, consumption-surface, reason-set, baseline p95, BR-4 privacy boundary). NFR-008 and NFR-009 mitigations are inert until owners exist.
+5. **Force the proto-consumer enumeration (NFR-009) as a pre-rollout gate FR**, not a prose aspiration — a contract change with an unenumerated consumer list is the single highest-risk item here.
+6. **Make FR-006 testable** by replacing "actionable" with a concrete reason-code→approved-message mapping table (dependent on the content-decision owner).
+7. **Supply the baseline p95** so NFR-001 becomes measurable.
+8. **Specify input-validation rules** so FR-003's trigger is concrete and testable.
+9. **Address the remaining edge cases** (ambiguous multi-match, unknown-reason-code forward compatibility, telemetry non-blocking, masking non-reversibility, tiered diagnostic access-control, probe rate-limiting) before engineering, in roughly that priority order.

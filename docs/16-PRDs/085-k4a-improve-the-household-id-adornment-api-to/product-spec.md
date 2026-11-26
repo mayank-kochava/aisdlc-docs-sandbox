@@ -260,35 +260,25 @@ _Applied reviewer's request._
 
 _Durable, ID'd reference for HITL 2 (G1) and beyond — inline `[DECISION REQUIRED: DEC-00N]` tags in the sections above point back here. Reflects the latest round only._
 
-### Decisions Required (business trade-offs — needs a human call)
-
-_Each carries an **Owner** (accountable for supplying the answer) and a **Provisional Value** (the working assumption engineering may build against until the decision lands), so none of these fully block engineering — implementation proceeds on the provisional value and adjusts if the confirmed decision differs._
-
-| ID | Decision | Owner | Provisional Value (build against until confirmed) |
-|----|----------|-------|-----------------------------------------------------|
-| **DEC-002** | How much detail about why a lookup failed is safe to show support agents, given the reason relates to a household or customer lookup — should it stay a plain category explanation only, or may it include more specific diagnostic detail that could hint at customer data? | Compliance/Security with Product owner (K4A) | Diagnostic content describes only the category of failure (e.g. 'no match found') and never echoes or hints at the customer-identifying values submitted in the query. |
-| **DEC-003** | Where do support agents actually view the result of a household ID lookup today — through a support-facing screen, a raw API response, a support tool, or logs — so we know whether this work needs any screen changes or is purely an API change? | Product owner (Mayank Ukey, K4A) | Treat this as a backend/API-only change delivering structured diagnostic reasons in the response; assume no front-end display work until the agents' consumption surface is confirmed. |
-| **DEC-004** | When a household ID lookup finds no match, should agents also get a suggested next step to try (like searching by phone number), or just the reason it failed? | Product owner (Mayank Ukey) with Support operations | Phase 1 returns the reason only; prescriptive next-step suggestions are out of scope until support operations confirm which next steps are actually useful per cause. |
-| **DEC-006** | Distinguish failure causes: A "no results" outcome has multiple distinct underlying causes that must not be collapsed into a single generic response. At minimum the system must distinguish: (a) a genuine no match found for well-formed, valid input; (b) a downstream/lookup dependency unavailable condition; and (c) an invalid input format condition. Each cause must carry its own distinct, named reason so support agents can tell them apart. | _(not yet assigned)_ | _(not yet specified)_ |
-| **DEC-007** | Privacy boundary: Diagnostic detail about a household/customer lookup must not expose, log, or hint at raw customer-identifying data. Reason information must describe the category of failure, not echo back customer data contained in the query. | _(not yet assigned)_ | _(not yet specified)_ |
-
 ### Decisions Resolved
 
 - **DEC-001**: Assumed: Return three distinct named reasons: 'no match found', 'lookup dependency unavailable', and 'invalid input format'. Each carries its own actionable message for the agent.
+- **DEC-002**: Engineering decides: Diagnostic content describes only the category of failure (e.g. 'no match found') and never echoes or hints at the customer-identifying values submitted in the query.
+- **DEC-003**: Engineering decides: Treat this as a backend/API-only change delivering structured diagnostic reasons in the response; assume no front-end display work until the agents' consumption surface is confirmed.
+- **DEC-004**: Engineering decides: Phase 1 returns the reason only; prescriptive next-step suggestions are out of scope until support operations confirm which next steps are actually useful per cause.
 - **DEC-005**: Engineering decides: Hold the current production p95 for the success path as the baseline (no measurable regression), measured under representative concurrent load; confirm the actual baseline number from existing monitoring.
-
-### Open Questions (evidence gaps — needs more input)
-
-- **OQ-003**: Do support agents need internal diagnostic detail (which data sources were queried, which filters applied) or only customer-friendly explanations of why nothing matched?
-- **OQ-004**: Should the error response include suggested next steps for the agent (e.g. 'try searching by phone number'), or just the reason the lookup failed?
-- **OQ-005**: Where do support agents actually consume this information — raw API response, a support tool, or a frontend UI (frontend-mos)? This determines whether any frontend work is in scope at all.
-- **OQ-006**: Are there privacy or compliance limits on what diagnostic detail we can expose in an error response, given the lookup concerns households/customers and the payload could hint at customer data?
-- **OQ-007**: Is it acceptable to change the response contract by adding structured error/reason fields (which ripples to all proto consumers), or must the improvement stay within the existing response shape?
+- **DEC-006**: Engineering decides: Distinguish failure causes: A "no results" outcome has multiple distinct underlying causes that must not be collapsed into a single generic response. At minimum the system must distinguish: (a) a genuine no match found for well-formed, valid input; (b) a downstream/lookup dependency unavailable condition; and (c) an invalid input format condition. Each cause must carry its own distinct, named reason so support agents can tell them apart.
+- **DEC-007**: Engineering decides: Privacy boundary: Diagnostic detail about a household/customer lookup must not expose, log, or hint at raw customer-identifying data. Reason information must describe the category of failure, not echo back customer data contained in the query.
 
 ### Questions Resolved
 
 - **OQ-001**: Engineering decides: What are the top 3-5 reasons a household ID lookup returns no results in production today, and roughly how often does each happen? This drives what diagnostics are even worth building.
 - **OQ-002**: OQ-002 resolved: the API does not need to distinguish failure causes with different responses — a single enhanced error response (one reason) is sufficient.
+- **OQ-003**: Engineering decides: Do support agents need internal diagnostic detail (which data sources were queried, which filters applied) or only customer-friendly explanations of why nothing matched?
+- **OQ-004**: Engineering decides: Should the error response include suggested next steps for the agent (e.g. 'try searching by phone number'), or just the reason the lookup failed?
+- **OQ-005**: Engineering decides: Where do support agents actually consume this information — raw API response, a support tool, or a frontend UI (frontend-mos)? This determines whether any frontend work is in scope at all.
+- **OQ-006**: Engineering decides: Are there privacy or compliance limits on what diagnostic detail we can expose in an error response, given the lookup concerns households/customers and the payload could hint at customer data?
+- **OQ-007**: Engineering decides: Is it acceptable to change the response contract by adding structured error/reason fields (which ripples to all proto consumers), or must the improvement stay within the existing response shape?
 
 ---
-> **Classification:** Type A
+> **Classification:** Type A (confirmed)
