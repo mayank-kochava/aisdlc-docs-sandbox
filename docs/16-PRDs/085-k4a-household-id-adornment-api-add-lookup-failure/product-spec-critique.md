@@ -1,4 +1,4 @@
-# Spec Critique: Household ID Lookup Failure Diagnostics
+# Spec Critique: Household ID Lookup Diagnostic Enrichment
 
 **Spec Version:** product-spec.md
 **Reviewed By:** AI QA Architect
@@ -17,9 +17,12 @@
 
 | ID | Issue | Severity | Section | Suggested Fix |
 |----|-------|----------|---------|---------------|
-| CG-001 | FR-008/NFR-003 state diagnostics degrade gracefully on a *build error*, but no requirement covers a **partial** diagnostic build — e.g. the step identifier resolves but searched-value extraction throws. The flow chart has only "built" vs "error building," no partial state. It is undefined whether partial diagnostics are emitted or suppressed wholesale. | High | 2, 3C, 5 | Add an FR: on partial diagnostic assembly failure, either emit the successfully-built subset with an explicit "partial" marker, or omit all diagnostics — pick one and make it testable. NFR-003 says "must not leak partial or malformed diagnostic data," which implies all-or-nothing, but no FR enforces it. |
-| CG-002 | "No result" is treated as a single branch, but the lookup can fail for two distinct reasons: (a) resolution ran and matched nothing, vs (b) resolution could not run at all (malformed input, upstream dependency error inside the lookup). The spec never distinguishes "genuine no-match" from "lookup errored out." FR-003's "which step failed" is meaningless if the lookup never reached any step. | High | 1, 3A | Define whether an internal lookup *error* (not a clean no-match) is in scope for diagnostics, and if so what the step identifier reports for a pre-step failure. |
-| CG-003 | FR-005 promises Support can determine cause "for the common failure cases" but "common failure cases" is never enumerated, and no FR defines what happens for uncommon cases beyond the implicit escalation branch (flow node K). There is no acceptance boundary for FR-005. | High | 3A | Enumerate the common failure cases the diagnostics are guaranteed to cover, or reframe FR-005 as non-testable context rather than a requirement (see Testability). |
+| CG-001 | FR-005 is unfalsifiable. "The agent can determine why the lookup returned nothing... for the common failure cases" has no definition of "common failure cases" and no way to pass/fail a test. It smuggles an untestable success claim into a Gherkin block. | High | §3 FR-005 | Either drop the resolution claim from the FR (it's a value statement, not a behavior) or enumerate the specific failure categories the diagnostics must cover and assert presence of each. |
+| CG-002 | FR-003/FR-004 Then-clauses are written from the point of view of what "Support can" do ("Support can identify which specific step"), which is a human cognitive outcome, not an observable system behavior. These cannot be automated. | High | §3 FR-003, FR-004 | Rewrite so the assertion is on the response payload (e.g. "the diagnostic information contains a non-empty step identifier"), not on what a human infers. |
+| CG-003 | No requirement defines behavior when the lookup returns no result **because the input itself was empty/malformed** (e.g. blank household ID, missing address). FR-004 says "the input values that were used/searched" are echoed — but an empty-input no-result has no meaningful searched values, and the flow diagram has no branch for it. Dead end. | High | §2, §3 | Add an FR covering the empty/invalid-input no-result case: what the step identifier and searched-values fields contain when nothing was validly searched. |
+| CG-004 | NFR-005 flags that searched values may contain customer identifiers/address fields, but **no FR enforces masking or exposure limits.** The risk is acknowledged and the decision deferred, yet FR-004/FR-010 unconditionally require echoing raw lookup data and "the raw lookup data underlying that summary." If this ships before the [DECISION REQUIRED] is resolved, raw customer input lands in the diagnostic response and any logs. | High | §3 FR-004/FR-010, §5 NFR-005 | Add an FR making the raw-value echo conditional on the masking decision, OR gate FR-004/FR-010 behind resolution of the NFR-005 decision. Do not let an unresolved data-exposure decision coexist with an unconditional "echo raw data" requirement. |
+
+No Critical issues found — the change is genuinely additive, single-service, and error-branch-only, and the resilience path (FR-008/NFR-003) is well specified. The four items above are High: real testability and data-exposure gaps that should be closed before engineering, but none block implementation or cause guaranteed data loss on their own.
 
 ---
 
@@ -29,13 +32,12 @@
 
 | FR ID | Original Text | Problem | Suggested Rewrite (Gherkin) |
 |-------|---------------|---------|----------------------------|
-| FR-005 | "...the agent can determine why the lookup returned nothing without escalating to engineering **for the common failure cases**" | "Common failure cases" is unbounded and "the agent can determine" is a human-judgment outcome, not a system behavior. Cannot be automated. | `Given a no-result response for each enumerated failure case {step-A-miss, step-B-miss, input-normalization-miss}, When Support reads the diagnostic block, Then the response contains a non-null failed-step identifier AND the searched-values set for that case.` (Test the presence/shape of data; drop the human-cognition clause.) |
-| FR-003 | "Then Support **can identify** which specific step/stage..." | Tests a human capability, not an API output. | `Given a no-result response, When the response is inspected, Then the diagnostic information contains exactly one failed-step identifier drawn from the service's enumerated step set.` |
-| FR-004 | "Then Support **can see** the input values..." | Same human-capability framing. | `Given a no-result response, When the response is inspected, Then the diagnostic information contains the searched input values and each corresponds to a field present in the original request.` |
-| NFR-002 | "must not add **material latency**" | "Material" is subjective; the +10ms p95 guardrail is given but labeled a "working default... adjust during eng-plan," so no committed threshold exists. | `Given the no-result path under representative concurrent load, When diagnostics are generated, Then added p95 overhead ≤ 10ms vs. the pre-change baseline.` (Commit the number or mark NFR-002 explicitly deferred, not both.) |
-| Value section | "**shortening** the time to resolve" / "Support can **quickly** determine" | "Quickly"/"shortening" not measurable. Correctly moved to Section 6 as a future-phase target, but still appears as live prose in Section 1. | Flag as context only; no acceptance criterion should depend on it. |
+| FR-005 | "the agent can determine why the lookup returned nothing without escalating to engineering for the common failure cases" | "Common failure cases" undefined; "can determine" is a human outcome, not a measurable response property. | `Given a no-result response, Then the diagnostic information contains a non-empty failure-reason summary and a non-empty failed-step identifier and a non-empty searched-values set` (assert on payload, not on the human). |
+| FR-003 | "Support can identify which specific step/stage of the resolution process failed to produce a match" | Asserts human identification; not automatable. | `Given a no-result response, Then the diagnostic information contains a step/stage identifier field, And that field value is one of the defined resolution stage names, And it is not empty.` |
+| FR-004 | "Support can see the input values that were used/searched during the lookup" | Human-centric; silent on empty-input case. | `Given a no-result response for a non-empty input, Then the diagnostic information contains the searched input values, And each value present in the request appears in the searched-values set.` |
+| NFR-002 | "must not add material latency" (prose standalone sentence); the +10ms p95 figure is tagged "Working default... adjust during eng-plan" | "Material latency" is vague; the one concrete number is explicitly provisional, so there is no committed threshold to test against. | `Given the no-result path under representative concurrent load, When diagnostics are generated, Then added p95 overhead ≤ 10ms` — and remove "adjust during eng-plan" or move it to a decision note so a firm number exists. |
 
-Note: all nine FRs are structurally in Gherkin. The testability failures above are semantic (human-capability `Then` clauses and an uncommitted threshold), not format violations.
+Note: all FR-001 through FR-010 are in valid Gherkin structure. The testability defects are in the *content* of the Then-clauses (human outcomes / undefined terms), not in the format.
 
 ---
 
@@ -43,24 +45,24 @@ Note: all nine FRs are structurally in Gherkin. The testability failures above a
 
 | Risk (from spec Section 1 / NFRs) | Mitigation in Spec? | Verdict | Notes |
 |-----------------------------------|---------------------|---------|-------|
-| Proto/contract change ripples to unknown consumers | Yes — NFR-001, FR-006, FR-007 | PASS | Mitigation is concrete and has a verification condition (old-contract consumer operates unchanged). |
-| Lookup may not have discrete nameable steps | Yes — FR-003 guarded, fallback to searched-values only | PASS (conditional) | Mitigation is a *deferral* ("confirm in engineering"), which is acceptable given [DECISION REQUIRED], but the fallback behavior (steps-not-discrete → searched-values only) is **not captured in any FR**. The mitigation lives only in prose. Add an FR variant for the single-stage case. |
-| Diagnostic generation failure degrades core lookup | Yes — NFR-002/003, FR-008 | PASS | Well covered and testable via forced-failure injection. |
-| Over-broad diagnostic payload / sensitive values | Partial — NFR-005, BR-4 | FAIL | NFR-005 states diagnostics "must not introduce raw credentials/secrets/tokens" but the actual exposure risk here is **customer address/name/identifier values** echoed into the response and logs. Masking is punted to a [DECISION REQUIRED] content call with no requirement, no default-safe behavior, and no FR. "Must not broaden exposure beyond what the lookup already handled" is unverifiable without knowing the lookup's current handling. This is the only genuine risk gap and should be closed before eng commits to echoing raw searched values. |
+| Proto/contract change ripples to unknown consumers | Yes — NFR-001, FR-006, FR-007 | PASS | Additive/optional required and verifiably assertable. |
+| Lookup may not have discrete, nameable steps | Yes — FR-003 flagged as assumption; fallback to searched-values-only | PASS | Fallback behavior is stated; still carries an open [DECISION REQUIRED] in §4. |
+| Diagnostic generation failure degrades core lookup | Yes — NFR-002, NFR-003, FR-008 | PASS | Forced-failure test is specified. |
+| Over-broad / sensitive diagnostic payload | Partially — NFR-005 names it, but no FR enforces masking | **FAIL** | The risk is acknowledged and then deferred, while FR-004/FR-010 unconditionally mandate echoing raw data. Acknowledgment without an enforcing requirement = unmitigated. See CG-004. |
+| Empty/invalid-input no-result | No | **FAIL** | Not listed as a risk and not covered by any FR. See CG-003. |
 
 ---
 
 ## 4. Missed Edge Cases
 
-1. **Partial diagnostic build:** Step identifier succeeds but searched-value capture fails (or vice versa). Undefined — see CG-001.
-2. **Lookup internal error vs. clean no-match:** No distinction between "matched nothing" and "couldn't run." See CG-002.
-3. **Empty / malformed request input:** If the request itself has no searchable values, FR-004's "searched values" set is empty — is an empty diagnostic echo valid, or is that itself a diagnosable condition? Not specified.
-4. **Multiple steps fail / ambiguous failure point:** FR-003 assumes exactly one identifiable failed step. If resolution fails across several stages, which step is reported? First, last, or all? Information Requirements say "which discrete step" (singular) — unaddressed.
-5. **Diagnostics size / unbounded searched-value payload:** No cap on the size of echoed searched values. A request with a very large input set could bloat the no-result response. No limit specified.
-6. **Concurrency / idempotency of diagnostic generation:** NFR-002 mentions "representative concurrent load" but no FR covers whether diagnostic generation is stateless/thread-safe. Likely fine, but unstated.
-7. **Old-contract consumer encountering the new optional field on a wire format that is position-sensitive (e.g. non-tag-based):** FR-007 assumes tolerant deserialization. For a strict/positional contract this assumption can break. The proto path is only medium-confidence; the deserialization-tolerance claim should be verified against the actual contract encoding, not assumed.
-8. **Masked-value correlation loss:** If NFR-005 masking is later applied, masked searched-values may no longer let Support "correlate with customer-reported input" (FR-004's stated purpose). The masking decision and FR-004 are in tension; neither references the other.
-9. **Caching / intermediary layers:** If any CDN, gateway, or response cache sits in front of the API, a cached no-result response could carry stale diagnostics for a different input. No caching posture stated.
+1. **Empty / malformed input no-result:** What do the step-identifier and searched-values fields contain when the lookup had nothing valid to search? Undefined.
+2. **Partial / concurrent multi-step failure:** If resolution fans through several steps and more than one "fails," FR-003 assumes a single failed step. No requirement defines reporting when the no-result is the cumulative outcome of multiple stages.
+3. **Diagnostic generation partially succeeds:** NFR-003 says degrade "gracefully" and must not "leak partial or malformed diagnostic data," but no FR defines the partial-success case — is a half-built diagnostic omitted entirely, or emitted partial? FR-008 only covers total build failure.
+4. **Sensitive-value masking before echo:** Raw searched values echoed unmasked (CG-004) — no edge handling for identifier/address fields that should be redacted.
+5. **Oversized diagnostic payload:** "Raw lookup data" (FR-010) could be large. No bound on diagnostic size; could inflate the no-result response materially.
+6. **Backward-compat for a consumer that strictly validates/rejects unknown fields:** FR-006/FR-007 assume tolerant deserializers. A consumer with strict schema validation (reject-on-unknown) would break even on an "additive optional" field. Not addressed.
+7. **Logging of diagnostics:** NFR-005 mentions "any associated logging" but no FR governs whether/where diagnostics are logged, or retention — the same raw-value exposure risk applies to logs, not just the response.
+8. **Localization / human-readable summary language:** FR-010 requires a "human-readable summary" but doesn't define language, format, or whether it's a free-text string vs. a coded reason — affects both testability and i18n.
 
 ---
 
@@ -68,25 +70,21 @@ Note: all nine FRs are structurally in Gherkin. The testability failures above a
 
 | Check | Result | Details |
 |-------|--------|---------|
-| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-009 all use valid Gherkin blocks. |
-| Document contains only Sections 0–6 | PASS | Sections 1–6 present. The trailing "Appendix: Engineering Reference" is a KG-derived engineering-reference section with service bullets — it is a short grounded-context block, not a multi-paragraph narrative findings/recommendations appendix. It borders the "stray KG appendix" concern; recommend relocating its content into Section 1's existing Service Scope Note to be unambiguous, but it is not treated as a blocking format failure. No Revision Summary or metadata-blockquote trailer present. |
-| Section 4 is bullet-list only (no tables/types) | PASS | Section 4 is a pure bullet list of business concepts; no attribute tables, no types. The "e.g. the address/name/identifier values" is illustrative prose, not a schema. |
+| All FRs in Gherkin (Given/When/Then) | PASS | FR-001 through FR-010 all use valid Given/When/Then blocks. Content-level testability issues are logged in §2, not here. |
+| Document contains only Sections 0–6 | **FAIL** | The document contains an **"## Appendix: Engineering Reference"** section with a multi-subsection narrative (Affected Services list with role/confidence prose). This is a stray appendix beyond Sections 0–6 and is NOT one of the sanctioned trailers (it is not a Revision Summary, nor a one-line labeled blockquote metadata line). The trailing "## Revision Summary" itself is EXPECTED and is NOT flagged. |
+| Section 4 is bullet-list only (no tables/types) | PASS | §4 is a bullet list of business concepts; no attribute tables or type declarations present. |
 
----
+Note on the Appendix: the base rule explicitly cites "a multi-paragraph narrative KG cross-check analysis appendix with its own prose findings" as the kind of stray content to flag. The "Appendix: Engineering Reference" here is exactly that shape — a narrative, multi-item engineering-reference section appended after Section 6 — so it is flagged. (The §1 "Service Scope Note (KG cross-check)" is in-section and NOT a violation.)
 
-## KG Cross-Check Findings
-
-The independent KG lookup re-confirmed exactly the two services the spec claims: `household-id-adornment-api` (high confidence, owns lookup) and `household-id-adornment-proto` (medium confidence, contract change). **No discrepancy** between the Context Seed's claimed services and the fresh lookup — the spec's Service Scope Note (Section 1) and Appendix correctly represent the grounded reality, including the medium-confidence caveat on the proto. No service was claimed by the spec that the fresh lookup failed to re-find, and no additional service surfaced. The spec's implementation-reality claims (single-service, additive contract change, no cross-service fan-out, no new datastores) are consistent with the evidence. One caveat: the spec asserts prior-contract consumers "continue to deserialize without error" (FR-007/NFR-001) as a design guarantee — the evidence does not confirm the proto's encoding is tag-based/tolerant, so that guarantee should be verified against the actual proto rather than asserted (see Missed Edge Case #7).
+**KG cross-check reconciliation:** The spec's claimed affected services (`household-id-adornment-api` high confidence; `household-id-adornment-proto` medium confidence) **match the independent KG cross-check exactly** — same two services, same roles, same confidence levels. No discrepancy; no contradiction with implementation reality. The spec correctly treats the change as additive to the proto contract.
 
 ---
 
 ## 6. Recommendations
 
-1. **Close the sensitive-value handling gap (NFR-005 / FR-004).** Define a default-safe behavior for echoing customer identifier/address values into the response and logs — mask-by-default until the BR-4 content decision lands, rather than leaving raw echo as the implicit default. This is the one real risk gap.
-2. **Resolve the no-match vs. lookup-error distinction (CG-002)** and define what the failed-step identifier reports when resolution never reached a step.
-3. **Specify partial-diagnostic behavior (CG-001)** — all-or-nothing vs. marked-partial — to back NFR-003's "no partial/malformed data" claim with a testable FR.
-4. **Make FR-005 testable** by enumerating the guaranteed-covered "common failure cases" or demoting it to context.
-5. **Add an FR for the single-stage fallback** currently living only in the FR-003 risk prose, so the "no discrete steps" path has acceptance criteria.
-6. **Commit or explicitly defer the NFR-002 +10ms threshold** — don't do both.
-7. **Verify the proto's deserialization tolerance** against the actual contract encoding before relying on FR-007's additive-optional guarantee; address multi-step/empty-input and payload-size edge cases (#3, #4, #5).
-8. **Consider relocating the Engineering Reference appendix** content into the Section 1 Service Scope Note to keep the document strictly within Sections 0–6.
+1. **Resolve the NFR-005 sensitive-value decision before engineering (CG-004 / Risk FAIL).** Do not ship unconditional "echo raw lookup data" (FR-004/FR-010) alongside an unresolved masking decision. Add an FR that gates raw-value echo on the masking determination, covering both the response payload and logs.
+2. **Add an FR for the empty/invalid-input no-result case (CG-003 / Edge Case 1).** Define what step-identifier and searched-values contain when nothing valid was searched.
+3. **Rewrite FR-003, FR-004, FR-005 Then-clauses to assert on the response payload, not on human cognition (CG-001/CG-002).** Remove "common failure cases" and "Support can determine" phrasings; assert presence/non-emptiness of concrete diagnostic fields.
+4. **Remove the "## Appendix: Engineering Reference" section (Format FAIL)** or fold its grounded-context content into Section 1's Service Scope Note / Section 6, so the document stays within Sections 0–6 plus the sanctioned Revision Summary.
+5. **Commit a firm latency threshold in NFR-002** or relocate the "adjust during eng-plan" caveat to a decision note, so there is one testable number.
+6. **Add requirements for partial diagnostic build success (Edge Case 3), strict-validation consumers (Edge Case 6), payload-size bounds (Edge Case 5), and summary format/localization (Edge Case 8).**
