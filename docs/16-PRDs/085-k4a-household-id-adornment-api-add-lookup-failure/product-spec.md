@@ -19,7 +19,7 @@ Enriching the API's "no result" response path with diagnostic information lets S
 - **BR-2 — Additive, non-breaking change.** The enhancement adds information to the existing response. Existing consumers that do not read the new diagnostic information must continue to function exactly as before. The diagnostic content is supplemental, not a replacement of any current field.
 - **BR-3 — Consumer audience is internal Support.** The diagnostic information exists to serve the Support function diagnosing failures, not end customers.
 - **BR-4 — Specific diagnostic content is deferred to engineering, but must satisfy the Support use case.** The requester deferred the exact diagnostic fields to engineering. The product steer is that **Support needs to see the reason the lookup returned no result** — the minimum useful content is whatever conveys that reason. Whatever set is chosen, it must let Support determine (a) which lookup step/stage failed and (b) what values were searched — the two diagnostic categories the requester affirmed as useful and which together convey the failure reason. The requester did not call for match scores or any other diagnostic category.
-- **BR-5 — Delivery channel for the diagnostics.** The diagnostic information is returned inline in the API response that reports the "no result" outcome, rather than via a separate debugging endpoint or an external dashboard/ticketing integration. This keeps the change additive and single-service. [DECISION REQUIRED]
+- **BR-5 — Delivery channel for the diagnostics.** The diagnostic information is returned inline in the API response that reports the "no result" outcome, rather than via a separate debugging endpoint or an external dashboard/ticketing integration. This was confirmed by the requester: Support receives the diagnostics in the response itself. This keeps the change additive and single-service.
 
 ### Service Scope Note (KG cross-check)
 
@@ -210,9 +210,7 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Updated BR-4 to fold in the reviewer's steer that Support needs the failure reason, and removed the resolved [DECISION REQUIRED] tag.
-- Added an explicit 'reason' expectation to FR-005 reflecting the reviewer's steer that Support just needs to see the reason.
-- Noted in Information Requirements that the diagnostic content's purpose is to convey the failure reason, per the reviewer's steer.
+- Resolved BR-5: removed [DECISION REQUIRED] and folded in the confirmed inline-response delivery channel.
 
 
 ---
@@ -227,19 +225,22 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
 | **DEC-001** | When a household ID lookup returns nothing, what information does Support actually need to see to diagnose it on their own? | Product owner (Mayank Ukey) with Support input | Return, at minimum, which lookup step/stage failed and the values that were searched — the two categories the requester affirmed as useful — in a form a Support agent can read without engineering help. |
-| **DEC-002** | Should Support get this diagnostic information straight back in the lookup response, or somewhere else like a separate debugging view or the ticketing tool they already use? | Product owner (Mayank Ukey) with Support input | Return it inline in the same no-result lookup response, since that keeps the change additive and inside the single service rather than taking on a dashboard or ticketing integration. |
 | **DEC-003** | Should the diagnostic response mask or omit any of the customer-supplied searched values (such as address or identifier fields) before Support sees them, or is echoing the raw searched input acceptable for this internal use? | Product owner, with Compliance/Security input | Echo the searched input values as-is for this internal Support-only feature (no masking), since they are the same values the lookup request already handled and there is no new external surface; revisit only if a specific field is later classified as restricted. |
 | **DEC-004** | Specific diagnostic content is deferred to engineering, but must satisfy the Support use case. The requester deferred the exact diagnostic fields to engineering. Whatever set is chosen, it must let Support determine (a) which lookup step/stage failed and (b) what values were searched — the two diagnostic categories the requester did affirm as useful. | _(not yet assigned)_ | _(not yet specified)_ |
+
+### Decisions Resolved
+
+- **DEC-002**: Resolved — diagnostics are delivered inline in the lookup response itself (not a separate debug endpoint or dashboard/ticketing tool); OQ-002 and DEC-002 settle together on the same answer.
 
 ### Open Questions (evidence gaps — needs more input)
 
 - **OQ-001**: OQ-001 steered: Support just needs to see the reason the lookup returned no result; the failed step/stage plus searched values convey that reason, and match scores or other categories were not requested. The exact field set remains deferred to engineering.
-- **OQ-002**: How should Support actually receive and consume this diagnostic info — inline in the API response, a separate debug endpoint, or into an existing dashboard/ticketing tool? This materially changes the design.
 - **OQ-004**: Are there privacy or data-retention limits on echoing customer identifiers, searched address/name values, or matching scores into a response Support can see?
 - **OQ-005**: Who are the current consumers of the household-id-adornment response, and is adding a new optional failure field/status to the proto acceptable to all of them?
 
 ### Questions Resolved
 
+- **OQ-002**: Resolved — diagnostics are delivered inline in the lookup response itself (not a separate debug endpoint or dashboard/ticketing tool); OQ-002 and DEC-002 settle together on the same answer.
 - **OQ-003**: Resolved OQ-003 — Support users need both a human-readable summary and the raw lookup data; added FR-010 and an Information Requirements item, and moved the summary into scope in Section 6.
 - **OQ-006**: Success is defined qualitatively as fewer escalations to engineering, with no numeric target.
 
