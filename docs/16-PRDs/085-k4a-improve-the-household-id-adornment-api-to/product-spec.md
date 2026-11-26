@@ -27,6 +27,8 @@ Enhancing the API's no-results response with clear, structured, actionable diagn
 
 The exact diagnostic content support agents need was not defined at intake ("Unknown, for engineering to confirm"). This specification defines the *structure and behavior* of enhanced error reporting (distinct, named reasons per failure cause; actionable, privacy-safe content) and flags the content-definition and consumption-surface choices as decisions requiring a human owner. The requirements below are written against the behavioral contract, not against a specific pre-decided payload.
 
+Note on production frequency data: the top reasons household ID lookups return no results in production today, and how often each occurs, are **not currently known** — support reports only that some lookups come back empty and that they cannot tell why (which is the problem this work addresses). No production measurement of failure-cause frequency is available to prioritize which diagnostics are most worth building (tracked as OQ-001). Consequently, the three minimum named causes below are derived from the structural outcomes of the lookup flow rather than from measured production frequency; the taxonomy should be revisited once frequency data exists.
+
 ### KG Cross-Check Note
 
 An independent codebase knowledge-graph cross-check reconciled against the originally identified services. The core backend lookup service and its proto/contract surface are confirmed as the affected area. A possible front-end display surface for support agents was identified only at **low confidence** and could not be confirmed as the surface agents actually use to view lookup results. Whether support agents consume the diagnostic information through a front-end display, a raw API response, a support tool, or logs is therefore unconfirmed and is flagged as a decision below. [DECISION REQUIRED]
@@ -244,6 +246,13 @@ _The sections below are derived automatically from the codebase knowledge graph,
 - **household-id-adornment-proto** (backend / contract) — Proto contract for the household-id adornment API; the surface where any structured diagnostic fields land first, and a backward-compatibility surface for all contract consumers.
 - **frontend-mos** (frontend) — May display household ID lookup results to support agents; identified at **low confidence** and not confirmed as the surface agents use. In scope only if the consumption-surface decision confirms it.
 
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Added a Discovery Note paragraph recording that production failure-cause frequency (OQ-001) is unknown and the three causes are structurally derived.
+
+
 ---
 ## Open Questions & Decisions Register
 
@@ -268,7 +277,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: What are the top 3-5 reasons a household ID lookup returns no results in production today, and roughly how often does each happen? This drives what diagnostics are even worth building.
+- **OQ-001**: OQ-001 remains open — reviewer could not supply production failure-cause frequency data; support reports only that lookups come back empty with no visibility into why, so the three named causes are derived structurally rather than from measured frequency.
 - **OQ-002**: Should the API distinguish between different failure causes (genuine no-match vs. lookup service unavailable vs. invalid input format) with different responses, or is a single enhanced error response enough?
 - **OQ-003**: Do support agents need internal diagnostic detail (which data sources were queried, which filters applied) or only customer-friendly explanations of why nothing matched?
 - **OQ-004**: Should the error response include suggested next steps for the agent (e.g. 'try searching by phone number'), or just the reason the lookup failed?
