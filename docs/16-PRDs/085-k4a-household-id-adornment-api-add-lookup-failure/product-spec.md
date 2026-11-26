@@ -18,8 +18,8 @@ Enriching the API's "no result" response path with diagnostic information lets S
 - **BR-1 — Diagnostics are emitted only on the failure path.** Diagnostic information is attached to the response **only** when a household ID lookup returns no result. A successful lookup's response behavior is unchanged.
 - **BR-2 — Additive, non-breaking change.** The enhancement adds information to the existing response. Existing consumers that do not read the new diagnostic information must continue to function exactly as before. The diagnostic content is supplemental, not a replacement of any current field.
 - **BR-3 — Consumer audience is internal Support.** The diagnostic information exists to serve the Support function diagnosing failures, not end customers.
-- **BR-4 — Specific diagnostic content is deferred to engineering, but must satisfy the Support use case.** The requester deferred the exact diagnostic fields to engineering. Whatever set is chosen, it must let Support determine (a) which lookup step/stage failed and (b) what values were searched — the two diagnostic categories the requester did affirm as useful. [DECISION REQUIRED: DEC-001]
-- **BR-5 — Delivery channel for the diagnostics.** The diagnostic information is returned inline in the API response that reports the "no result" outcome, rather than via a separate debugging endpoint or an external dashboard/ticketing integration. This keeps the change additive and single-service. [DECISION REQUIRED: DEC-002]
+- **BR-4 — Specific diagnostic content is deferred to engineering, but must satisfy the Support use case.** The requester deferred the exact diagnostic fields to engineering. The product steer is that **Support needs to see the reason the lookup returned no result** — the minimum useful content is whatever conveys that reason. Whatever set is chosen, it must let Support determine (a) which lookup step/stage failed and (b) what values were searched — the two diagnostic categories the requester affirmed as useful and which together convey the failure reason. The requester did not call for match scores or any other diagnostic category.
+- **BR-5 — Delivery channel for the diagnostics.** The diagnostic information is returned inline in the API response that reports the "no result" outcome, rather than via a separate debugging endpoint or an external dashboard/ticketing integration. This keeps the change additive and single-service. [DECISION REQUIRED]
 
 ### Service Scope Note (KG cross-check)
 
@@ -93,7 +93,8 @@ So that Support can correlate the failure with the customer-reported input
 Given a household ID lookup has returned no result
 And the response contains the diagnostic information from FR-001
 When a Support agent reviews the response
-Then the agent can determine why the lookup returned nothing without escalating to engineering for the common failure cases
+Then the agent can see the reason the lookup returned no result
+And the agent can determine why the lookup returned nothing without escalating to engineering for the common failure cases
 ```
 
 ### Feature Area B — Additive, Non-Breaking Behavior
@@ -149,8 +150,8 @@ Now reporting the decisions I flagged in Sections 0–3.
 The system must track the following business information to support the Functional Requirements. The exact field names, types, and contract representation are deferred to engineering (see BR-4/BR-5); the items below are the business concepts, not schema.
 
 - **Lookup outcome (match / no-result):** System-derived during lookup resolution. Determines whether diagnostic information is attached at all (FR-001, FR-002).
-- **Failed lookup step/stage identifier:** System-derived from the resolution process. Identifies which discrete step of the household ID resolution did not produce a match. Required for FR-003. Depends on the lookup being genuinely multi-stage with nameable steps — if resolution is a single opaque match rather than discrete stages, this item must be reconsidered. [DECISION REQUIRED: DEC-003]
-- **Searched input values:** Derived from the original lookup request's inputs (e.g. the address/name/identifier values the lookup used). Echoed back on the failure path so Support can correlate the failure with customer-reported input (FR-004).
+- **Failed lookup step/stage identifier:** System-derived from the resolution process. Identifies which discrete step of the household ID resolution did not produce a match. Required for FR-003. Depends on the lookup being genuinely multi-stage with nameable steps — if resolution is a single opaque match rather than discrete stages, this item must be reconsidered. [DECISION REQUIRED]
+- **Searched input values:** Derived from the original lookup request's inputs (e.g. the address/name/identifier values the lookup used). Echoed back on the failure path so Support can correlate the failure with customer-reported input (FR-004). The product steer for this round is that Support needs to see the **reason** for the no-result outcome; the failed step/stage and the searched values together are what convey that reason — match scores or other categories were not called for.
 - **Diagnostic representation (human-readable summary + raw lookup data):** The diagnostic information is carried in two forms — a human-readable summary of the failure and the raw lookup data underlying it — so Support can both quickly read what happened and inspect the underlying values (FR-010).
 - **Diagnostic-generation outcome (produced / omitted):** System-derived. Captures whether diagnostics were successfully built or had to be omitted on the failure branch, so an omitted-diagnostics case is distinguishable from a lookup that genuinely had nothing to report (FR-008).
 - **Response contract version / diagnostic presence flag:** System-derived. Supports the additive, optional nature of the diagnostic element so prior-contract consumers continue to deserialize (FR-006, FR-007).
@@ -167,7 +168,7 @@ The system must track the following business information to support the Function
 
 **NFR-004 — Diagnostics scoped to internal Support consumption.** The diagnostic content exists for internal Support diagnosing failures (BR-3). It is returned inline in the lookup response (BR-5). This spec does not introduce a new external-facing surface, dashboard, or ticketing integration; any such consumption channel is out of scope (see Section 6).
 
-**NFR-005 — No raw sensitive data in diagnostics or logs.** The "searched values" echoed into diagnostics may include customer-supplied identifiers or address fields. Even though this is a LOW-risk internal feature with no classified PII/auth surface, the diagnostic payload and any associated logging must not introduce raw credentials, secrets, or tokens, and must not broaden exposure of customer input beyond what the lookup request already handled. Whether any searched-value field warrants masking before it appears in the diagnostic response is a content decision tied to BR-4. [DECISION REQUIRED: DEC-004]
+**NFR-005 — No raw sensitive data in diagnostics or logs.** The "searched values" echoed into diagnostics may include customer-supplied identifiers or address fields. Even though this is a LOW-risk internal feature with no classified PII/auth surface, the diagnostic payload and any associated logging must not introduce raw credentials, secrets, or tokens, and must not broaden exposure of customer input beyond what the lookup request already handled. Whether any searched-value field warrants masking before it appears in the diagnostic response is a content decision tied to BR-4. [DECISION REQUIRED]
 
 **NFR-006 — No feature flag / kill-switch required.** Per Kochava convention, kill-switches are reserved for HIGH-risk, multi-service, or sensitive-data changes. This is a LOW-risk, single-service, additive diagnostic change on an error-only branch; no feature flag or kill-switch is required. Standard deploy/rollback (revert the additive change) is sufficient.
 
@@ -209,10 +210,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Added FR-010 requiring diagnostics to include both a human-readable summary and the raw lookup data.
-- Added an Information Requirements item for carrying both a human-readable summary and raw lookup data.
-- Moved the human-readable summary from Future phase to in scope, reflecting the decision to provide both summary and raw data.
-- Reframed the success-target row: success is defined qualitatively as fewer escalations to engineering, with no numeric target.
+- Updated BR-4 to fold in the reviewer's steer that Support needs the failure reason, and removed the resolved [DECISION REQUIRED] tag.
+- Added an explicit 'reason' expectation to FR-005 reflecting the reviewer's steer that Support just needs to see the reason.
+- Noted in Information Requirements that the diagnostic content's purpose is to convey the failure reason, per the reviewer's steer.
 
 
 ---
@@ -233,7 +233,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: When a lookup returns no results, what diagnostic detail should the response carry — which step failed, the values that were searched, match scores, or something else? (Intake left this deferred to engineering, so a product-side steer on the minimum useful set would unblock scoping.)
+- **OQ-001**: OQ-001 steered: Support just needs to see the reason the lookup returned no result; the failed step/stage plus searched values convey that reason, and match scores or other categories were not requested. The exact field set remains deferred to engineering.
 - **OQ-002**: How should Support actually receive and consume this diagnostic info — inline in the API response, a separate debug endpoint, or into an existing dashboard/ticketing tool? This materially changes the design.
 - **OQ-004**: Are there privacy or data-retention limits on echoing customer identifiers, searched address/name values, or matching scores into a response Support can see?
 - **OQ-005**: Who are the current consumers of the household-id-adornment response, and is adding a new optional failure field/status to the proto acceptable to all of them?
