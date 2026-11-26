@@ -132,6 +132,16 @@ Then the diagnostic information is delivered inline within that same lookup resp
 And no separate call to a distinct debugging endpoint is required to retrieve it
 ```
 
+**FR-010 — Diagnostics provide both a human-readable summary and the raw lookup data**
+```gherkin
+Given a household ID lookup has returned no result
+And the response carries the diagnostic information from FR-001
+When a Support agent reads the diagnostic information
+Then the diagnostic information includes a human-readable summary of the failure
+And the diagnostic information includes the raw lookup data underlying that summary
+So that Support can both quickly read what happened and inspect the underlying values
+```
+
 Now reporting the decisions I flagged in Sections 0–3.
 
 ## 4. Information Requirements
@@ -141,6 +151,7 @@ The system must track the following business information to support the Function
 - **Lookup outcome (match / no-result):** System-derived during lookup resolution. Determines whether diagnostic information is attached at all (FR-001, FR-002).
 - **Failed lookup step/stage identifier:** System-derived from the resolution process. Identifies which discrete step of the household ID resolution did not produce a match. Required for FR-003. Depends on the lookup being genuinely multi-stage with nameable steps — if resolution is a single opaque match rather than discrete stages, this item must be reconsidered. [DECISION REQUIRED: DEC-003]
 - **Searched input values:** Derived from the original lookup request's inputs (e.g. the address/name/identifier values the lookup used). Echoed back on the failure path so Support can correlate the failure with customer-reported input (FR-004).
+- **Diagnostic representation (human-readable summary + raw lookup data):** The diagnostic information is carried in two forms — a human-readable summary of the failure and the raw lookup data underlying it — so Support can both quickly read what happened and inspect the underlying values (FR-010).
 - **Diagnostic-generation outcome (produced / omitted):** System-derived. Captures whether diagnostics were successfully built or had to be omitted on the failure branch, so an omitted-diagnostics case is distinguishable from a lookup that genuinely had nothing to report (FR-008).
 - **Response contract version / diagnostic presence flag:** System-derived. Supports the additive, optional nature of the diagnostic element so prior-contract consumers continue to deserialize (FR-006, FR-007).
 
@@ -180,8 +191,8 @@ The following are explicitly **NOT** part of this phase, to prevent scope creep:
 | Diagnostics on the **successful** lookup path | Out of scope | Enhancement applies only to the no-result branch (BR-1, FR-002). |
 | A separate debugging/diagnostics endpoint | Out of scope | Diagnostics are delivered inline in the existing response (BR-5, FR-009). |
 | Integration into a Support dashboard or ticketing system | Out of scope | No UI/frontend work confirmed; diagnostics consumed from the API response. Candidate for a future phase. |
-| Human-readable summary / formatting layer for Support | Future phase | Whether Support needs a formatted summary vs. raw diagnostic data is unconfirmed; not required for the core enrichment. |
-| Quantified success target (e.g. "resolve 90% of no-result cases unaided" or a resolution-time reduction) | Future phase | Success is currently qualitative ("Support can quickly determine why"); a measurable target can be defined once the feature is in use. |
+| Human-readable summary of the diagnostics | In scope | Support needs both a human-readable summary and the raw lookup data; the summary is required alongside the raw data (FR-010). |
+| A *numeric* quantified success target (e.g. "resolve 90% of no-result cases unaided" or a specific resolution-time reduction) | Out of scope | Success is defined qualitatively as fewer Support escalations to engineering, with no numeric target set; a measurable number can be defined later once the feature is in use if needed. |
 | Changes to the lookup/resolution logic itself | Out of scope | This feature reports on failures; it does not change how household IDs are resolved or matched. |
 | New data stores, cross-service changes, or auth/PII handling | Out of scope | No evidence of such surfaces; change is single-service and additive. |
 
@@ -193,6 +204,16 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 - **household-id-adornment-api** (backend) — Owns the household ID lookup and reporting path; must expose the step/value diagnostics on the no-result branch. Primary site of this change.
 - **household-id-adornment-proto** (backend, medium confidence) — The response contract/proto definition; likely needs a new optional failure field or status to carry the diagnostic information. Any change here must be additive and optional (NFR-001).
+
+## Revision Summary
+
+_Applied reviewer's request._
+
+- Added FR-010 requiring diagnostics to include both a human-readable summary and the raw lookup data.
+- Added an Information Requirements item for carrying both a human-readable summary and raw lookup data.
+- Moved the human-readable summary from Future phase to in scope, reflecting the decision to provide both summary and raw data.
+- Reframed the success-target row: success is defined qualitatively as fewer escalations to engineering, with no numeric target.
+
 
 ---
 ## Open Questions & Decisions Register
@@ -214,10 +235,13 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 - **OQ-001**: When a lookup returns no results, what diagnostic detail should the response carry — which step failed, the values that were searched, match scores, or something else? (Intake left this deferred to engineering, so a product-side steer on the minimum useful set would unblock scoping.)
 - **OQ-002**: How should Support actually receive and consume this diagnostic info — inline in the API response, a separate debug endpoint, or into an existing dashboard/ticketing tool? This materially changes the design.
-- **OQ-003**: Do Support users need a human-readable summary, the raw lookup data, or both?
 - **OQ-004**: Are there privacy or data-retention limits on echoing customer identifiers, searched address/name values, or matching scores into a response Support can see?
 - **OQ-005**: Who are the current consumers of the household-id-adornment response, and is adding a new optional failure field/status to the proto acceptable to all of them?
-- **OQ-006**: What does success look like concretely — e.g. Support self-resolving some target % of 'no result' cases, or a target reduction in resolution time — so we can tell whether the diagnostics are sufficient?
+
+### Questions Resolved
+
+- **OQ-003**: Resolved OQ-003 — Support users need both a human-readable summary and the raw lookup data; added FR-010 and an Information Requirements item, and moved the summary into scope in Section 6.
+- **OQ-006**: Success is defined qualitatively as fewer escalations to engineering, with no numeric target.
 
 ---
 > **Classification:** Type B — requirement-agent's independent re-check DISAGREES with intake's original Type A call. The behavior is actually clear (enrich the no-results lookup response with diagnostic details like which step failed and what values were searched—confirmed by the intake Q&A option and KG role "must expose step/value diagnostics"), and it spans two services (household-id-adornment-api + household-id-adornment-proto proto/schema change), making this engineering-led design rather than genuine product discovery.
