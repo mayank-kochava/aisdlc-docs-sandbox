@@ -9,7 +9,7 @@ title: Product Specification
 
 ### Problem
 
-When a household ID lookup returns no results, the current `household-id-adornment-api` does not explain *why*. Support agents investigating a failed lookup have no actionable diagnostic information, which slows customer support resolution — agents cannot distinguish a genuine no-match from a transient service problem from a malformed input, so they cannot tell the customer anything useful or take the right next step.
+When a household ID lookup returns no results, the current `household-id-adornment-api` does not explain *why*. Support agents investigating a failed lookup have no actionable diagnostic information, which slows customer support resolution — agents are given no explanation at all for why a lookup came back empty, so they cannot tell the customer anything useful or take the right next step.
 
 ### Value
 
@@ -18,16 +18,16 @@ Enhancing the API's no-results response with clear, structured, actionable diagn
 ### Business Rules
 
 - **BR-1 — Enhanced response on empty result:** Whenever a household ID lookup yields no results, the API response must include diagnostic information explaining the reason for the empty result, in addition to the existing empty-result indication.
-- **BR-2 — Distinguish failure causes:** A "no results" outcome has multiple distinct underlying causes that must not be collapsed into a single generic response. At minimum the system must distinguish: (a) a genuine *no match found* for well-formed, valid input; (b) a *downstream/lookup dependency unavailable* condition; and (c) an *invalid input format* condition. Each cause must carry its own distinct, named reason so support agents can tell them apart. [DECISION REQUIRED]
+- **BR-2 — Single enhanced reason on empty result:** A "no results" outcome must carry a single enhanced diagnostic reason explaining why the result was empty. Per the resolution of OQ-002, the API does *not* need to distinguish genuine no-match, lookup dependency unavailable, and invalid input format with separate named reasons; one enhanced error response is sufficient. The reason must still be actionable (BR-3) and privacy-safe (BR-4).
 - **BR-3 — Actionability:** The diagnostic information must be actionable by a support agent — it must explain the cause in terms an agent can act on, not merely restate that the result was empty.
 - **BR-4 — Privacy boundary:** Diagnostic detail about a household/customer lookup must not expose, log, or hint at raw customer-identifying data. Reason information must describe the *category* of failure, not echo back customer data contained in the query. [DECISION REQUIRED]
 - **BR-5 — Backward compatibility:** The enhancement extends the existing lookup response consumed by existing callers. Existing callers that do not read the new diagnostic information must continue to function unchanged; the enhancement is additive to the existing response contract.
 
 ### Discovery Note — Undefined Diagnostic Content
 
-The exact diagnostic content support agents need was not defined at intake ("Unknown, for engineering to confirm"). This specification defines the *structure and behavior* of enhanced error reporting (distinct, named reasons per failure cause; actionable, privacy-safe content) and flags the content-definition and consumption-surface choices as decisions requiring a human owner. The requirements below are written against the behavioral contract, not against a specific pre-decided payload.
+The exact diagnostic content support agents need was not defined at intake ("Unknown, for engineering to confirm"). This specification defines the *structure and behavior* of enhanced error reporting (a single enhanced, actionable, privacy-safe reason on the no-results path) and flags the content-definition and consumption-surface choices as decisions requiring a human owner. The requirements below are written against the behavioral contract, not against a specific pre-decided payload.
 
-Note on production frequency data: the top reasons household ID lookups return no results in production today, and how often each occurs, are **not currently known** — support reports only that some lookups come back empty and that they cannot tell why (which is the problem this work addresses). No production measurement of failure-cause frequency is available to prioritize which diagnostics are most worth building (tracked as OQ-001). Consequently, the three minimum named causes below are derived from the structural outcomes of the lookup flow rather than from measured production frequency; the taxonomy should be revisited once frequency data exists.
+Note on production frequency data: the top reasons household ID lookups return no results in production today, and how often each occurs, are **not currently known** — support reports only that some lookups come back empty and that they cannot tell why (which is the problem this work addresses). No production measurement of failure-cause frequency is available to prioritize which diagnostics are most worth building (tracked as OQ-001). Per the resolution of OQ-002, a single enhanced reason is sufficient and the API does not split these structural outcomes into distinct named causes; the content of that single reason should be revisited once frequency data exists.
 
 ### KG Cross-Check Note
 
@@ -250,7 +250,10 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Added a Discovery Note paragraph recording that production failure-cause frequency (OQ-001) is unknown and the three causes are structurally derived.
+- Reworded Problem statement to drop the premise that agents need to distinguish separate failure causes, per the OQ-002 resolution.
+- Rewrote BR-2 to require a single enhanced reason instead of distinct named causes, reflecting the OQ-002 resolution.
+- Updated the Discovery Note to describe a single enhanced reason rather than distinct per-cause reasons.
+- Updated the production-frequency note to reflect a single reason rather than a three-cause taxonomy.
 
 
 ---
@@ -277,13 +280,16 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Open Questions (evidence gaps — needs more input)
 
-- **OQ-001**: OQ-001 remains open — reviewer could not supply production failure-cause frequency data; support reports only that lookups come back empty with no visibility into why, so the three named causes are derived structurally rather than from measured frequency.
-- **OQ-002**: Should the API distinguish between different failure causes (genuine no-match vs. lookup service unavailable vs. invalid input format) with different responses, or is a single enhanced error response enough?
 - **OQ-003**: Do support agents need internal diagnostic detail (which data sources were queried, which filters applied) or only customer-friendly explanations of why nothing matched?
 - **OQ-004**: Should the error response include suggested next steps for the agent (e.g. 'try searching by phone number'), or just the reason the lookup failed?
 - **OQ-005**: Where do support agents actually consume this information — raw API response, a support tool, or a frontend UI (frontend-mos)? This determines whether any frontend work is in scope at all.
 - **OQ-006**: Are there privacy or compliance limits on what diagnostic detail we can expose in an error response, given the lookup concerns households/customers and the payload could hint at customer data?
 - **OQ-007**: Is it acceptable to change the response contract by adding structured error/reason fields (which ripples to all proto consumers), or must the improvement stay within the existing response shape?
+
+### Questions Resolved
+
+- **OQ-001**: Engineering decides: What are the top 3-5 reasons a household ID lookup returns no results in production today, and roughly how often does each happen? This drives what diagnostics are even worth building.
+- **OQ-002**: OQ-002 resolved: the API does not need to distinguish failure causes with different responses — a single enhanced error response (one reason) is sufficient.
 
 ---
 > **Classification:** Type A
