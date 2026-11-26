@@ -18,16 +18,16 @@ Enhancing the API's no-results response with clear, structured, actionable diagn
 ### Business Rules
 
 - **BR-1 — Enhanced response on empty result:** Whenever a household ID lookup yields no results, the API response must include diagnostic information explaining the reason for the empty result, in addition to the existing empty-result indication.
-- **BR-2 — Single enhanced reason on empty result:** A "no results" outcome must carry a single enhanced diagnostic reason explaining why the result was empty. Per the resolution of OQ-002, the API does *not* need to distinguish genuine no-match, lookup dependency unavailable, and invalid input format with separate named reasons; one enhanced error response is sufficient. The reason must still be actionable (BR-3) and privacy-safe (BR-4).
+- **BR-2 — Distinct named reason per cause on empty result:** A "no results" outcome must carry a distinct, named diagnostic reason explaining why the result was empty. **Working assumption (not yet confirmed by a human owner):** the API returns three distinct named reasons — 'no match found', 'lookup dependency unavailable', and 'invalid input format' — and each carries its own actionable message for the agent rather than being collapsed into one generic response. The reason must still be actionable (BR-3) and privacy-safe (BR-4).
 - **BR-3 — Actionability:** The diagnostic information must be actionable by a support agent — it must explain the cause in terms an agent can act on, not merely restate that the result was empty.
 - **BR-4 — Privacy boundary:** Diagnostic detail about a household/customer lookup must not expose, log, or hint at raw customer-identifying data. Reason information must describe the *category* of failure, not echo back customer data contained in the query. [DECISION REQUIRED]
 - **BR-5 — Backward compatibility:** The enhancement extends the existing lookup response consumed by existing callers. Existing callers that do not read the new diagnostic information must continue to function unchanged; the enhancement is additive to the existing response contract.
 
 ### Discovery Note — Undefined Diagnostic Content
 
-The exact diagnostic content support agents need was not defined at intake ("Unknown, for engineering to confirm"). This specification defines the *structure and behavior* of enhanced error reporting (a single enhanced, actionable, privacy-safe reason on the no-results path) and flags the content-definition and consumption-surface choices as decisions requiring a human owner. The requirements below are written against the behavioral contract, not against a specific pre-decided payload.
+The exact diagnostic content support agents need was not defined at intake ("Unknown, for engineering to confirm"). This specification defines the *structure and behavior* of enhanced error reporting (three distinct, actionable, privacy-safe named reasons on the no-results path — see the working assumption in BR-2) and flags the content-definition and consumption-surface choices as decisions requiring a human owner. The requirements below are written against the behavioral contract, not against a specific pre-decided payload.
 
-Note on production frequency data: the top reasons household ID lookups return no results in production today, and how often each occurs, are **not currently known** — support reports only that some lookups come back empty and that they cannot tell why (which is the problem this work addresses). No production measurement of failure-cause frequency is available to prioritize which diagnostics are most worth building (tracked as OQ-001). Per the resolution of OQ-002, a single enhanced reason is sufficient and the API does not split these structural outcomes into distinct named causes; the content of that single reason should be revisited once frequency data exists.
+Note on production frequency data: the top reasons household ID lookups return no results in production today, and how often each occurs, are **not currently known** — support reports only that some lookups come back empty and that they cannot tell why (which is the problem this work addresses). No production measurement of failure-cause frequency is available to prioritize which diagnostics are most worth building (tracked as OQ-001). As a working assumption (not yet confirmed by a human owner), the API splits the no-results outcome into three distinct named causes — 'no match found', 'lookup dependency unavailable', and 'invalid input format' — each with its own actionable message; the exact wording of these reasons should be revisited once frequency data exists.
 
 ### KG Cross-Check Note
 
@@ -250,10 +250,9 @@ _The sections below are derived automatically from the codebase knowledge graph,
 
 _Applied reviewer's request._
 
-- Reworded Problem statement to drop the premise that agents need to distinguish separate failure causes, per the OQ-002 resolution.
-- Rewrote BR-2 to require a single enhanced reason instead of distinct named causes, reflecting the OQ-002 resolution.
-- Updated the Discovery Note to describe a single enhanced reason rather than distinct per-cause reasons.
-- Updated the production-frequency note to reflect a single reason rather than a three-cause taxonomy.
+- Rewrote BR-2 to adopt the three-distinct-named-reasons working assumption, labeled as an unconfirmed assumption.
+- Updated the Discovery Note to reflect three distinct named reasons instead of a single enhanced reason.
+- Replaced the single-reason frequency note with the three-distinct-named-causes working assumption.
 
 
 ---
@@ -267,7 +266,6 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 | ID | Decision | Owner | Provisional Value (build against until confirmed) |
 |----|----------|-------|-----------------------------------------------------|
-| **DEC-001** | When a household ID lookup returns nothing, should support agents see the specific reason it failed — such as no match found versus the lookup service being temporarily down versus a badly formatted input — as separate distinct reasons, and are those three the right set of causes to distinguish for them? | Product owner (Mayank Ukey, K4A) | Return three distinct named reasons: 'no match found', 'lookup dependency unavailable', and 'invalid input format'. Each carries its own actionable message for the agent. |
 | **DEC-002** | How much detail about why a lookup failed is safe to show support agents, given the reason relates to a household or customer lookup — should it stay a plain category explanation only, or may it include more specific diagnostic detail that could hint at customer data? | Compliance/Security with Product owner (K4A) | Diagnostic content describes only the category of failure (e.g. 'no match found') and never echoes or hints at the customer-identifying values submitted in the query. |
 | **DEC-003** | Where do support agents actually view the result of a household ID lookup today — through a support-facing screen, a raw API response, a support tool, or logs — so we know whether this work needs any screen changes or is purely an API change? | Product owner (Mayank Ukey, K4A) | Treat this as a backend/API-only change delivering structured diagnostic reasons in the response; assume no front-end display work until the agents' consumption surface is confirmed. |
 | **DEC-004** | When a household ID lookup finds no match, should agents also get a suggested next step to try (like searching by phone number), or just the reason it failed? | Product owner (Mayank Ukey) with Support operations | Phase 1 returns the reason only; prescriptive next-step suggestions are out of scope until support operations confirm which next steps are actually useful per cause. |
@@ -276,6 +274,7 @@ _Each carries an **Owner** (accountable for supplying the answer) and a **Provis
 
 ### Decisions Resolved
 
+- **DEC-001**: Assumed: Return three distinct named reasons: 'no match found', 'lookup dependency unavailable', and 'invalid input format'. Each carries its own actionable message for the agent.
 - **DEC-005**: Engineering decides: Hold the current production p95 for the success path as the baseline (no measurable regression), measured under representative concurrent load; confirm the actual baseline number from existing monitoring.
 
 ### Open Questions (evidence gaps — needs more input)
