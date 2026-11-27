@@ -1,0 +1,332 @@
+{
+  "matrix_id": "wi_prd082_580e3c-r1",
+  "prd": {
+    "id": "wi_prd082_580e3c",
+    "folder": "local/082-markdown",
+    "docs_ref": null
+  },
+  "design_ref": {
+    "eng_plan_sha": null,
+    "plans_index_sha": null
+  },
+  "project_type": "A",
+  "gate": {
+    "name": "G2b",
+    "owner_role": "feature_leader",
+    "asana_gid": null,
+    "decision": null,
+    "decided_at": null
+  },
+  "generated_at": "2026-11-27T20:43:42.897710Z",
+  "generated_by": "taskmatrix 0.1.0",
+  "source_path": "tasks",
+  "tasks": [
+    {
+      "id": "T003",
+      "title": "Create the `cross_platform_attribution_settings` table migration",
+      "title_clean": "Create the cross_platform_attribution_settings table migration",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T003 — Create the `cross_platform_attribution_settings` table migration",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/links-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "022ab9f827cf4b70f8d2ff0975c4d821ace6cc8d",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test -tags=unit ./..."
+    },
+    {
+      "id": "T004",
+      "title": "Create the `toggle_audit_log` table migration",
+      "title_clean": "Create the toggle_audit_log table migration",
+      "summary": "",
+      "flags": [],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T004 — Create the `toggle_audit_log` table migration",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/links-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "coding-runtime",
+        "id": "coding-agent",
+        "reason": "backend: kg-service kind=backend",
+        "confidence": 0.8,
+        "evidence": [
+          {
+            "source": "kg:kind",
+            "ref": "backend"
+          }
+        ],
+        "assignee": null,
+        "lane": "backend"
+      },
+      "allocation": "ai",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "022ab9f827cf4b70f8d2ff0975c4d821ace6cc8d",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "new",
+        "notes": []
+      },
+      "test_cmd": "go test -tags=unit ./..."
+    },
+    {
+      "id": "T401",
+      "title": "Verify `bbq analytics` reads only data downstream of memorialization",
+      "title_clean": "Verify bbq analytics reads only data downstream of memorialization",
+      "summary": "",
+      "flags": [
+        {
+          "level": "orange",
+          "text": "Repo not named in the doc — which repo?"
+        },
+        {
+          "level": "orange",
+          "text": "Owner unclear — confirm who does this"
+        }
+      ],
+      "description": "",
+      "source": {
+        "file": "eng-tasks.md",
+        "heading": "T401 — Verify `bbq analytics` reads only data downstream of memorialization",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "UNKNOWN",
+      "stack": null,
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "manual",
+        "id": "manual-developer",
+        "reason": "Couldn't tell the repo's language — please confirm the owner",
+        "confidence": 0.3,
+        "evidence": [
+          {
+            "source": "repo-stack-unknown",
+            "ref": "UNKNOWN"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "manual",
+      "depends_on": [],
+      "inferred_depends_on": [],
+      "wave": 0,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "implement",
+      "grounding": {
+        "repo_ref": "",
+        "resolved": [],
+        "missing": [],
+        "fixed": {},
+        "existing_symbols": [],
+        "missing_symbols": [],
+        "exemplars": [],
+        "status": "unknown",
+        "notes": [
+          "GitHub tree for Kochava/UNKNOWN failed: HTTPStatusError"
+        ]
+      },
+      "test_cmd": ""
+    },
+    {
+      "id": "TG1",
+      "title": "Run tests & validate build",
+      "title_clean": "Run tests & validate build",
+      "summary": "",
+      "flags": [],
+      "description": "Run the full build and tests for Kochava/links-api with every task above merged. Do not edit source.",
+      "source": {
+        "file": "generated",
+        "heading": "TG1",
+        "anchors": [],
+        "pattern": ""
+      },
+      "repo": "Kochava/links-api",
+      "stack": "go",
+      "domain_manifest": null,
+      "governance": "default",
+      "files": {
+        "create": [],
+        "modify": [],
+        "test": []
+      },
+      "file_sources": {},
+      "interfaces": {
+        "consumes": "",
+        "produces": ""
+      },
+      "owner": {
+        "kind": "gate",
+        "id": "test-change-gate",
+        "reason": "Test/Change gate for Kochava/links-api before its PR",
+        "confidence": 0.9,
+        "evidence": [
+          {
+            "source": "agents.yaml",
+            "ref": "test-change-gate per repo"
+          }
+        ],
+        "assignee": null,
+        "lane": null
+      },
+      "allocation": "ai",
+      "depends_on": [
+        "T003",
+        "T004"
+      ],
+      "inferred_depends_on": [],
+      "wave": 1,
+      "requirements": [],
+      "contracts": [],
+      "estimate": {
+        "size": "M",
+        "tokens_est": null
+      },
+      "status": "planned",
+      "dispatch": null,
+      "kind": "gate",
+      "grounding": null,
+      "test_cmd": "go test -tags=unit ./..."
+    }
+  ],
+  "waves": [
+    [
+      "T003",
+      "T004",
+      "T401"
+    ],
+    [
+      "TG1"
+    ]
+  ],
+  "coverage": {
+    "requirements_total": 0,
+    "covered": 0,
+    "uncovered": []
+  },
+  "conflicts": [],
+  "open_questions": [
+    {
+      "task_id": "T401",
+      "question": "Owner allocation for T401 has low confidence (0.30); confirm manual-developer manually before dispatch.",
+      "reason": "Couldn't tell the repo's language — please confirm the owner"
+    },
+    {
+      "task_id": null,
+      "question": "Couldn't tell the language of UNKNOWN — please confirm the owner for its tasks",
+      "reason": "repo-stack-unknown"
+    }
+  ],
+  "decisions": "",
+  "warnings": [
+    "T003: `docker/mysql` is a folder, not a file; dropped from the task's files",
+    "T004: `docker/mysql` is a folder, not a file; dropped from the task's files",
+    "grounding unavailable for Kochava/UNKNOWN: GitHub tree for Kochava/UNKNOWN failed: HTTPStatusError"
+  ],
+  "removed": []
+}
